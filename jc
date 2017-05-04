@@ -1,0 +1,49 @@
+#!/bin/bash
+
+
+## Compiles Any Java File in the Tomcat Webapps workspace
+## USAGE: jc [ webapps_folder_name ] [ filename.java ]
+
+##INSTALLATION:
+## 1. store this file in your bin folder
+## 2. add your bin folder to the $PATH variable in your .bash_profile or .profile
+## 3. place a folder called lib inside of your bin folder that contains:
+##	a) mysql-connector-java-5.1.41.bin.jar
+##	b) servlet-api.jar
+
+#http://stackoverflow.com/questions/957928/is-there-a-way-to-get-the-git-root-directory-in-one-command
+master_path=$(git rev-parse --show-toplevel)
+
+#mysql-connector-java-5.1.41.bin.jar
+mysqlib=lib/mysql-connector-java-5.1.41.bin.jar
+#servlet-api.jar
+servlet=lib/servlet-api.jar
+
+if [ "$1" == "--help" ]; then
+        echo "Usage: jc [webapps_folder_name] [filename.java]"
+elif [ $# -ne 2 ]; then
+	echo "Usage: jc [webapps_folder_name] [filename.java]"
+else
+	master_path=$(git rev-parse --show-toplevel)
+	web_app_name="$1"
+	source_name="$2"
+	ext=$(echo $source_name | cut -f2 -d".")
+
+	if [ "$ext" != "java" ]; then
+		echo "$source_name is not a $ext file"
+	else
+		#cannot compile java files with jar dependencies (don't know why servlet-api.jar)
+		if [ -f "$master_path/$web_app_name/WEB-INF/sources/$source_name" ]; then
+			printf "all:\n\tjavac -d $master_path/$web_app_name/WEB-INF/classes -cp :.:$mysqlib:$servlet" > javaMakefile 
+            for file in $(ls $master_path/$web_app_name/WEB-INF/lib/*.jar); do
+                printf ":$file" >> javaMakefile
+            done
+            printf " $master_path/$web_app_name/WEB-INF/sources/$source_name" >> javaMakefile
+			make -f javaMakefile
+			rm javaMakefile
+		else
+			echo "file not found: $master_path/$web_app_name/WEB-INF/sources/$source_name"
+		fi
+	fi
+
+fi
