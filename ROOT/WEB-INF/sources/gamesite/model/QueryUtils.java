@@ -5,7 +5,7 @@ public class QueryUtils {
     //Class not meant to be instantiated
     private QueryUtils () {};
 
-    public static Connection makeConn () {
+    public static Connection createConn () {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
 
             String loginUser = "user";

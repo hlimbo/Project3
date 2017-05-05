@@ -202,7 +202,7 @@ public class SearchServlet extends HttpServlet
             } else {
                 query = "SELECT "+table+".* FROM "+table;
             }
-            String originalQuery = query;
+            //String originalQuery = query;
             //query = query.replaceFirst("DISTINCT "+table+"\\.\\*","COUNT(DISTINCT "+table+".*)");
             query = "SELECT COUNT(*) FROM ("+query+") AS countable";
             statement = dbcon.prepareStatement(query);
