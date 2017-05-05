@@ -15,40 +15,6 @@ public class SearchServlet extends HttpServlet
         return "Servlet connects to MySQL database and displays result of a SELECT";
     }
 
-    private String addSearchTerm (HttpServletRequest request, String term, boolean useSubMatch) {
-            String value = (String) request.getParameter(term);
-            String searchTerm = "";
-            if (value != null && value.trim() != "") {
-                if (!useSubMatch) {
-                    for (String subvalue : value.split(" ")) {
-                        searchTerm+=" AND ";
-                        searchTerm+=term+" LIKE ?";
-                    }
-                } else {
-                    searchTerm+=" AND ";
-                    searchTerm+=term+" LIKE ?";
-                }
-            }
-            return searchTerm;
-    }
-
-    private int setSearchTerm (HttpServletRequest request, String term, PreparedStatement statement, 
-            int offset, boolean useSubMatch) throws SQLException {
-            String value = (String) request.getParameter(term);
-            String searchTerm = "";
-            if (value != null && value.trim() != "") {
-                if (!useSubMatch) {
-                    for (String subvalue : value.split(" ")) {
-                        statement.setString(offset,"%"+subvalue+"%");
-                        offset+=1;
-                    }
-                } else {
-                    statement.setString(offset,value);
-                    offset+=1;
-                }
-            }
-            return offset;
-    }
 
     private String cartButton (String id, String quantity, HttpServletRequest request) {
         String button = "<tr><td><form action=\"/ShoppingCart/view-shopping-cart\" method=\"GET\">";
@@ -65,7 +31,7 @@ public class SearchServlet extends HttpServlet
         return button;
     }
 
-	private static String tableRow (ResultSet result, Hashtable<String,Boolean> link,
+	/*private static String tableRow (ResultSet result, Hashtable<String,Boolean> link,
             Hashtable<String,Boolean> images, Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) throws SQLException {
 		ResultSetMetaData meta = result.getMetaData();
 	    String resString = "";
@@ -134,30 +100,22 @@ public class SearchServlet extends HttpServlet
 		}
 		//resString+="</tr>";
         return resString;
-	}
+	}*/
 
     // Use http GET
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException
     {
-        String loginUser = "user";
-        String loginPasswd = "password";
-        String loginUrl = "jdbc:mysql://localhost:3306/gamedb";
-
         response.setContentType("text/html");    // Response mime type
 
-        String query = "";
+        //String query = "";
         String returnLink = "<a href=\"/\"> Return to home </a>";
         try
         {
-            //Class.forName("org.gjt.mm.mysql.Driver");
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-
-            Connection dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd);
             // Declare our statement
             //Statement statement = dbcon.createStatement();
-            PreparedStatement statement; 
+            //PreparedStatement statement; 
 
             String table = (String) request.getParameter("table");
             if (table==null) {
@@ -263,7 +221,6 @@ public class SearchServlet extends HttpServlet
             statementOffset = setSearchTerm(request,"publisher",statement,statementOffset,useSubMatch);
             statementOffset = setSearchTerm(request,"genre",statement,statementOffset,useSubMatch);
             statementOffset = setSearchTerm(request,"platform",statement,statementOffset,useSubMatch);
-            ResultSet rs = statement.executeQuery();
             rs.next();
             int count = rs.getInt(1);
             request.setAttribute("searchCount",count);
@@ -411,12 +368,8 @@ public class SearchServlet extends HttpServlet
                     "<HEAD><TITLE>" +
                     "gamedb: Error" +
                     "</TITLE></HEAD>\n<BODY>" +
-                    "<P>Error in SQL: ");
-            while (ex != null) {
-                out.println ("SQL Exception:  " + ex.getMessage ());
-                ex = ex.getNextException ();
-            }  // end while
-            out.println(" in sql expression "+query+"<br />\n"+returnLink);
+                    "<P>");
+            SQLExceptionHandler.getMessage(ex,query)+"<br />\n"+returnLink;
             out.println("</P></BODY></HTML>");
             out.close();
         }  // end catch SQLException
