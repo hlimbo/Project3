@@ -29,7 +29,7 @@
 
   <servlet>
     <servlet-name>Search</servlet-name>
-    <servlet-class>SearchServlet</servlet-class>
+    <servlet-class>gamesite.Servlet.SearchServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
@@ -39,7 +39,7 @@
 
   <servlet>
     <servlet-name>Display</servlet-name>
-    <servlet-class>DisplayServlet</servlet-class>
+    <servlet-class>gamesite.Servlet.DisplayServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
