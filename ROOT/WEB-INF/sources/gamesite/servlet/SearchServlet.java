@@ -37,7 +37,7 @@ public class SearchServlet extends HttpServlet
 
 	private static String tableRow (ArrayList<HashMap<String,String>> results, int i, String table,
             Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
-            Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) throws SQLException {
+            Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
 	    String resString = "";
 		//resString+="<tr>";
         for (Map.Entry<String,String> field : results.get(i).entrySet()) {
@@ -162,6 +162,9 @@ public class SearchServlet extends HttpServlet
 
             ArrayList<HashMap<String,String>> rows = SearchResults.getInstance().search(table,limit,offset,game,
                     year,genre,platform,publisher,order,descend,useSubMatch);
+            int searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                    year,genre,platform,publisher,order,descend,useSubMatch);
+            request.setAttribute("searchCount",searchCount);
 
             String results = "";
             results+="<TABLE border>";
@@ -284,14 +287,14 @@ public class SearchServlet extends HttpServlet
             dispatcher.forward(request,response);
 
         }
-        catch (SQLException ex) {
+        catch (SQLExceptionHandler ex) {
             PrintWriter out = response.getWriter();
             out.println("<HTML>" +
                     "<HEAD><TITLE>" +
                     "gamedb: Error" +
                     "</TITLE></HEAD>\n<BODY>" +
                     "<P>");
-            out.println(SQLExceptionHandler.getErrorMessage(ex)+"<br />\n"+returnLink);
+            out.println(ex.getErrorMessage()+"<br />\n"+returnLink);
             out.println("</P></BODY></HTML>");
             out.close();
         }  // end catch SQLException

@@ -8,12 +8,15 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import gamesite.model.QueryUtils;
+import gamesite.model.SQLExceptionHandler;
 
 public class SearchResults {
     private static String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
 
     //Singleton class, so constructor not permitted outside of class
-    private SearchResults () {}
+    private SearchResults () {
+        cache = new ConcurrentHashMap<String,ArrayList<HashMap<String,String>>> ();
+    }
 
     //Initialization-on-demand holder idiom
     //https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
@@ -125,7 +128,7 @@ public class SearchResults {
 
     public ArrayList<HashMap<String,String>> search (String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher, String order, 
-            boolean descend, boolean match) throws SQLException, java.lang.Exception {
+            boolean descend, boolean match) throws SQLExceptionHandler, java.lang.Exception {
         String query = buildQuery(table,limit,offset,game,year,genre,platform,publisher,order,descend,match);
         if (descend) {
             query+=" ORDER BY ISNULL( "+table+"."+order+"), "+table+"."+order+" DESC, "
@@ -136,11 +139,18 @@ public class SearchResults {
         }
         ArrayList<HashMap<String,String>> results = cache.get(query);
         if (results == null) {
-            results = callSearchQuery(query,
-                table,limit,offset,game,year,genre,
-                platform,publisher,order,descend,match);
-            if (results != null) {
-                return cache.putIfAbsent(query,results);
+            try {
+                results = callSearchQuery(query,
+                    table,limit,offset,game,year,genre,
+                    platform,publisher,order,descend,match);
+                if (results != null) {
+                    cache.putIfAbsent(query,results);
+                    return results;
+                } else {
+                    results = new ArrayList<HashMap<String,String>>();
+                }
+            } catch (SQLException ex) {
+                throw new SQLExceptionHandler(ex,query);
             }
             /*return cache.computeIfAbsent(query, qry -> {
                 try {
