@@ -22,7 +22,9 @@
 	<p> ${word} </p>
 </c:forEach>
 
+<!-- using jstl functions to initialize a list -->
 <c:set var="alphabet" value="${['A','B','C']}" scope="request" />
 <c:forEach var="some" items="${alphabet}">
-	<p> <c:out value="${some}"/> </p>
+	<p> <c:out value="${some}"/> </p> 
+	<!--<p> ${some} </p>--> <!--  equivalent callto above line -->
 </c:forEach>
