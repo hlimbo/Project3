@@ -17,7 +17,7 @@ public class QueryUtils {
         String loginUser = "user";
         String loginPasswd = "password";
 		//disable and supress SSL errors
-        String loginUrl = "jdbc:mysql://localhost:3306/gamedb?autoReconnect=true&useSSL=false";
+        String loginUrl = "jdbc:mysql://localhost:3306/gamedb?useSSL=false";
 
         Connection dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd);
         return dbcon;
