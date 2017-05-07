@@ -63,7 +63,7 @@ public class QueryUtilsTest
 	}
 	
 	@Test
-	public void testGetTables()
+	public void test_for_size_GetTables()
 	{
 		//Assumption getting the tables from gamedb
 		ArrayList<String> expectedTables = new ArrayList<String>();
@@ -82,7 +82,6 @@ public class QueryUtilsTest
 		{
 			ArrayList<String> tables = QueryUtils.getTables();
 			assertEquals("failure - tables are not the same size", tables.size(), expectedTables.size());		
-			assertEquals("failure - tables do not contain the same table names", tables, expectedTables);
 		}
 		catch (SQLException e)
 		{
@@ -93,6 +92,38 @@ public class QueryUtilsTest
 			e.printStackTrace();
 		}
 	
+	}
+	
+	@Test 
+	public void test_for_equality_GetTables()
+	{
+		//Assumption getting the tables from gamedb
+		ArrayList<String> expectedTables = new ArrayList<String>();
+		expectedTables.add("creditcards");
+		expectedTables.add("customers");
+		expectedTables.add("games");
+		expectedTables.add("genres");
+		expectedTables.add("genres_of_games");
+		expectedTables.add("platforms");
+		expectedTables.add("platforms_of_games");
+		expectedTables.add("publishers");
+		expectedTables.add("publishers_of_games");
+		expectedTables.add("sales");
+		
+		try
+		{
+			ArrayList<String> tables = QueryUtils.getTables();
+			assertEquals("failure - tables do not contain the same table names", tables, expectedTables);
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (java.lang.Exception e)
+		{
+			e.printStackTrace();
+		}
+		
 	}
 	
 	
