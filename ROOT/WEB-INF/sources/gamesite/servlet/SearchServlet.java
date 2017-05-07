@@ -162,6 +162,9 @@ public class SearchServlet extends HttpServlet
 
             ArrayList<HashMap<String,String>> rows = SearchResults.getInstance().search(table,limit,offset,game,
                     year,genre,platform,publisher,order,descend,useSubMatch);
+            int searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                    year,genre,platform,publisher,order,descend,useSubMatch);
+            request.setAttribute("searchCount",searchCount);
 
             String results = "";
             results+="<TABLE border>";

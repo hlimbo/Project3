@@ -142,7 +142,8 @@ public class SearchResults {
                 table,limit,offset,game,year,genre,
                 platform,publisher,order,descend,match);
             if (results != null) {
-                return cache.putIfAbsent(query,results);
+                cache.putIfAbsent(query,results);
+                return results;
             } else {
                 results = new ArrayList<HashMap<String,String>>();
             }
