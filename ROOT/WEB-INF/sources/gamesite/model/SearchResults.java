@@ -23,7 +23,7 @@ public class SearchResults {
     private static class SearchCache {
         static final SearchResults INSTANCE = new SearchResults();
     }
-    //TODO implement caching
+    //TODO implement size limit on caching
 
     public static SearchResults getInstance() {
         return SearchCache.INSTANCE;
@@ -70,7 +70,7 @@ public class SearchResults {
         if (!searchAll) {
             //duplicates due to games on multiple platforms, with multiple genres, or etc...
             query = "SELECT DISTINCT "+table+".* FROM games, publishers, platforms, genres, "+masterTable+" WHERE "
-                +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id";
+                +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id AND genres.id=genre_id";
             query+=QueryUtils.addSearchTerm(game,"name",match);
             query+=QueryUtils.addSearchTerm(year,"year",match);
             query+=QueryUtils.addSearchTerm(publisher,"publisher",match);
