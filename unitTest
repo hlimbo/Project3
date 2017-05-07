@@ -43,8 +43,10 @@ for file in $(ls $master_path/$lib_path/*.jar); do
 	printf ":$file" >> java2Makefile
 done
 
+#if there are / in the class name, replace all of them with .
+class=$(echo $class_name | sed 's_/_._g')
 #grab class name without extension .class
-class=$(echo $class_name | sed 's/\(.*\)\./\1:/' | cut -f1 -d":")
+class=$(echo $class | sed 's/\(.*\)\./\1:/' | cut -f1 -d":")
 
 #junit main class for testing
 printf " org.junit.runner.JUnitCore $class" >> java2Makefile
