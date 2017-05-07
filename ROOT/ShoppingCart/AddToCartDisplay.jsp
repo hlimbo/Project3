@@ -71,6 +71,14 @@
 		<% String loginUrl = "jdbc:mysql://localhost:3306/gamedb"; %>
 		<% Connection dbcon = null; %>
 		<% try { %>
+		
+		<% 
+			/* Any JDBC 4.0 drivers that are found in your class are automatically loaded
+			Must manually load any drivers prior to JDBC 4.0 with the method below
+			https://docs.oracle.com/javase/tutorial/jdbc/basics/connecting.html 
+		    Note: we shouldn't need this line below if we are running JDBC 4.0 or above.*/
+		%>
+		
 		<% Class.forName("com.mysql.jdbc.Driver").newInstance(); %>
 		<% dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd); %>
 		<% } catch (SQLException e) { %>
@@ -93,7 +101,7 @@
 		<% HashMap<String,Integer> cart = (HashMap<String,Integer>)session.getAttribute("cartList"); %>	
 		<% int totalCost = 0; %>
 		<tbody>
-			
+				<% // sql querying should be done in a java controller class instead (This is the view!) %>
 				<% if ( cart != null && !cart.isEmpty() ) { %>
 				<% for (Map.Entry<String,Integer> item : cart.entrySet()){ %>
 				<% String itemQuery = "SELECT * FROM games WHERE id=?"; %>
