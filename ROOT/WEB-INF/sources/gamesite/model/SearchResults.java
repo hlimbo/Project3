@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 
 import gamesite.model.QueryUtils;
 import gamesite.model.SQLExceptionHandler;
+import gamesite.utils.DBConnection;
 
 public class SearchResults {
     private static String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
@@ -36,7 +37,7 @@ public class SearchResults {
         ArrayList<HashMap<String,String>> results = new ArrayList<HashMap<String,String>> ();
         Connection dbconn = null;
         try {
-            dbconn=QueryUtils.createConn();
+            dbconn=DBConnection.create();
             PreparedStatement statement = dbconn.prepareStatement(query);
             setSearchTerms(statement,game,year,publisher,genre,platform,match);
             ResultSet rs = statement.executeQuery();
@@ -48,9 +49,7 @@ public class SearchResults {
         } catch (java.lang.Exception ex) {
             throw ex;
         } finally {
-            if (dbconn != null) {
-                dbconn.close();
-            }
+			DBConnection.close(dbconn);
         }
         return results;
     }
@@ -177,16 +176,14 @@ public class SearchResults {
         int count = -1;
         Connection dbconn=null;
         try {
-            dbconn=QueryUtils.createConn();
+            dbconn=DBConnection.create();
             PreparedStatement statement = dbconn.prepareStatement(countQuery);
             setSearchTerms(statement,game,year,publisher,genre,platform,match);
             ResultSet rs = statement.executeQuery();
             rs.next();
             count = rs.getInt(1);
         } finally {
-            if (dbconn!=null) {
-                dbconn.close();
-            }
+            DBConnection.close(dbconn);
         }
         return count;
     }
