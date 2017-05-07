@@ -10,6 +10,10 @@ public class Table {
         key = keyName;
     }
 
+    public getRow(String keyValue) {
+        return rows.get(keyValue);
+    }
+
     //String key in outer HashMap is a primary key to find a particular
     //row by.
     public HashMap<String,HashMap<String,String>> rows;
