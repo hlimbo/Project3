@@ -122,34 +122,50 @@ public class SearchResults {
         return results;
     }
 
+    /*private NTreeNode<ArrayList<HashMap<String,String>>> searchNode (Connection conn, NTreeNode<String> parent, String key) 
+        throws SQLExceptionHandler, java.lang.Exception {
+        String query = "";
+        try {
+            //TODO
+            String joinTable;
+            String parentTable;
+            query = "SELECT DISTINCT "+parent.data+".* FROM "+parent.data+" JOIN "+joinTable
+                +" ON id="+key+" WHERE "+parent.data+"="+key;
+                +"";
+            PreparedStatement statement = conn.prepareStatement(query);
+            ResultSet rs = statement.executeQuery();
+            ArrayList<HashMap<String,String>> rows;
+            while (rs.next()) {
+                rows.add(tableRow(rs));
+            }
+            NTreeNode<ArrayList<HashMap<String,String>>> root = new NTreeNode<ArrayList<HashMap<String,String>>>(rows);
+            for (NTreeNode<String> child : parent) {
+                root.addChild(searchNode(conn,child));
+            }
+            return root;
+        } catch (SQLException ex) {
+            throw new SQLExceptionHandler(ex,query);
+        }
+    }*/
 
-    /*public ArrayList<HashMap<String,ArrayList<String>>> masterSearch (String table, String limit, String offset,
+    /*public NTreeNode<ArrayList<HashMap<String,String>>> masterSearch (String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher, String order, 
             boolean descend, int match) throws SQLExceptionHandler, java.lang.Exception {
-        ArrayList<String> siblings = QueryUtils.getSiblings(table);
-        ArrayList<HashMap<String,String>> tableResults = search(table,limit,offset,game,
-                year,genre,platform,publisher,order,descend,match);
-        ArrayList<HashMap<String,ArrayList<String>>> results = new ArrayList<HashMap<String,ArrayList<String>>>();
-        for () {
-        }
-        for (HashMap<String,String> row : results) {
-            if (row.containsKey("id")) {
-                ids.add(row.get("id"));
-            }
-        }
+        NTreeNode<String> siblings = QueryUtils.getSiblings(table);
+        NTreeNode<ArrayList<HashMap<String,String>>> resultsRoot = new NTreeNode<Array<HashMap<String,String>>>(
+                search(table,limit,offset,game,year,genre,platform,publisher,order,descend,match));
         Connection dbcon = null;
+        //NTreeNode<ArrayList<HashMap<String,String>>> parent = resultsRoot;
         try {
             dbcon = QueryUtils.createConn();
-            for (HashMap<String,String> row : results) {
-                if (row.containsKey("id")) {
-                    for (String sibling : siblings) {
-                    }
-                }
-            }
+            for
+            searchNode(dbcon,siblings);
         } finally {
-            dbcon.close();
+            if (dbcon!=null) {
+                dbcon.close();
+            }
         }
-        return results;
+        return resultsRoot;
     }*/
 
     public int getCount(String table, String limit, String offset,

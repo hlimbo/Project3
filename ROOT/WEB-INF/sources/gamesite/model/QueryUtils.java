@@ -3,6 +3,8 @@ package gamesite.model;
 import java.sql.*;
 import java.util.*;
 
+import gamesite.datastruct.NTreeNode;
+
 public class QueryUtils {
 
     //Class not meant to be instantiated
@@ -114,25 +116,28 @@ public class QueryUtils {
         }
     }
 
-    /*public static ArrayList<String> getSiblings (String firstTable) throws SQLExceptionHandler, java.lang.Exception {
-        ArrayList<String> siblings = new ArrayList<string>();
-        HashMap<String,boolean> visited = new HashMap<String,boolean> ();
-        LinkedList<String> tableQueue = new LinkedList<String> ();
+    public static NTreeNode<String> getSiblings (String firstTable) throws SQLExceptionHandler, java.lang.Exception {
+        NTreeNode<String> siblings = new NTreeNode<String>(firstTable);
+        HashMap<String,Boolean> visited = new HashMap<String,Boolean> ();
+        LinkedList<NTreeNode<String>> tableQueue = new LinkedList<NTreeNode<String>> ();
+        tableQueue.add(siblings);
         visited.put(firstTable,true);
         Connection dbcon = null;
         ArrayList<String> potentialSiblings = getTables();
         try {
             dbcon = QueryUtils.createConn();
             while (!tableQueue.isEmpty()) {
-                String table = tableQueue.remove().trim().toLowerCase();
+                NTreeNode<String> node = tableQueue.remove();
+                String table = node.data.trim().toLowerCase();
                 for (String sibling : potentialSiblings) {
                     if (sibling.indexOf(table) != -1) {
                         //find sibling table by SQL schema convention of relationship tables
-                        String next = sibling.replace(table,"").replace("_of_");
+                        String next = sibling.replaceFirst(table,"").replaceFirst("_of_","");
                         if (potentialSiblings.contains(next) && !visited.containsKey(next)) {
-                            tableQueue.add(next);
-                            visited.put(next);
-                            siblings.add(next);
+                            NTreeNode<String> nextNode = new NTreeNode<String>(next);
+                            tableQueue.add(nextNode);
+                            visited.put(next,true);
+                            node.addChild(nextNode);
                         }
                     }
                 }
@@ -141,5 +146,5 @@ public class QueryUtils {
         } finally {
             dbcon.close();
         }
-    }*/
+    }
 }
