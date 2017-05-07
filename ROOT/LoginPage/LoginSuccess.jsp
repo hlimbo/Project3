@@ -22,6 +22,6 @@
         <jsp:include page="/search/search.jsp" />
 	</div>
         <% }  %>
-		
+				
 	</BODY>
 </HTML>
