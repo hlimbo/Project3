@@ -9,9 +9,12 @@
 <%@page import="java.util.ArrayList" %>
  
  
-<% ArrayList<String> words = new ArrayList<String>();
+<% 
+   ArrayList<String> words = new ArrayList<String>();
    words.add("flimsy"); 
    System.out.println(words.get(0)); 
+   //Note:: arraylist words has to be set as an attribute in order for the jstl tags
+   //to register it as a variable
    request.setAttribute("words", words); %>
 
 <c:set scope="request" var="randomWord" value="dongle"/>

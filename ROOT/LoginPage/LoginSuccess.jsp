@@ -12,6 +12,9 @@
 	
 	<BODY>
 		<h1>Games Station Main Page</h1>
+		
+		<!-- need to ensure this attribute is set before the
+		java servlet forwards/redirects to this page -->
 		<% if ( session.getAttribute("first_name") == null) { %>
 			name is null
         <% } else {%>

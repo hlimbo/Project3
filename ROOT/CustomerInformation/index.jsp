@@ -23,6 +23,7 @@
   
 	window.onload = function()
 	{
+		//TODO(HARVEY): Try to find a more elegant way of writing this input validation logic if possible
 		var input = document.getElementById("first_name");
 		
 		input.oninvalid = function(event)
@@ -84,7 +85,7 @@
 <p>Confirm your purchase with credit card information.</p>
 
 
-
+<!-- TODO(HARVEY): Find a way to handle login credential validation asynchronously via ajax. -->
 <% String errorMsg = (String)session.getAttribute("invalidFlag"); %>
 <%	if (errorMsg != null) { %>
 		<p class="error"> <%= errorMsg %> </p>
@@ -93,7 +94,7 @@
 
 
 <FORM ACTION="/CustomerInformation/customer-info-confirmation" METHOD="POST">
-	
+	<!-- TODO(HARVEY): move all pattern regex requirements to javascript logic -->
 	<div>
 		<label>First Name:</label>
 		<input type="text" id="first_name" name="first_name" pattern="[A-Za-z]*" required>

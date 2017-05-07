@@ -14,7 +14,7 @@
 	
 	<BODY>
 	
-		<!-- HARDCODING... -->
+		<!-- HARDCODING... TODO(HARVEY): move to  java servlet -->
 		<% String loginUser = "user"; %>
 		<% String loginPasswd = "password"; %>
 		<% String loginUrl = "jdbc:mysql://localhost:3306/gamedb"; %>
@@ -42,6 +42,7 @@
 		</thead>
 		
 		<tbody>
+		<!-- TODO(HARVEY): Move to java servlet where it can forward/redirect to this page to display the cart contents! -->
 		<% HashMap<String,Integer> cart = (HashMap<String,Integer>)session.getAttribute("cartList"); %>	
 		<% String itemQuery = "SELECT * FROM games WHERE id=?"; %>
 		<% PreparedStatement statement = dbcon.prepareStatement(itemQuery); %>

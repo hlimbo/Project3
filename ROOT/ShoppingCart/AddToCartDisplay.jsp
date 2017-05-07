@@ -6,6 +6,8 @@
 <%@ page import="javax.servlet.*" %>
 <%@ page import="javax.servlet.http.*" %>
 
+
+<!-- TODO(HARVEY): move back to previous page query string parsing logic to a java file -->
 <%  String paramQueryString = request.getQueryString();
     HashMap<String,String> parsedParams= new HashMap<String,String>();
     if (paramQueryString!=null && paramQueryString.trim().compareTo("")!=0) {
@@ -65,7 +67,7 @@
 	
 	<BODY>	
 	
-		<!-- HARDCODING... -->
+		<!-- HARDCODING... TODO(HARVEY): move to java servlet class-->
 		<% String loginUser = "user"; %>
 		<% String loginPasswd = "password"; %>
 		<% String loginUrl = "jdbc:mysql://localhost:3306/gamedb"; %>
@@ -98,6 +100,7 @@
 			<th>Quantity</th>
 		</thead>
 		
+		<!-- TODO(HARVEY): Create a bean class that encapsulates this data internally.. might need to generalize this to a form of ArrayList<HashMap> ... -->
 		<% HashMap<String,Integer> cart = (HashMap<String,Integer>)session.getAttribute("cartList"); %>	
 		<% int totalCost = 0; %>
 		<tbody>
