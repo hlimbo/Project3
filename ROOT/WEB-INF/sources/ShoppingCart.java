@@ -12,8 +12,7 @@ import javax.servlet.http.*;
 // 2. authenticate user credentials
 // 3. query for certain items to be found in the database. i.e. game id, genre id.
 
-//TODO(HARVEY): use attributes from session to add items to the user's cart.
-//TODO(HARVEY): sendRedirect to another webpage that displays shoppping cart contents
+//TODO(HARVEY): create java beans class ShoppingCartItem
 public class ShoppingCart extends HttpServlet
 {	
 	public String getServletInfo()
