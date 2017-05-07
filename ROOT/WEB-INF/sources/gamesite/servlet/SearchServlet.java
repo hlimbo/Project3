@@ -8,6 +8,10 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import gamesite.model.QueryUtils;
+import gamesite.model.SearchResults;
+import gamesite.model.SQLExceptionHandler;
+
 public class SearchServlet extends HttpServlet
 {
     public String getServletInfo()
@@ -31,41 +35,15 @@ public class SearchServlet extends HttpServlet
         return button;
     }
 
-	/*private static String tableRow (ResultSet result, Hashtable<String,Boolean> link,
-            Hashtable<String,Boolean> images, Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) throws SQLException {
-		ResultSetMetaData meta = result.getMetaData();
+	private static String tableRow (ArrayList<HashMap<String,String>> results, int i, String table,
+            Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
+            Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) throws SQLException {
 	    String resString = "";
 		//resString+="<tr>";
-		for (int i=1;i<=meta.getColumnCount();++i) {
-			int type = meta.getColumnType(i);
-            String table = meta.getTableName(i);
-			String typeName = meta.getColumnTypeName(i);
-            boolean handled = false;
-            String value="";
-			switch(typeName.toUpperCase()) {
-			case "YEAR":
-                if (result.getString(i) != null) {
-				    value+=result.getString(i).substring(0,4);
-                    handled=true;
-                }
-				break;
-			}
-			if (!handled) {
-				switch(type) {
-				case Types.INTEGER:
-                    if (result.getString(i) != null) {
-					    value+=result.getInt(i);
-                    }
-					break;
-				default:
-                    if (result.getString(i) != null) {
-					    value+=result.getString(i);
-                    }
-					break;
-				}
-			}
+        for (Map.Entry<String,String> field : results.get(i).entrySet()) {
+            String colName = field.getKey();
+            String value = field.getValue();
             //handle nulls and empty values here
-			String colName = meta.getColumnName(i);
             if (ignores.containsKey(colName) && ignores.get(colName)) {
                 continue;
             }
@@ -97,10 +75,10 @@ public class SearchServlet extends HttpServlet
                 resString+=value;
 			    resString+="</td>";
             }
-		}
+        }
 		//resString+="</tr>";
         return resString;
-	}*/
+	}
 
     // Use http GET
 
@@ -109,7 +87,6 @@ public class SearchServlet extends HttpServlet
     {
         response.setContentType("text/html");    // Response mime type
 
-        //String query = "";
         String returnLink = "<a href=\"/\"> Return to home </a>";
         try
         {
@@ -177,63 +154,14 @@ public class SearchServlet extends HttpServlet
                 useSubMatch = true;
             }
 
-            String name = (String) request.getParameter("name");
+            String game = (String) request.getParameter("name");
             String year = (String) request.getParameter("year");
             String publisher = (String) request.getParameter("publisher");
             String genre = (String) request.getParameter("genre");
             String platform = (String) request.getParameter("platform");
-            boolean searchAll = false;
-            if ((name==null || name.trim().compareTo("")==0) && (year==null || year.trim().compareTo("")==0)
-                    && (publisher==null || publisher.trim().compareTo("")==0) 
-                    && (genre==null || genre.trim().compareTo("")==0) 
-                    && (platform==null || platform.trim().compareTo("")==0)) {
-                searchAll = true;
-            }
-            if (!searchAll) {
-                String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
-                //duplicates due to games on multiple platforms, with multiple genres, or etc...
-                query = "SELECT DISTINCT "+table+".* FROM games, publishers, platforms, genres, "+masterTable+" WHERE "
-                    +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id";
-                query+=addSearchTerm(request,"name",useSubMatch);
-                query+=addSearchTerm(request,"year",useSubMatch);
-                query+=addSearchTerm(request,"publisher",useSubMatch);
-                query+=addSearchTerm(request,"genre",useSubMatch);
-                query+=addSearchTerm(request,"platform",useSubMatch);
-            } else {
-                query = "SELECT "+table+".* FROM "+table;
-            }
-            //String originalQuery = query;
-            //query = query.replaceFirst("DISTINCT "+table+"\\.\\*","COUNT(DISTINCT "+table+".*)");
-            query = "SELECT COUNT(*) FROM ("+query+") AS countable";
-            statement = dbcon.prepareStatement(query);
-            query = originalQuery;
-            if (descend) {
-                query+=" ORDER BY ISNULL( "+table+"."+order+"), "+table+"."+order+" DESC, "
-                    +table+".id LIMIT "+limit+" OFFSET "+offset;
-            } else {
-                query+=" ORDER BY ISNULL( "+table+"."+order+"), "+table+"."+order+" ASC, "
-                    +table+".id LIMIT "+limit+" OFFSET "+offset;
-            }
 
-            int statementOffset = 1;
-            statementOffset = setSearchTerm(request,"name",statement,statementOffset,useSubMatch);
-            statementOffset = setSearchTerm(request,"year",statement,statementOffset,useSubMatch);
-            statementOffset = setSearchTerm(request,"publisher",statement,statementOffset,useSubMatch);
-            statementOffset = setSearchTerm(request,"genre",statement,statementOffset,useSubMatch);
-            statementOffset = setSearchTerm(request,"platform",statement,statementOffset,useSubMatch);
-            rs.next();
-            int count = rs.getInt(1);
-            request.setAttribute("searchCount",count);
-
-            // Perform the query
-            statement = dbcon.prepareStatement(query);
-            statementOffset = 1;
-            statementOffset = setSearchTerm(request,"name",statement,statementOffset,useSubMatch);
-            statementOffset = setSearchTerm(request,"year",statement,statementOffset,useSubMatch);
-            statementOffset = setSearchTerm(request,"publisher",statement,statementOffset,useSubMatch);
-            statementOffset = setSearchTerm(request,"genre",statement,statementOffset,useSubMatch);
-            statementOffset = setSearchTerm(request,"platform",statement,statementOffset,useSubMatch);
-            rs = statement.executeQuery();
+            ArrayList<HashMap<String,String>> rows = SearchResults.getInstance().search(table,limit,offset,game,
+                    year,genre,platform,publisher,order,descend,useSubMatch);
 
             String results = "";
             results+="<TABLE border>";
@@ -256,13 +184,6 @@ public class SearchServlet extends HttpServlet
             ignores.put("rank",true);
             ignores.put("globalsales",true);
 
-            ResultSetMetaData meta = rs.getMetaData();
-            boolean noResults = false;
-            if (!rs.next()) {
-                noResults=true;
-            } else {
-                rs.beforeFirst();
-            }
             results+="<tr>";
             String requestUrl = "?"+request.getQueryString();
             String requestUrlEnd = "";
@@ -278,25 +199,28 @@ public class SearchServlet extends HttpServlet
             } else {
                 requestUrl+="&";
             }
-            for (int i=1;i<=meta.getColumnCount();++i) {
-                String column = meta.getColumnName(i);
-                if (ignores.containsKey(column) && ignores.get(column)) {
-                    continue;
+            //for (int i=1;i<=meta.getColumnCount();++i) {
+                //String column = meta.getColumnName(i);
+            if (!rows.isEmpty()) {
+                for (String column : rows.get(0).keySet()) {
+                    if (ignores.containsKey(column) && ignores.get(column)) {
+                        continue;
+                    }
+                    results+="<td><a class=\"sortColumn\" href=\"/search/query"+requestUrl+"order="+column
+                        +requestUrlEnd+"\">"+column+"</a></td>\n";
                 }
-                results+="<td><a class=\"sortColumn\" href=\"/search/query"+requestUrl+"order="+column
-                    +requestUrlEnd+"\">"+column+"</a></td>\n";
             }
             results+="</tr>";
             if (table.trim().compareToIgnoreCase("games")==0) {
                 ArrayList<String> records= new ArrayList<String>();
                 ArrayList<Integer> gameIDs = new ArrayList<Integer>();
                 //get game fields
-                while (rs.next())
-                {
-                    records.add("<tr>"+tableRow(rs,links,images,externalLinks,ignores)+"</tr>");
-                    gameIDs.add(rs.getInt(1));
+                for (int i=0;i<rows.size();++i) {
+                    records.add("<tr>"+tableRow(rows,i,"games",links,images,externalLinks,ignores)+"</tr>");
+                    gameIDs.add(Integer.parseInt(rows.get(i).get("id")));
                 }
                 //get publishers
+                /*Connection dbcon = QueryUtils.createConn();
                 for (int i=0;i<gameIDs.size();++i) {
                     //query="SELECT DISTINCT publisher FROM publishers JOIN publishers_of_games ON id=publisher_id WHERE game_id=?";
                     query="SELECT DISTINCT publisher, platform FROM publishers "
@@ -304,7 +228,7 @@ public class SearchServlet extends HttpServlet
                         +"JOIN platforms ON platforms.id=platform_id WHERE game_id=?";
                     PreparedStatement pubStatement =dbcon.prepareStatement(query);
                     pubStatement.setInt(1,gameIDs.get(i));
-                    rs = pubStatement.executeQuery();
+                    ResultSet rs = pubStatement.executeQuery();
                     records.set(i,records.get(i)+"<tr><td>publishers: </td><td>");
                     while (rs.next()) {
                         records.set(i,records.get(i)+"\n<ul style=\""
@@ -315,13 +239,14 @@ public class SearchServlet extends HttpServlet
                                         ).replaceAll("</td>","</li> ")+"</ul>");
                     }
                     records.set(i,records.get(i)+"</td></tr>");
+                    rs.close()
                 }
                 //get genres
                 for (int i=0;i<gameIDs.size();++i) {
                     query="SELECT genre FROM genres JOIN genres_of_games ON id=genre_id WHERE game_id=?";
                     PreparedStatement genStatement =dbcon.prepareStatement(query);
                     genStatement.setInt(1,gameIDs.get(i));
-                    rs = genStatement.executeQuery();
+                    ResultSet rs = genStatement.executeQuery();
                     records.set(i,records.get(i)+"<tr><td>genres: </td><td><ul>");
                     while (rs.next()) {
                         records.set(i,records.get(i)+tableRow(rs,links,
@@ -329,7 +254,9 @@ public class SearchServlet extends HttpServlet
                                     ignores).replaceAll("<td>","<li>").replaceAll("</td>","</li>"));
                     }
                     records.set(i,records.get(i)+"</ul></td></tr>");
+                    rs.close()
                 }
+                dbcon.close()*/
                 int i=0;
                 for (String record : records) {
                     results+=record;
@@ -337,24 +264,19 @@ public class SearchServlet extends HttpServlet
                     ++i;
                 }
             } else {
-                while (rs.next())
-                {
-                    results+="<tr>"+tableRow(rs,links,images,externalLinks,ignores)+"</tr>";
-                    //results+=cartButton(Integer.toString(rs.getInt(1)),"1",request);
+                for (int i=0;i<rows.size();++i) {
+                    results+="<tr>"+tableRow(rows,i,table,links,images,externalLinks,ignores)+"</tr>";
                 }
             }
             results+="</TABLE>";
 
-            rs.close();
-            statement.close();
-            dbcon.close();
             String nextJSP = request.getParameter("nextPage");
             if (nextJSP == null) {
                 nextJSP = "/search/index.jsp";
             } else {
                 nextJSP="/"+nextJSP;
             }
-            if (noResults) {
+            if (rows.isEmpty()) {
                 results="";
             }
             request.setAttribute("searchResults",results);
@@ -369,7 +291,7 @@ public class SearchServlet extends HttpServlet
                     "gamedb: Error" +
                     "</TITLE></HEAD>\n<BODY>" +
                     "<P>");
-            SQLExceptionHandler.getMessage(ex,query)+"<br />\n"+returnLink;
+            out.println(SQLExceptionHandler.getErrorMessage(ex)+"<br />\n"+returnLink);
             out.println("</P></BODY></HTML>");
             out.close();
         }  // end catch SQLException

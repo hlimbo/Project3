@@ -3,7 +3,7 @@ package gamesite.model;
 import java.sql.*;
 
 public class SQLExceptionHandler {
-    public String getErrorMessage (SQLException ex, String query) {
+    public static String getErrorMessage (SQLException ex, String query) {
         String msg = "Error in SQL:\n";
         while (ex!=null) {
             msg+=ex.getMessage()+"\n";
@@ -13,7 +13,7 @@ public class SQLExceptionHandler {
         return msg;
     }
 
-    public String getErrorMessage (SQLException ex) {
+    public static String getErrorMessage (SQLException ex) {
         return getErrorMessage(ex,"");
     }
 }
