@@ -97,4 +97,49 @@ public class QueryUtils {
             }
             return offset;
     }
+
+    public static ArrayList<String> getTables () throws SQLExceptionHandler, java.lang.Exception {
+        Connection dbcon = null;
+        try {
+            ArrayList<String> tables = new ArrayList<String>();
+            dbcon = QueryUtils.createConn();
+            DatabaseMetaData dbmeta = dbcon.getMetaData();
+            ResultSet tableMeta = dbmeta.getTables(dbcon.getCatalog(),null,"%",null);
+            while (tableMeta.next()) {
+                tables.add(tableMeta.getString("TABLE_NAME"));
+            } 
+            return tables;
+        } finally {
+            dbcon.close();
+        }
+    }
+
+    /*public static ArrayList<String> getSiblings (String firstTable) throws SQLExceptionHandler, java.lang.Exception {
+        ArrayList<String> siblings = new ArrayList<string>();
+        HashMap<String,boolean> visited = new HashMap<String,boolean> ();
+        LinkedList<String> tableQueue = new LinkedList<String> ();
+        visited.put(firstTable,true);
+        Connection dbcon = null;
+        ArrayList<String> potentialSiblings = getTables();
+        try {
+            dbcon = QueryUtils.createConn();
+            while (!tableQueue.isEmpty()) {
+                String table = tableQueue.remove().trim().toLowerCase();
+                for (String sibling : potentialSiblings) {
+                    if (sibling.indexOf(table) != -1) {
+                        //find sibling table by SQL schema convention of relationship tables
+                        String next = sibling.replace(table,"").replace("_of_");
+                        if (potentialSiblings.contains(next) && !visited.containsKey(next)) {
+                            tableQueue.add(next);
+                            visited.put(next);
+                            siblings.add(next);
+                        }
+                    }
+                }
+            }
+            return siblings;
+        } finally {
+            dbcon.close();
+        }
+    }*/
 }

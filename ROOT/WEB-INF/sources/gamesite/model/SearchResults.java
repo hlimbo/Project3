@@ -122,6 +122,36 @@ public class SearchResults {
         return results;
     }
 
+
+    /*public ArrayList<HashMap<String,ArrayList<String>>> masterSearch (String table, String limit, String offset,
+            String game, String year, String genre, String platform, String publisher, String order, 
+            boolean descend, int match) throws SQLExceptionHandler, java.lang.Exception {
+        ArrayList<String> siblings = QueryUtils.getSiblings(table);
+        ArrayList<HashMap<String,String>> tableResults = search(table,limit,offset,game,
+                year,genre,platform,publisher,order,descend,match);
+        ArrayList<HashMap<String,ArrayList<String>>> results = new ArrayList<HashMap<String,ArrayList<String>>>();
+        for () {
+        }
+        for (HashMap<String,String> row : results) {
+            if (row.containsKey("id")) {
+                ids.add(row.get("id"));
+            }
+        }
+        Connection dbcon = null;
+        try {
+            dbcon = QueryUtils.createConn();
+            for (HashMap<String,String> row : results) {
+                if (row.containsKey("id")) {
+                    for (String sibling : siblings) {
+                    }
+                }
+            }
+        } finally {
+            dbcon.close();
+        }
+        return results;
+    }*/
+
     public int getCount(String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher,
             String order, boolean descend, int match) throws SQLException, java.lang.Exception {
