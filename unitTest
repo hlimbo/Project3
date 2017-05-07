@@ -20,6 +20,9 @@ if [ $# -ne 1 ]; then
 fi
 
 master_path="/"$(git rev-parse --show-toplevel | sed 's/^C\:/c/g')
+if [ "$OSTYPE"  == "linux-gnu" ]; then
+    master_path=$(git rev-parse --show-toplevel | sed 's/^C\:/c/g')
+fi
 class_path="ROOT/WEB-INF/classes"
 class_name="$1"
 #trim .class extension from file
