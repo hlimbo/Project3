@@ -1,19 +1,23 @@
 package gamesite.model;
 
+import java.sql.*;
+import java.util.*;
+
 public class QueryUtils {
 
     //Class not meant to be instantiated
     private QueryUtils () {};
 
-    public static Connection createConn () {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+    public static Connection createConn () throws InstantiationException, 
+           SQLException, IllegalAccessException, ClassNotFoundException {
+        Class.forName("com.mysql.jdbc.Driver").newInstance();
 
-            String loginUser = "user";
-            String loginPasswd = "password";
-            String loginUrl = "jdbc:mysql://localhost:3306/gamedb";
+        String loginUser = "user";
+        String loginPasswd = "password";
+        String loginUrl = "jdbc:mysql://localhost:3306/gamedb";
 
-            Connection dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd);
-            return dbcon;
+        Connection dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd);
+        return dbcon;
     }
 
 	public static HashMap<String, String> tableRow (ResultSet result) throws SQLException {
@@ -49,7 +53,7 @@ public class QueryUtils {
 			}
             //handle nulls and empty values here
 			String colName = meta.getColumnName(i);
-            row.put[colName]=value;
+            row.put(colName,value);
 		}
         return row;
 	}
