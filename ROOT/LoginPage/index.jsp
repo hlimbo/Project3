@@ -10,6 +10,7 @@
 
 
 <!-- can only obtain values from httprequest and httpresponse -->
+<!--  probably should move this portion of code to a controller class -->
 <% if ( session.getAttribute("invalidLoginFlag") != null){ %>
 	<p><%= session.getAttribute("invalidLoginFlag") %></p>
 	 <% session.setAttribute("invalidLoginFlag", null); %>

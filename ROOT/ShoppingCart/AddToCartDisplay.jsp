@@ -79,7 +79,7 @@
 		    Note: we shouldn't need this line below if we are running JDBC 4.0 or above.*/
 		%>
 		
-		<% Class.forName("com.mysql.jdbc.Driver").newInstance(); %>
+		<% //Class.forName("com.mysql.jdbc.Driver").newInstance(); %>
 		<% dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd); %>
 		<% } catch (SQLException e) { %>
 		<% e.printStackTrace(); } %>
