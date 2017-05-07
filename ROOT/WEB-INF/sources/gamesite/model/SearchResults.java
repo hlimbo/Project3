@@ -13,7 +13,9 @@ public class SearchResults {
     private static String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
 
     //Singleton class, so constructor not permitted outside of class
-    private SearchResults () {}
+    private SearchResults () {
+        cache = new ConcurrentHashMap<String,ArrayList<HashMap<String,String>>> ();
+    }
 
     //Initialization-on-demand holder idiom
     //https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
@@ -141,6 +143,8 @@ public class SearchResults {
                 platform,publisher,order,descend,match);
             if (results != null) {
                 return cache.putIfAbsent(query,results);
+            } else {
+                results = new ArrayList<HashMap<String,String>>();
             }
             /*return cache.computeIfAbsent(query, qry -> {
                 try {
