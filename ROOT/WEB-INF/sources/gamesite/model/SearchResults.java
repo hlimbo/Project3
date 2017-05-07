@@ -23,50 +23,16 @@ public class SearchResults {
     private static class SearchCache {
         static final SearchResults INSTANCE = new SearchResults();
     }
-    //TODO implement caching
+    //TODO implement size limit on caching
 
     public static SearchResults getInstance() {
         return SearchCache.INSTANCE;
     }
 
-    private static String addSearchTerm (String value, String term, boolean useSubMatch) {
-            String searchTerm = "";
-            if (value != null && value.trim() != "") {
-                if (!useSubMatch) {
-                    for (String subvalue : value.split(" ")) {
-                        searchTerm+=" AND ";
-                        searchTerm+=term+" LIKE ?";
-                    }
-                } else {
-                    searchTerm+=" AND ";
-                    searchTerm+=term+" LIKE ?";
-                }
-            }
-            return searchTerm;
-    }
-
-    private static int setSearchTerm (String value, String term, PreparedStatement statement, 
-            int offset, boolean useSubMatch) throws SQLException {
-
-            String searchTerm = "";
-            if (value != null && value.trim() != "") {
-                if (!useSubMatch) {
-                    for (String subvalue : value.split(" ")) {
-                        statement.setString(offset,"%"+subvalue+"%");
-                        offset+=1;
-                    }
-                } else {
-                    statement.setString(offset,value);
-                    offset+=1;
-                }
-            }
-            return offset;
-    }
-
     private static ArrayList<HashMap<String,String>> callSearchQuery (String query, String table, 
             String limit, String offset, String game, String year, String genre, 
             String platform, String publisher, String order, 
-            boolean descend, boolean match) throws SQLException, java.lang.Exception {
+            boolean descend, int match) throws SQLException, java.lang.Exception {
         ArrayList<HashMap<String,String>> results = new ArrayList<HashMap<String,String>> ();
         Connection dbconn = null;
         try {
@@ -92,7 +58,7 @@ public class SearchResults {
     public static String buildQuery (String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher, 
             String order, boolean descend, 
-            boolean match) throws SQLException, java.lang.Exception {
+            int match) throws SQLException, java.lang.Exception {
         String query="";
         boolean searchAll = false;
         if ((game==null || game.trim().compareTo("")==0) && (year==null || year.trim().compareTo("")==0)
@@ -104,12 +70,12 @@ public class SearchResults {
         if (!searchAll) {
             //duplicates due to games on multiple platforms, with multiple genres, or etc...
             query = "SELECT DISTINCT "+table+".* FROM games, publishers, platforms, genres, "+masterTable+" WHERE "
-                +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id";
-            query+=addSearchTerm(game,"name",match);
-            query+=addSearchTerm(year,"year",match);
-            query+=addSearchTerm(publisher,"publisher",match);
-            query+=addSearchTerm(genre,"genre",match);
-            query+=addSearchTerm(platform,"platform",match);
+                +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id AND genres.id=genre_id";
+            query+=QueryUtils.addSearchTerm(game,"name",match);
+            query+=QueryUtils.addSearchTerm(year,"year",match);
+            query+=QueryUtils.addSearchTerm(publisher,"publisher",match);
+            query+=QueryUtils.addSearchTerm(genre,"genre",match);
+            query+=QueryUtils.addSearchTerm(platform,"platform",match);
         } else {
             query = "SELECT "+table+".* FROM "+table;
         }
@@ -117,18 +83,18 @@ public class SearchResults {
     }
 
     private static void setSearchTerms (PreparedStatement statement,String name, String year, String publisher,
-            String genre, String platform,boolean useSubMatch) throws SQLException {
+            String genre, String platform,int useSubMatch) throws SQLException {
         int statementOffset = 1;
-        statementOffset = setSearchTerm(name,"name",statement,statementOffset,useSubMatch);
-        statementOffset = setSearchTerm(year,"year",statement,statementOffset,useSubMatch);
-        statementOffset = setSearchTerm(publisher,"publisher",statement,statementOffset,useSubMatch);
-        statementOffset = setSearchTerm(genre,"genre",statement,statementOffset,useSubMatch);
-        setSearchTerm(platform,"platform",statement,statementOffset,useSubMatch);
+        statementOffset = QueryUtils.setSearchTerm(name,"name",statement,statementOffset,useSubMatch);
+        statementOffset = QueryUtils.setSearchTerm(year,"year",statement,statementOffset,useSubMatch);
+        statementOffset = QueryUtils.setSearchTerm(publisher,"publisher",statement,statementOffset,useSubMatch);
+        statementOffset = QueryUtils.setSearchTerm(genre,"genre",statement,statementOffset,useSubMatch);
+        QueryUtils.setSearchTerm(platform,"platform",statement,statementOffset,useSubMatch);
     }
 
     public ArrayList<HashMap<String,String>> search (String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher, String order, 
-            boolean descend, boolean match) throws SQLExceptionHandler, java.lang.Exception {
+            boolean descend, int match) throws SQLExceptionHandler, java.lang.Exception {
         String query = buildQuery(table,limit,offset,game,year,genre,platform,publisher,order,descend,match);
         if (descend) {
             query+=" ORDER BY ISNULL( "+table+"."+order+"), "+table+"."+order+" DESC, "
@@ -152,22 +118,13 @@ public class SearchResults {
             } catch (SQLException ex) {
                 throw new SQLExceptionHandler(ex,query);
             }
-            /*return cache.computeIfAbsent(query, qry -> {
-                try {
-                    return callSearchQuery(qry,
-                        table,limit,offset,game,year,genre,
-                        platform,publisher,order,descend,match);
-                } catch (SQLException ex) {
-                    throw ex;
-                }
-                    });*/
         }
         return results;
     }
 
     public int getCount(String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher,
-            String order, boolean descend, boolean match) throws SQLException, java.lang.Exception {
+            String order, boolean descend, int match) throws SQLException, java.lang.Exception {
         String countQuery = "SELECT COUNT(*) FROM ("+
             buildQuery(table,limit,offset,game,year,genre,platform,publisher,order,descend,match)
             +") AS countable";
