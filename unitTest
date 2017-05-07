@@ -4,6 +4,7 @@
 # Runs any compiled java class file in the Tomcat Webapps workspace
 # USAGE: unitTest [ filename.class ]
 # e.g. unitTest CalculatorTest.class
+# e.g. unitTest tests/QueryUtilsTest.class
 
 if [ "$1" == "--help" ] && [ $# -eq 1 ]; then
 	echo "Usage: unitTest [ filename.class ]"

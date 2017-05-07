@@ -82,7 +82,7 @@ public class QueryUtilsTest
 		{
 			ArrayList<String> tables = QueryUtils.getTables();
 			assertEquals("failure - tables are not the same size", tables.size(), expectedTables.size());		
-			assertSame("failure - tables do not contain the same table names", tables, expectedTables);
+			assertEquals("failure - tables do not contain the same table names", tables, expectedTables);
 		}
 		catch (SQLException e)
 		{
