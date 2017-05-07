@@ -37,6 +37,21 @@ public class NTreeNode<T> {
         return root;
     }
 
+    @Override
+    public boolean equals (Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!NTreeNode.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        if (((NTreeNode)obj).data.equals(data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public T data;
     public ArrayList<NTreeNode<T>> children;
 }

@@ -75,4 +75,12 @@ public class NTreeNodeTest
         node.consumePreOrder(result);
         assertEquals("Consumption failure",expected,result.result);
     }
+
+    @Test
+	public void testEquals()
+	{
+        NTreeNode<Integer> node = new NTreeNode<Integer>(0);
+        NTreeNode<Integer> other = new NTreeNode<Integer>(0);
+        assertTrue("NTreeNode equals method not equal.",node.equals(other));
+    }
 }

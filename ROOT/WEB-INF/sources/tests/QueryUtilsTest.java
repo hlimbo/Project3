@@ -95,5 +95,30 @@ public class QueryUtilsTest
 	
 	}
 	
+	@Test
+	public void testGetSiblings()
+	{
+		NTreeNode<String> expectedTables = new NTreeNode<String>("games");
+		expectedTables.addChild(new NTreeNode<String>("publishers"));
+		expectedTables.addChild(new NTreeNode<String>("platforms"));
+		expectedTables.addChild(new NTreeNode<String>("genres"));
+
+		try 
+        {
+			NTreeNode<String> tables = QueryUtils.getSiblings("games");
+			assertEquals("failure - sibling roots do not contain the same data", tables.data, expectedTables.data);		
+            for (NTreeNode<String> sibling : expectedTables.children) {
+                assertTrue(tables.children.contains(sibling));
+            }
+        } 
+        catch (SQLException e) 
+        {
+			e.printStackTrace();
+		} 
+        catch (java.lang.Exception e) 
+        {
+			e.printStackTrace();
+		}
+    }
 	
 }
