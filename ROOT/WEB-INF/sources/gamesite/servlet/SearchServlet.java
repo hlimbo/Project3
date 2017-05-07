@@ -160,10 +160,19 @@ public class SearchServlet extends HttpServlet
             String genre = (String) request.getParameter("genre");
             String platform = (String) request.getParameter("platform");
 
-            ArrayList<HashMap<String,String>> rows = SearchResults.getInstance().search(table,limit,offset,game,
-                    year,genre,platform,publisher,order,descend,useSubMatch);
-            int searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
-                    year,genre,platform,publisher,order,descend,useSubMatch);
+            ArrayList<HashMap<String,String>> rows;
+            int searchCount=-1;
+            if (useSubMatch) {
+                rows = SearchResults.getInstance().search(table,limit,offset,game,
+                    year,genre,platform,publisher,order,descend,1);
+                searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                    year,genre,platform,publisher,order,descend,1);
+            } else {
+                rows = SearchResults.getInstance().search(table,limit,offset,game,
+                    year,genre,platform,publisher,order,descend,2);
+                searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                    year,genre,platform,publisher,order,descend,2);
+            }
             request.setAttribute("searchCount",searchCount);
 
             String results = "";
@@ -202,8 +211,6 @@ public class SearchServlet extends HttpServlet
             } else {
                 requestUrl+="&";
             }
-            //for (int i=1;i<=meta.getColumnCount();++i) {
-                //String column = meta.getColumnName(i);
             if (!rows.isEmpty()) {
                 for (String column : rows.get(0).keySet()) {
                     if (ignores.containsKey(column) && ignores.get(column)) {

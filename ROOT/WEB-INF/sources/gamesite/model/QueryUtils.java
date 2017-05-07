@@ -60,4 +60,41 @@ public class QueryUtils {
 		}
         return row;
 	}
+
+    public static String addSearchTerm (String value, String term, int useSubMatch) {
+            String searchTerm = "";
+            if (value != null && value.trim() != "") {
+                if (useSubMatch==1) {
+                    for (String subvalue : value.split(" ")) {
+                        searchTerm+=" AND ";
+                        searchTerm+=term+" LIKE ?";
+                    }
+                } else if (useSubMatch==2) {
+                    searchTerm+=" AND ";
+                    searchTerm+=term+" LIKE ?";
+                } else {
+                    searchTerm+=" AND ";
+                    searchTerm+=term+" = ?";
+                }
+            }
+            return searchTerm;
+    }
+
+    public static int setSearchTerm (String value, String term, PreparedStatement statement, 
+            int offset, int useSubMatch) throws SQLException {
+
+            String searchTerm = "";
+            if (value != null && value.trim() != "") {
+                if (useSubMatch==1) {
+                    for (String subvalue : value.split(" ")) {
+                        statement.setString(offset,"%"+subvalue+"%");
+                        offset+=1;
+                    }
+                } else {
+                    statement.setString(offset,value);
+                    offset+=1;
+                }
+            }
+            return offset;
+    }
 }
