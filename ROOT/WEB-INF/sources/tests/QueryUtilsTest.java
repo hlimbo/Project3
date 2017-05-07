@@ -34,34 +34,7 @@ import gamesite.datastruct.NTreeNode;
 import gamesite.model.QueryUtils;
 
 public class QueryUtilsTest
-{
-	@Test
-	public void testDBConnection()
-	{
-		try
-		{
-			Connection dbcon = QueryUtils.createConn();
-			assertNotNull("Database Connection should not be null", dbcon);
-			dbcon.close();
-		}
-		catch (ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-		catch (InstantiationException e)
-		{
-			e.printStackTrace();
-		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
+{	
 	@Test
 	public void test_for_size_GetTables()
 	{

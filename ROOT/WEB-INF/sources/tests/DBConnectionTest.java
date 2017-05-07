@@ -28,7 +28,7 @@ import org.junit.Test;
 import java.sql.*;
 import java.util.*;
 
-import gamesite2.utils.DBConnection;
+import gamesite.utils.DBConnection;
 
 public class DBConnectionTest
 {

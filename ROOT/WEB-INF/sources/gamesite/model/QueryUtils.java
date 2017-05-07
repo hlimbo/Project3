@@ -4,24 +4,12 @@ import java.sql.*;
 import java.util.*;
 
 import gamesite.datastruct.NTreeNode;
+import gamesite.utils.DBConnection;
 
 public class QueryUtils {
 
     //Class not meant to be instantiated
     private QueryUtils () {};
-
-    public static Connection createConn () throws InstantiationException, 
-           SQLException, IllegalAccessException, ClassNotFoundException {
-        Class.forName("com.mysql.jdbc.Driver").newInstance();
-
-        String loginUser = "user";
-        String loginPasswd = "password";
-		//disable and supress SSL errors
-        String loginUrl = "jdbc:mysql://localhost:3306/gamedb?useSSL=false";
-
-        Connection dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd);
-        return dbcon;
-    }
 
     public static String getValue (ResultSet result, ResultSetMetaData meta, int i) 
         throws SQLException{
@@ -105,7 +93,7 @@ public class QueryUtils {
         Connection dbcon = null;
         try {
             ArrayList<String> tables = new ArrayList<String>();
-            dbcon = QueryUtils.createConn();
+            dbcon = DBConnection.create();
             DatabaseMetaData dbmeta = dbcon.getMetaData();
             ResultSet tableMeta = dbmeta.getTables(dbcon.getCatalog(),null,"%",null);
             while (tableMeta.next()) {
@@ -113,7 +101,7 @@ public class QueryUtils {
             } 
             return tables;
         } finally {
-            dbcon.close();
+            DBConnection.close(dbcon);
         }
     }
 
@@ -126,7 +114,7 @@ public class QueryUtils {
         Connection dbcon = null;
         ArrayList<String> potentialSiblings = getTables();
         try {
-            dbcon = QueryUtils.createConn();
+            dbcon = DBConnection.create();
             while (!tableQueue.isEmpty()) {
                 NTreeNode<String> node = tableQueue.remove();
                 String table = node.data.trim().toLowerCase();
@@ -145,7 +133,7 @@ public class QueryUtils {
             }
             return siblings;
         } finally {
-            dbcon.close();
+            DBConnection.close(dbcon);
         }
     }
 }

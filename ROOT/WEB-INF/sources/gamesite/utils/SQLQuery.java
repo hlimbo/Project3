@@ -1,4 +1,4 @@
-package gamesite2.utils;
+package gamesite.utils;
 
 import java.sql.*;
 import java.util.*;
