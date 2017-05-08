@@ -5,6 +5,8 @@ package gamesite.model;
 */
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class ShoppingCart
 {
@@ -31,5 +33,26 @@ public class ShoppingCart
 			return items.get(gameId);
 		
 		return null;
+	}
+	
+	public int size() { return items.size(); }
+	
+	//used for iterating through a map
+	//	e.g. for(Map.entry<String,ShoppingCart entry : itemSet);
+	public Set<Map.Entry<String,ShoppingCartItem>> itemSet()
+	{
+		return items.entrySet();
+	}
+	
+	public Integer getTotalPrice()
+	{
+		Integer totalPrice = 0;
+		for (Map.Entry<String,ShoppingCartItem> entry : items.entrySet())
+		{
+			ShoppingCartItem item = entry.getValue();
+			totalPrice += item.getTotalPrice();
+		}
+		
+		return totalPrice;
 	}
 }

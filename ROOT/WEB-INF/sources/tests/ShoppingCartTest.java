@@ -49,4 +49,66 @@ public class ShoppingCartTest
 		ShoppingCartItem item = new ShoppingCartItem("Breath of the Wild", 60, 5);
 		assertEquals("Failure - item total price not equal: ", 300, (int)item.getTotalPrice());
 	}
+	
+	@Test
+	public void testShoppingCartForNull()
+	{
+		ShoppingCart cart = new ShoppingCart();
+		cart.put("1", new ShoppingCartItem("Wii Sports", 18, 1));
+		cart.put("2", new ShoppingCartItem("Super Mario Bros.", 69, 1));
+		cart.put("3", new ShoppingCartItem("Mario Kart Wii", 8, 4));
+		cart.put("4", new ShoppingCartItem("Wii Sports Resort", 30, 2));
+		
+		for(Map.Entry<String,ShoppingCartItem> entry : cart.getItems().entrySet())
+		{
+			assertNotNull(entry);
+		}
+	}
+	
+	@Test
+	public void testShoppingCartPrice()
+	{
+		ShoppingCart cart = new ShoppingCart();
+		cart.put("1", new ShoppingCartItem("Wii Sports", 18, 1));
+		cart.put("2", new ShoppingCartItem("Super Mario Bros.", 69, 1));
+		cart.put("3", new ShoppingCartItem("Mario Kart Wii", 8, 4));
+		cart.put("4", new ShoppingCartItem("Wii Sports Resort", 30, 2));
+		
+		assertEquals(18, (int)cart.getItem("1").getPrice());
+		assertEquals(69, (int)cart.getItem("2").getPrice());
+		assertEquals(8, (int)cart.getItem("3").getPrice());
+		assertEquals(30, (int)cart.getItem("4").getPrice());
+	}
+	
+	@Test
+	public void testShoppingCartQuantity()
+	{
+		ShoppingCart cart = new ShoppingCart();
+		cart.put("1", new ShoppingCartItem("Wii Sports", 18, 1));
+		cart.put("2", new ShoppingCartItem("Super Mario Bros.", 69, 1));
+		cart.put("3", new ShoppingCartItem("Mario Kart Wii", 8, 4));
+		cart.put("4", new ShoppingCartItem("Wii Sports Resort", 30, 2));
+		
+		assertEquals(1, (int)cart.getItem("1").getQuantity());
+		assertEquals(1, (int)cart.getItem("2").getQuantity());
+		assertEquals(4, (int)cart.getItem("3").getQuantity());
+		assertEquals(2, (int)cart.getItem("4").getQuantity());
+	}
+	
+	@Test
+	public void testShoppingCartTotalPrice()
+	{
+		ShoppingCart cart = new ShoppingCart();
+		cart.put("1", new ShoppingCartItem("Wii Sports", 18, 1));
+		cart.put("2", new ShoppingCartItem("Super Mario Bros.", 69, 1));
+		cart.put("3", new ShoppingCartItem("Mario Kart Wii", 8, 4));
+		cart.put("4", new ShoppingCartItem("Wii Sports Resort", 30, 2));
+		
+		Integer actualPrice = cart.getTotalPrice();
+		Integer expectedPrice = 0;
+		for(Map.Entry<String,ShoppingCartItem> entry : cart.getItems().entrySet())
+			expectedPrice += entry.getValue().getTotalPrice();
+		
+		assertEquals((int)expectedPrice, (int)actualPrice);
+	}
 }
