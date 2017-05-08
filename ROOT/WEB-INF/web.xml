@@ -99,7 +99,7 @@
 
     <servlet>
     	<servlet-name>DeleteItemServlet</servlet-name>
-    	<servlet-class>DeleteItem</servlet-class>
+    	<servlet-class>gamesite.servlet.DeleteItemServlet</servlet-class>
     </servlet>
       
     <servlet-mapping>

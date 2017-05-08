@@ -1,3 +1,5 @@
+package gamesite.servlet;
+
 import java.io.*;
 import java.net.*;
 import java.sql.*;
@@ -7,12 +9,15 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 
+import gamesite.model.ShoppingCart;
+import gamesite.model.ShoppingCartItem;
+
 //The servlet's job should be to:
 // 1. redirect the user to the proper jsp webpage.
 // 2. authenticate user credentials
 // 3. query for certain items to be found in the database. i.e. game id, genre id.
 
-public class DeleteItem extends HttpServlet
+public class DeleteItemServlet extends HttpServlet
 {	
 	public String getServletInfo()
 	{
@@ -24,15 +29,8 @@ public class DeleteItem extends HttpServlet
 	{	
 		System.out.println("DeleteItem.java");
 		HttpSession session = request.getSession(false);	
-		HashMap<String,Integer> cartList = (HashMap<String,Integer>)session.getAttribute("cartList");
-/* 		ArrayList<?> attrs = (ArrayList<?>)session.getAttribute("cartList");
-        if (attrs != null) {
-            cartList = new ArrayList<String>();
-            for (Object attr : attrs) {
-                cartList.add((String)attr);
-            }
-        } */
-		if(cartList == null)
+		ShoppingCart cart = (ShoppingCart)session.getAttribute("cart");
+		if(cart == null || cart.isEmpty())
 		{
 			System.out.println("Cannot remove item. Cart is already empty");
 			session.setAttribute("errorString", "Cannot remove item. Cart is already empty");
@@ -40,9 +38,10 @@ public class DeleteItem extends HttpServlet
 		else
 		{
 			String itemID = (String)request.getParameter("itemID");
-			if(cartList.containsKey(itemID))
+			ShoppingCartItem item = cart.remove(itemID);
+			
+			if(item != null)
 			{
-				cartList.remove(itemID);
 				System.out.println("Successfully removed game id: " + itemID);
 			}
 			else
@@ -51,7 +50,6 @@ public class DeleteItem extends HttpServlet
 			}
 		}
 		
-		//response.sendRedirect("/ShoppingCart/AddToCartDisplay.jsp");
 		if(request.getParameter("previousPage") != null)
 			response.sendRedirect("/ShoppingCart/AddToCartDisplay.jsp?previousPage=" + (String)request.getParameter("previousPage"));
 		else
@@ -59,8 +57,8 @@ public class DeleteItem extends HttpServlet
 		
 	}
 	
-	/* public void doPost(HttpServletRequest request, HttpServletResponse response)
+	/*public void doPost(HttpServletRequest request, HttpServletResponse response)
 	{
 		
-	} */
+	}*/
 }

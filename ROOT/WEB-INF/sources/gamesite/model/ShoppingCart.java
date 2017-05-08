@@ -76,4 +76,10 @@ public class ShoppingCart
 	{
 		return items.isEmpty();
 	}
+	
+	//returns the ShoppingCartItem to remove,otherwise return null if not found.
+	public ShoppingCartItem remove(String gameId)
+	{
+		return items.remove(gameId);
+	}
 }

@@ -92,6 +92,15 @@
 				<td> <c:out value="${entry.value.getGameName()}" /> </td>
 				<td> <c:out value="${entry.value.getPrice()}" /> </td>
 				<td> <c:out value="${entry.value.getQuantity()}" /> </td>
+				<td> <!-- delete item ~ TODO(HARVEY): needs rework -->
+					<form name="deleteForm" action="/ShoppingCart/delete-item" method="GET">
+						<input type="hidden" name="itemID" value=<c:out value="${entry.key}" /> >
+						<% for (Map.Entry<String,String> parsedParam : parsedParams.entrySet()) { %>
+						<%= "<input type=\"hidden\" name=\""+parsedParam.getKey()+"\" value=\""+parsedParam.getValue()+"\" />"%>
+						<% } %>
+						<button name="deleteItem"> Delete </button>
+					</form>
+				</td>
 			</tr>
 		</c:forEach>
 		</tbody>
