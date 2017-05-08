@@ -77,11 +77,12 @@ public class SearchServlet extends HttpServlet
             Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
             Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
         String htmlRow = "";
+	    htmlRow+="<div class=\""+table+"_row\">";
         for (Map.Entry<String,String> field: row.entrySet()) {
-	        htmlRow+="<div class=\""+table+"_row\">"
-                +fieldValue(field.getKey(), field.getValue(), table, 
-                        link, images, externalLinks, ignores)+"</div>";
+                htmlRow+=fieldValue(field.getKey(), field.getValue(), table, 
+                        link, images, externalLinks, ignores);
         }
+        htmlRow+="</div>";
         return htmlRow;
     }
 
