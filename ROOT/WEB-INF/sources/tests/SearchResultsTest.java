@@ -22,6 +22,11 @@ public class SearchResultsTest {
             assertNotNull(table);
             assertFalse(table.isEmpty());
             assertEquals(table.get(0).get("publisher"),"Nintendo");
+            table = SearchResults.getInstance().search("games","1",
+                    "0","Wii Sports","","","","","id",false,1);
+            assertNotNull(table);
+            assertFalse(table.isEmpty());
+            assertEquals(table.get(0).get("name"),"Wii Sports");
         } catch (SQLExceptionHandler ex) {
             System.out.println(ex.getErrorMessage());
         } catch (java.lang.Exception e) {
