@@ -82,4 +82,9 @@ public class ShoppingCart
 	{
 		return items.remove(gameId);
 	}
+	
+	public boolean containsKey(String gameId)
+	{
+		return items.containsKey(gameId);
+	}
 }

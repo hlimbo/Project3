@@ -91,7 +91,26 @@
 				<td> <c:out value="${entry.key}" /> </td>
 				<td> <c:out value="${entry.value.getGameName()}" /> </td>
 				<td> <c:out value="${entry.value.getPrice()}" /> </td>
-				<td> <c:out value="${entry.value.getQuantity()}" /> </td>
+				<td> 
+					<c:out value="${entry.value.getQuantity()}" />
+					<!-- TODO(HARVEY): These form buttons need rework via AJAX possibly -->
+					<form class="qControlBox" name="updateForm" action="/ShoppingCart/update-quantity" method="GET">
+						<input type="hidden" name="itemID" value=<c:out value="${entry.key}"/> >
+						<input type="hidden" name="updateFlag" value="increment" >
+						<% for (Map.Entry<String,String> parsedParam : parsedParams.entrySet()) { %>
+						<%= "<input type=\"hidden\" name=\""+parsedParam.getKey()+"\" value=\""+parsedParam.getValue()+"\" />"%>
+						<% } %>
+						<button name="quantity ">+</button>
+					</form>
+					<form class="qControlBox" name="updateForm" action="/ShoppingCart/update-quantity" method="GET">
+						<input type="hidden" name="itemID" value=<c:out value="${entry.key}"/> >
+						<input type="hidden" name="updateFlag" value="decrement" >
+						<% for (Map.Entry<String,String> parsedParam : parsedParams.entrySet()) { %>
+						<%= "<input type=\"hidden\" name=\""+parsedParam.getKey()+"\" value=\""+parsedParam.getValue()+"\" />"%>
+						<% } %>
+						<button id="q2" name="quantity ">-</button>
+					</form>					
+				</td>
 				<td> <!-- delete item ~ TODO(HARVEY): needs rework -->
 					<form name="deleteForm" action="/ShoppingCart/delete-item" method="GET">
 						<input type="hidden" name="itemID" value=<c:out value="${entry.key}" /> >

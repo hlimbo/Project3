@@ -109,7 +109,7 @@
 	
    <servlet>
     	<servlet-name>UpdateQuantityServlet</servlet-name>
-    	<servlet-class>UpdateQuantity</servlet-class>
+    	<servlet-class>gamesite.servlet.UpdateQuantityServlet</servlet-class>
     </servlet>
       
     <servlet-mapping>
