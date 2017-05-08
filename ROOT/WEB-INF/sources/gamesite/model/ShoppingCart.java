@@ -24,7 +24,18 @@ public class ShoppingCart
 	
 	public void put(String gameId, ShoppingCartItem item)
 	{
-		items.put(gameId, item);
+		if(items.containsKey(gameId))
+		{
+			ShoppingCartItem existing_item = items.get(gameId);
+			if(existing_item != null)
+				existing_item.setQuantity(existing_item.getQuantity() + 1);
+			else
+				items.put(gameId, item);
+		}
+		else
+		{
+			items.put(gameId, item);
+		}
 	}
 	
 	public ShoppingCartItem getItem(String gameId)

@@ -6,6 +6,9 @@
 <%@ page import="javax.servlet.*" %>
 <%@ page import="javax.servlet.http.*" %>
 
+<!-- jstl include -->
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 
 <!-- TODO(HARVEY): move back to previous page query string parsing logic to a java file -->
 <%  String paramQueryString = request.getQueryString();
@@ -67,27 +70,9 @@
 	
 	<BODY>	
 	
-		<!-- HARDCODING... TODO(HARVEY): move to java servlet class-->
-		<% String loginUser = "user"; %>
-		<% String loginPasswd = "password"; %>
-		<% String loginUrl = "jdbc:mysql://localhost:3306/gamedb"; %>
-		<% Connection dbcon = null; %>
-		<% try { %>
-		
-		<% 
-			/* Any JDBC 4.0 drivers that are found in your class are automatically loaded
-			Must manually load any drivers prior to JDBC 4.0 with the method below
-			https://docs.oracle.com/javase/tutorial/jdbc/basics/connecting.html 
-		    Note: we shouldn't need this line below if we are running JDBC 4.0 or above.*/
-		%>
-		
-		<% //Class.forName("com.mysql.jdbc.Driver").newInstance(); %>
-		<% dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd); %>
-		<% } catch (SQLException e) { %>
-		<% e.printStackTrace(); } %>
-	
 		<H1>Shopping Cart</H1>
 		
+		<!-- might remove this later -->
 		<% if ( session.getAttribute("errorString") != null ) { %>	
 		<p class="error"> <%= session.getAttribute("errorString") %> </p>
 		<% session.setAttribute("errorString", null); } %>
@@ -100,89 +85,20 @@
 			<th>Quantity</th>
 		</thead>
 		
-		<!-- TODO(HARVEY): Create a bean class that encapsulates this data internally.. might need to generalize this to a form of ArrayList<HashMap> ... -->
-		<% HashMap<String,Integer> cart = (HashMap<String,Integer>)session.getAttribute("cartList"); %>	
-		<% int totalCost = 0; %>
 		<tbody>
-				<% // sql querying should be done in a java controller class instead (This is the view!) %>
-				<% if ( cart != null && !cart.isEmpty() ) { %>
-				<% for (Map.Entry<String,Integer> item : cart.entrySet()){ %>
-				<% String itemQuery = "SELECT * FROM games WHERE id=?"; %>
-				<% PreparedStatement statement = dbcon.prepareStatement(itemQuery); %>
-				<% statement.setInt(1,Integer.valueOf(item.getKey())); %>
-				<% ResultSet set = statement.executeQuery(); %>
-					<% if(set.next()) { %>
-					<tr>
-						<td><%= item.getKey() %></td>
-						<td> <%= set.getString("name") %> </td>
-						<td> <%= set.getInt("price") %> </td>
-						<td> 
-							<span>
-								<input class="qtextbox" disabled="disabled" type="text" name="quantity" value=<%= item.getValue() %>>
-								
-								<form class="qControlBox" name="updateForm" action="/ShoppingCart/update-quantity" method="GET">
-									<input type="hidden" name="itemID" value=<%= item.getKey() %> >
-									<input type="hidden" name="updateFlag" value="increment" >
-                                    <% for (Map.Entry<String,String> parsedParam : parsedParams.entrySet()) { %>
-                                    <%= "<input type=\"hidden\" name=\""+parsedParam.getKey()+"\" value=\""+parsedParam.getValue()+"\" />"%>
-                                    <% } %>
-									<button name="quantity ">+</button>
-								</form>
-								<form class="qControlBox" name="updateForm" action="/ShoppingCart/update-quantity" method="GET">
-									<input type="hidden" name="itemID" value=<%= item.getKey() %> >
-									<input type="hidden" name="updateFlag" value="decrement" >
-                                    <% for (Map.Entry<String,String> parsedParam : parsedParams.entrySet()) { %>
-                                    <%= "<input type=\"hidden\" name=\""+parsedParam.getKey()+"\" value=\""+parsedParam.getValue()+"\" />"%>
-                                    <% } %>
-									<button id="q2" name="quantity ">-</button>
-								</form>
-							</span>
-						</td>
-						<td> 
-							<form name="deleteForm" action="/ShoppingCart/delete-item" method="GET">
-								<input type="hidden" name="itemID" value=<%= item.getKey() %> >
-                                <% for (Map.Entry<String,String> parsedParam : parsedParams.entrySet()) { %>
-                                <%= "<input type=\"hidden\" name=\""+parsedParam.getKey()+"\" value=\""+parsedParam.getValue()+"\" />"%>
-                                <% } %>
-								<button name="deleteItem"> Delete </button>
-							</form>
-						</td>
-					</tr>
-					
-					<!-- calculate total cost here -->
-					<% totalCost += set.getInt("price") * item.getValue(); %>
-					<% } %>
-				<% } } else { %>
-				<tr>
-					<p> Cart is Empty </p>
-				</tr>
-				<% } %>
-				
-				<% dbcon.close(); %>
+		<c:forEach var="entry" items="${cart.getItems()}">
+			<tr>	
+				<td> <c:out value="${entry.key}" /> </td>
+				<td> <c:out value="${entry.value.getGameName()}" /> </td>
+				<td> <c:out value="${entry.value.getPrice()}" /> </td>
+				<td> <c:out value="${entry.value.getQuantity()}" /> </td>
+			</tr>
+		</c:forEach>
 		</tbody>
+		
 		</table>
 		
 		<hr>
-		
-		<!-- only display the checkout button if the cart is not empty -->
-		<% if (cart != null && !cart.isEmpty() ) { %>
-			<span>
-				<form action="/CustomerInformation/index.jsp" method="GET">
-					<button name="checkout">Continue To Checkout</button>
-				</form>
-				<!-- display total cost -->
-				<p class="total">Total Cost: $<%= totalCost %>.00</p>
-			</span>
-			
-			<!-- clearing the cart contents -->
-			<form action="/ShoppingCart/clear-cart" method="GET">
-                <% for (Map.Entry<String,String> parsedParam : parsedParams.entrySet()) { %>
-                <%= "<input type=\"hidden\" name=\""+parsedParam.getKey()+"\" value=\""+parsedParam.getValue()+"\" />"%>
-                <% } %>
-				<button name="clearCart">Clear Cart</button>
-			</form>
-		<% } %>
-		
 		
 		<!-- back to previous page -->
 		<% if( request.getParameter("previousPage") != null ){%>

@@ -9,6 +9,11 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 
+import gamesite.model.ShoppingCart;
+import gamesite.model.ShoppingCartItem;
+import gamesite.utils.DBConnection;
+import gamesite.utils.SQLQuery;
+
 //The servlet's job should be to:
 // 1. redirect the user to the proper jsp webpage.
 // 2. authenticate user credentials
@@ -25,10 +30,9 @@ public class ShoppingCartServlet extends HttpServlet
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 		throws IOException, ServletException
 	{		
+	
+		ShoppingCart cart = null;
 		HttpSession session = request.getSession();
-		//key = game_id string
-		//value = quantity int
-		HashMap<String,Integer> cartList = null;
 		
 		//critical section ~ retrieve the list of items in cart if it already exists
 		//if not, create a new cart with the item added to it.
@@ -39,15 +43,14 @@ public class ShoppingCartServlet extends HttpServlet
 			//@SuppressWarnings("unchecked")
 			//Map<String,Integer> temp = (HashMap<String,Integer>)session.getAttribute("cartList");
 			
-			cartList = (HashMap<String,Integer>)session.getAttribute("cartList");
+			cart = (ShoppingCart)session.getAttribute("cart");
 			
 			//if  cartList from the cart does not already exist, create one
-			if(cartList == null)
+			if(cart == null)
 			{
-				cartList = new HashMap<String,Integer>();
-				session.setAttribute("cartList",cartList);
+				cart = new ShoppingCart();
+				session.setAttribute("cart",cart);
 			}
-			
 		}
 		
 		int parameterCount = request.getParameterMap().size();
@@ -58,15 +61,51 @@ public class ShoppingCartServlet extends HttpServlet
 			{
 				System.out.println("id value is null");
 			}
-			else if(cartList != null)
+			else if(cart != null)
 			{
-				System.out.println("id: " + id);
-				Integer quantity = cartList.get(id) == null ? 0 : (Integer) cartList.get(id);
-				cartList.put(id, ++quantity);
-			}
-			else
-			{
-				System.out.println("Failure!");
+				try
+				{
+					Connection dbcon = DBConnection.create();
+					
+					//query for item to add in cart
+					Integer game_id = Integer.valueOf(id);
+					//check if supplied game_id is in the database;
+					ResultSet set = SQLQuery.getGameInfo(dbcon, game_id);
+					if(set.next())
+					{
+						//add new shopping cart item.
+						ShoppingCartItem item = new ShoppingCartItem(set.getString("name"), set.getInt("price"), 1);
+						//Note: this function also internally updates the quantity of the item if the item is already in the cart.
+						cart.put(game_id.toString(), item);
+						
+						System.out.println("Successfully placed: " + item.getGameName() + " into cart");
+					}
+				
+					
+					DBConnection.close(dbcon);
+				}
+				catch (SQLException ex)
+				{
+					PrintWriter out = response.getWriter();
+					String returnLink = "<a href=\"/\"> Return to home </a>";
+					out.println("<HTML>" +
+							"<HEAD><TITLE>" +
+							"gamedb: Error" +
+							"</TITLE></HEAD>\n<BODY>" +
+							"<P>Error in SQL: ");
+							
+					while (ex != null)
+					{
+						out.println ("SQL Exception:  " + ex.getMessage ());
+						ex = ex.getNextException ();
+					}
+				    out.println("<br />\n"+returnLink+"</P></BODY></HTML>");
+					out.close();	
+				}
+				
+				//System.out.println("id: " + id);
+				//Integer quantity = cartList.get(id) == null ? 0 : (Integer) cartList.get(id);
+				//cart.put(id, ++quantity);
 			}
 		}
 		else
