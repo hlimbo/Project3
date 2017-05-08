@@ -17,7 +17,7 @@ public class SQLExceptionHandler extends SQLException {
         String msg = "Error in SQL:\n";
         while (ex!=null) {
             msg+=ex.getMessage()+"\n";
-            ex.getNextException();
+            ex=ex.getNextException();
         }
         msg+=" in sql expression "+query;
         return msg;
