@@ -89,6 +89,10 @@ public class QueryUtils {
             return offset;
     }
 
+    public static String getRelationIdName (String table) {
+        return table.substring(0,table.length()-1)+"_id";
+    }
+
     public static ArrayList<String> getTables () throws SQLExceptionHandler, java.lang.Exception {
         Connection dbcon = null;
         try {
