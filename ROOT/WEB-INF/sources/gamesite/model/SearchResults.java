@@ -111,14 +111,17 @@ public class SearchResults {
             query+=" ORDER BY ISNULL( "+table+"."+order+"), "+table+"."+order+" ASC, "
                 +table+".id LIMIT "+limit+" OFFSET "+offset;
         }
-        ArrayList<HashMap<String,String>> results = cache.get(query);
+        //TODO
+        //ArrayList<HashMap<String,String>> results = cache.get(query);
+        ArrayList<HashMap<String,String>> results = null;
         if (results == null) {
             try {
                 results = callSearchQuery(query,
                     table,limit,offset,game,year,genre,
                     platform,publisher,order,descend,match);
                 if (results != null) {
-                    cache.putIfAbsent(query,results);
+                    //TODO
+                    //cache.putIfAbsent(query,results);
                     return results;
                 } 
             } catch (SQLException ex) {
