@@ -2,7 +2,7 @@ package gamesite.datastruct;
 
 import java.util.*;
 
-public class Table implements Iterable {
+public class Table implements Iterable<HashMap<String,String>> {
 
     public Table (String newName,String keyName) {
         name = newName;
