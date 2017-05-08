@@ -15,7 +15,7 @@ public class SearchServlet extends HttpServlet
 {
     public String getServletInfo()
     {
-        return "Servlet connects to MySQL database and displays result of a SELECT";
+        return "Servlet displays search results";
     }
 
 
@@ -73,7 +73,17 @@ public class SearchServlet extends HttpServlet
         return resString;
 	}
 
-    // Use http GET
+    private String rowToHtml (HashMap<String,String> row, HttpServletRequest request, String table,
+            Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
+            Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
+        String htmlRow = "";
+        for (Map.Entry<String,String> field: row.entrySet()) {
+	        htmlRow+="<div class=\""+table+"_row\">"
+                +fieldValue(field.getKey(), field.getValue(), table, 
+                        link, images, externalLinks, ignores)+"</div>";
+        }
+        return htmlRow;
+    }
 
     private String ntreeToHtml (NTreeNode<Table> root, HttpServletRequest request, String id,
             Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
@@ -179,30 +189,7 @@ public class SearchServlet extends HttpServlet
                 useSubMatch = false;
             }
 
-            String game = (String) request.getParameter("name");
-            String year = (String) request.getParameter("year");
-            String publisher = (String) request.getParameter("publisher");
-            String genre = (String) request.getParameter("genre");
-            String platform = (String) request.getParameter("platform");
-
-            NTreeNode<Table> rows=null;
-            int searchCount=-1;
-            if (useSubMatch) {
-                rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
-                    year,genre,platform,publisher,order,descend,1);
-                searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
-                    year,genre,platform,publisher,order,descend,1);
-            } else {
-                rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
-                    year,genre,platform,publisher,order,descend,2);
-                searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
-                    year,genre,platform,publisher,order,descend,2);
-            }
-            request.setAttribute("searchCount",searchCount);
-
-            String results = "";
-
-            // Iterate through each row of rs
+            //column configurations
             Hashtable<String,Boolean> links = new Hashtable<String,Boolean>();
             links.put("name",true);
             links.put("publisher",true);
@@ -234,7 +221,49 @@ public class SearchServlet extends HttpServlet
             } else {
                 requestUrl+="&";
             }
-            results+=ntreeToHtml(rows,request,null,links,images,externalLinks,ignores);
+
+            String game = (String) request.getParameter("name");
+            String year = (String) request.getParameter("year");
+            String publisher = (String) request.getParameter("publisher");
+            String genre = (String) request.getParameter("genre");
+            String platform = (String) request.getParameter("platform");
+
+            int searchCount=-1;
+            String results = "";
+            if (table.equals("games")) {
+                NTreeNode<Table> rows=null;
+                if (useSubMatch) {
+                    rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,1);
+                    searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,1);
+                } else {
+                    rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,2);
+                    searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,2);
+                }
+
+                results+=ntreeToHtml(rows,request,null,links,images,externalLinks,ignores);
+            } else {
+                ArrayList<HashMap<String,String>> rows=null;
+                if (useSubMatch) {
+                    rows = SearchResults.getInstance().search(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,1);
+                    searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,1);
+                } else {
+                    rows = SearchResults.getInstance().search(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,2);
+                    searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,2);
+                }
+
+                for (HashMap<String,String> row : rows) {
+                    results+=rowToHtml(row,request,table,links,images,externalLinks,ignores);
+                }
+            }
+            request.setAttribute("searchCount",searchCount);
 
             String nextJSP = request.getParameter("nextPage");
             if (nextJSP == null) {
@@ -242,9 +271,7 @@ public class SearchServlet extends HttpServlet
             } else {
                 nextJSP="/"+nextJSP;
             }
-            if (rows.data.isEmpty()) {
-                results="";
-            }
+
             request.setAttribute("searchResults",results);
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP); 
             dispatcher.forward(request,response);
