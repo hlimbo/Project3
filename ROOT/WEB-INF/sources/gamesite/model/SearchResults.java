@@ -134,15 +134,55 @@ public class SearchResults {
             String rootId) throws SQLExceptionHandler, java.lang.Exception {
         Connection conn = null;
         ResultSet result = null;
+        String queryId = "null";
+        String itemQuery = null;
         Table sibData = new Table(child.data.name,"id");
         try {
+            ArrayList<String> tables = QueryUtils.getTables();
             conn = DBConnection.create();
-            //TODO
-            /*result = SQLQuery.getTableInfo(dbcon,
-                    Integer.parseInt(rootId),root.data.name);*/
+            //By SQL schema convention, relationship tables are named by
+            //table1_of_table2
+            String relationName = root.data.name+"_of_"+child.data.name;
+            if (!tables.contains(relationName)) {
+                relationName = child.data.name+"_of_"+root.data.name;
+                assert(tables.contains(relationName));
+            }
+            ArrayList<Integer> sibIds = new ArrayList<Integer>();
+            //By SQL schema convention, values.id = value_id in relation table
+            String parentIdField = QueryUtils.getRelationIdName(root.data.name);
+		    itemQuery = "SELECT * FROM "+relationName+" JOIN "+root.data.name
+                +" ON "+relationName+"."+parentIdField+"="+root.data.name+".id WHERE id=?";
+		    PreparedStatement statement = conn.prepareStatement(itemQuery);
+		    statement.setInt(1,Integer.parseInt(rootId));
+            result = statement.executeQuery();
+            while (result.next()) {
+                String sibIdField = QueryUtils.getRelationIdName(child.data.name);
+		        ResultSetMetaData meta = result.getMetaData();
+		        for (int i=1;i<=meta.getColumnCount();++i) {
+                    if (meta.getColumnName(i).equals(sibIdField)) {
+                        sibIds.add(result.getInt(i));
+                        break;
+                    }
+                }
+            }
+            result.close();
+            statement.close();
+            itemQuery=null;
+            for (Integer sibId : sibIds) {
+                queryId = sibId.toString();
+                result = SQLQuery.getTableInfo(conn,
+                        sibId,root.data.name);
+                while (result.next()) {
+                    sibData.addRow(QueryUtils.tableRow(result));
+                }
+            }
         } catch (SQLException ex) {
-            throw new SQLExceptionHandler(ex," SQLQuery.getTableInfo(conn, "
-                    +rootId+", "+root.data.name+")");
+            if (itemQuery!=null) {
+                throw new SQLExceptionHandler(ex,itemQuery);
+            } else {
+                throw new SQLExceptionHandler(ex," SQLQuery.getTableInfo(conn, "
+                    +queryId+", "+root.data.name+")");
+            }
         } finally {
             if (result!=null) {
                 result.close();
