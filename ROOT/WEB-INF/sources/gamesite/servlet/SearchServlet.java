@@ -8,9 +8,8 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import gamesite.model.QueryUtils;
-import gamesite.model.SearchResults;
-import gamesite.model.SQLExceptionHandler;
+import gamesite.datastruct.*;
+import gamesite.model.*;
 
 public class SearchServlet extends HttpServlet
 {
@@ -21,7 +20,7 @@ public class SearchServlet extends HttpServlet
 
 
     private String cartButton (String id, String quantity, HttpServletRequest request) {
-        String button = "<tr><td><form action=\"/ShoppingCart/view-shopping-cart\" method=\"GET\">";
+        String button = "<form class=\"cartButton\" action=\"/ShoppingCart/view-shopping-cart\" method=\"GET\">";
         button+="<input type=\"HIDDEN\" name=id value=\""+id+"\" \\>";
         button+="<input type=\"HIDDEN\" name=\"quantity\" value=\""+quantity+"\" \\>";
         try {
@@ -30,57 +29,82 @@ public class SearchServlet extends HttpServlet
                 +URLEncoder.encode(request.getQueryString(), "UTF-8")+"\" \\>";
         } catch (UnsupportedEncodingException e){
         }
-        button+="<input type=\"SUBMIT\" value=\"Add to Shopping Cart\" \\>";
-        button+="</form></td></tr>";
+        button+="<input class=\"cartButtonCheckout\" type=\"SUBMIT\" value=\"Add to Shopping Cart\" \\>";
+        button+="</form>";
         return button;
     }
 
-	private static String tableRow (ArrayList<HashMap<String,String>> results, int i, String table,
+	private static String fieldValue (String colName, String value, String table,
             Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
             Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
 	    String resString = "";
-		//resString+="<tr>";
-        for (Map.Entry<String,String> field : results.get(i).entrySet()) {
-            String colName = field.getKey();
-            String value = field.getValue();
+        //for (Map.Entry<String,String> field : results.get(i).entrySet()) {
+            //String colName = field.getKey();
+            //String value = field.getValue();
             //handle nulls and empty values here
             if (ignores.containsKey(colName) && ignores.get(colName)) {
-                continue;
+                return "";
             }
+			resString+=" <span class=\""+table+"_"+colName+"\">";
             if (value==null || value.trim().compareTo("") == 0) {
                 if (images.containsKey(colName) && images.get(colName)){
-                    resString+="<td><img src=\""
+                    resString+="<img src=\""
                         +"http://upload.wikimedia.org/wikipedia/"
                         +"commons/thumb/5/51/"
-                        +"Star_full.svg/11px-Star_full.svg.png\" /></td>";
+                        +"Star_full.svg/11px-Star_full.svg.png\" />";
                 }
-                continue;
+                return "";
             }
             if  (link.containsKey(colName) && link.get(colName)) {
                 try {
-			        resString+="<td><a href=\"/display/query?table="+table+"&columnName="+colName+
+			        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
                         "&"+colName+"="+URLEncoder.encode(value,"UTF-8")+"\">";
                 } catch (UnsupportedEncodingException error) {
-			        resString+="<td><a href=\"/display/query?table="+table+"&columnName="+colName+
+			        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
                         "&"+colName+"="+value.replaceAll("[^\\w]","_")+"\">";
                 }
                 resString+=value;
-                resString+="</a></td>";
+                resString+="</a>";
             } else if  (externalLinks.containsKey(colName) && externalLinks.get(colName)) {
-			    resString+="<td><a href=\"http://"+value+"\">"+value+"</a></td>";
+			    resString+="<a href=\"http://"+value+"\">"+value+"</a>";
             } else if (images.containsKey(colName) && images.get(colName)){
-                resString+="<td><img src=\"http://"+value+"\" /></td>";
+                resString+="<img src=\"http://"+value+"\" />";
             } else {
-			    resString+="<td>";
                 resString+=value;
-			    resString+="</td>";
             }
-        }
-		//resString+="</tr>";
+			resString+="</span> ";
+        //}
         return resString;
 	}
 
     // Use http GET
+
+    private String ntreeToHtml (NTreeNode<Table> root, 
+            Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
+            Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
+        String result = "";
+        for (HashMap<String,String> row : root.data) {
+            result+="<div class=\""+root.data.name+"_row\">";
+            for (String field : row.keySet()) {
+                if (!field.endsWith("_id")) {
+                    result+=fieldValue(field,row.get(field),root.data.name,
+                            link,images,externalLinks,ignores);
+                }
+            }
+            for (String field : row.keySet()) {
+                if (field.endsWith("_id")) {
+                    String childTable = QueryUtils.getTableFromRelationIdName(field);
+                    for (NTreeNode<Table> child : root.children) {
+                        if (child.data.name.equals(childTable)) {
+                            result+=ntreeToHtml(child,link,images,externalLinks,ignores);
+                        }
+                    }
+                }
+            }
+            result+="</div>\n";
+        }
+        return result;
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException
@@ -160,15 +184,15 @@ public class SearchServlet extends HttpServlet
             String genre = (String) request.getParameter("genre");
             String platform = (String) request.getParameter("platform");
 
-            ArrayList<HashMap<String,String>> rows;
+            NTreeNode<Table> rows;
             int searchCount=-1;
             if (useSubMatch) {
-                rows = SearchResults.getInstance().search(table,limit,offset,game,
+                rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
                     year,genre,platform,publisher,order,descend,1);
                 searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
                     year,genre,platform,publisher,order,descend,1);
             } else {
-                rows = SearchResults.getInstance().search(table,limit,offset,game,
+                rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
                     year,genre,platform,publisher,order,descend,2);
                 searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
                     year,genre,platform,publisher,order,descend,2);
@@ -176,7 +200,7 @@ public class SearchServlet extends HttpServlet
             request.setAttribute("searchCount",searchCount);
 
             String results = "";
-            results+="<TABLE border>";
+            //results+="<TABLE border>";
 
             // Iterate through each row of rs
             Hashtable<String,Boolean> links = new Hashtable<String,Boolean>();
@@ -196,7 +220,6 @@ public class SearchServlet extends HttpServlet
             ignores.put("rank",true);
             ignores.put("globalsales",true);
 
-            results+="<tr>";
             String requestUrl = "?"+request.getQueryString();
             String requestUrlEnd = "";
             int orderStart = requestUrl.indexOf("order=");
@@ -211,8 +234,12 @@ public class SearchServlet extends HttpServlet
             } else {
                 requestUrl+="&";
             }
-            if (!rows.isEmpty()) {
-                for (String column : rows.get(0).keySet()) {
+            results+=ntreeToHtml(rows,links,images,externalLinks,ignores);
+            /* 
+            results+="<tr>";
+            if (!rows.data.isEmpty()) {
+                //TODO get column names in table
+                for (String column : rows.data.rows.values()) {
                     if (ignores.containsKey(column) && ignores.get(column)) {
                         continue;
                     }
@@ -220,15 +247,15 @@ public class SearchServlet extends HttpServlet
                         +requestUrlEnd+"\">"+column+"</a></td>\n";
                 }
             }
-            results+="</tr>";
-            if (table.trim().compareToIgnoreCase("games")==0) {
+            results+="</tr>";*/
+            /*if (table.trim().compareToIgnoreCase("games")==0) {
                 ArrayList<String> records= new ArrayList<String>();
                 ArrayList<Integer> gameIDs = new ArrayList<Integer>();
                 //get game fields
                 for (int i=0;i<rows.size();++i) {
                     records.add("<tr>"+tableRow(rows,i,"games",links,images,externalLinks,ignores)+"</tr>");
                     gameIDs.add(Integer.parseInt(rows.get(i).get("id")));
-                }
+                }*/
                 //get publishers
                 /*Connection dbcon = QueryUtils.createConn();
                 for (int i=0;i<gameIDs.size();++i) {
@@ -267,18 +294,18 @@ public class SearchServlet extends HttpServlet
                     rs.close()
                 }
                 dbcon.close()*/
-                int i=0;
+                /*int i=0;
                 for (String record : records) {
                     results+=record;
                     results+=cartButton(Integer.toString(gameIDs.get(i)),"1",request);
                     ++i;
-                }
-            } else {
+                }*/
+            /*} else {
                 for (int i=0;i<rows.size();++i) {
                     results+="<tr>"+tableRow(rows,i,table,links,images,externalLinks,ignores)+"</tr>";
                 }
-            }
-            results+="</TABLE>";
+            }*/
+            //results+="</TABLE>";
 
             String nextJSP = request.getParameter("nextPage");
             if (nextJSP == null) {
@@ -286,7 +313,7 @@ public class SearchServlet extends HttpServlet
             } else {
                 nextJSP="/"+nextJSP;
             }
-            if (rows.isEmpty()) {
+            if (rows.data.isEmpty()) {
                 results="";
             }
             request.setAttribute("searchResults",results);

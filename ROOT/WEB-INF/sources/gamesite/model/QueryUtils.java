@@ -93,6 +93,10 @@ public class QueryUtils {
         return table.substring(0,table.length()-1)+"_id";
     }
 
+    public static String getTableFromRelationIdName (String idName) {
+        return idName.substring(0,idName.length()-3)+"s";
+    }
+
     public static ArrayList<String> getTables () throws SQLExceptionHandler, java.lang.Exception {
         Connection dbcon = null;
         try {
