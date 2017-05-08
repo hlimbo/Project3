@@ -30,6 +30,15 @@ public class Table implements Iterable<HashMap<String,String>> {
         return rows.size();
     }
 
+    public boolean find (String fieldName, String fieldValue) {
+        for (HashMap<String,String> row : this) {
+            if (row.containsKey(fieldName) && row.get(fieldName).equals(fieldValue)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     //String key in outer HashMap is a primary key to find a particular
     //row by.
     public HashMap<String,HashMap<String,String>> rows;

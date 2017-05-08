@@ -79,7 +79,7 @@ public class SearchServlet extends HttpServlet
 
     // Use http GET
 
-    private String ntreeToHtml (NTreeNode<Table> root, 
+    private String ntreeToHtml (NTreeNode<Table> root, HttpServletRequest request,
             Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
             Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
         String result = "";
@@ -96,11 +96,12 @@ public class SearchServlet extends HttpServlet
                     String childTable = QueryUtils.getTableFromRelationIdName(field);
                     for (NTreeNode<Table> child : root.children) {
                         if (child.data.name.equals(childTable)) {
-                            result+=ntreeToHtml(child,link,images,externalLinks,ignores);
+                            result+=ntreeToHtml(child,request,link,images,externalLinks,ignores);
                         }
                     }
                 }
             }
+            result+=cartButton(row.get("id"),"1",request);
             result+="</div>\n";
         }
         return result;
@@ -234,7 +235,7 @@ public class SearchServlet extends HttpServlet
             } else {
                 requestUrl+="&";
             }
-            results+=ntreeToHtml(rows,links,images,externalLinks,ignores);
+            results+=ntreeToHtml(rows,request,links,images,externalLinks,ignores);
             /* 
             results+="<tr>";
             if (!rows.data.isEmpty()) {
