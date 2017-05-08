@@ -10,13 +10,19 @@ import java.util.*;
 
 public class SQLQuery
 {
+
+	public static ResultSet getTableInfo(Connection dbcon, int table_id, String table) throws SQLException
+    {
+		String itemQuery = "SELECT * FROM "+table+" WHERE id=?";
+		PreparedStatement statement = dbcon.prepareStatement(itemQuery);
+		statement.setInt(1, table_id);
+		return statement.executeQuery();
+    }
+
 	//Note: can return a null ResultSet if game_id not found in database
 	public static ResultSet getGameInfo(Connection dbcon, int game_id) throws SQLException
 	{
-		String itemQuery = "SELECT * FROM games WHERE id=?";
-		PreparedStatement statement = dbcon.prepareStatement(itemQuery);
-		statement.setInt(1, game_id);
-		return statement.executeQuery();
+        return getTableInfo(dbcon,game_id,"games");
 	}
 	
 	//Find and return customer login information if email and password exist in database, otherwise return null
