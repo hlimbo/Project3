@@ -72,7 +72,8 @@ public class ShoppingCartServlet extends HttpServlet
 						
 						System.out.println("Successfully placed: " + item.getGameName() + " into cart");
 					}
-			
+					
+					set.close();
 					DBConnection.close(dbcon);
 				}
 				catch (SQLException ex)

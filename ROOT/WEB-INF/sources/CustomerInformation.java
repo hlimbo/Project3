@@ -1,4 +1,4 @@
-
+package gamesite.servlet;
 /* A servlet to display the contents of the MySQL movieDB database */
 
 import java.io.*;
@@ -10,6 +10,9 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 
+import gamesite.utils.DBConnection;
+import gamesite.utils.SQLQuery;
+
 public class CustomerInformation extends HttpServlet
 {
 	
@@ -20,28 +23,21 @@ public class CustomerInformation extends HttpServlet
 	
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException
-    {
-        String loginUser = "user";
-        String loginPasswd = "password";
-        String loginUrl = "jdbc:mysql://localhost:3306/gamedb";
-
-		
-		System.out.println("CustomerInformation class is active");
-		
+    {	
+	
+		System.out.println("CustomerInformation class is active");	
         response.setContentType("text/html");    // Response mime type
 		
         try
         {
-              //Class.forName("org.gjt.mm.mysql.Driver");
-              Class.forName("com.mysql.jdbc.Driver").newInstance();
-              Connection dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd);	
+			Connection dbcon = DBConnection.create();
 
-			  HttpSession session = request.getSession();
-			  String first_name = (String)request.getParameter("first_name");
-  			  String last_name = (String)request.getParameter("last_name");
-			  String cc_id = (String)request.getParameter("cc_id");
-			  String expiration = (String)request.getParameter("expiration");
-			  java.sql.Date expDate = java.sql.Date.valueOf(expiration);
+			HttpSession session = request.getSession();
+			String first_name = (String)request.getParameter("first_name");
+			String last_name = (String)request.getParameter("last_name");
+			String cc_id = (String)request.getParameter("cc_id");
+			String expiration = (String)request.getParameter("expiration");
+			java.sql.Date expDate = java.sql.Date.valueOf(expiration);
 			
 			Statement statement = dbcon.createStatement();	
              String query = "SELECT * FROM creditcards WHERE id='" + cc_id 
@@ -133,7 +129,8 @@ public class CustomerInformation extends HttpServlet
 			
 			  statement.close();
 			  result.close();
-              dbcon.close();
+			  
+              DBConnection.close(dbcon);
             }
         catch (SQLException ex) {
               while (ex != null) {

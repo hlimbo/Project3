@@ -35,5 +35,24 @@ public class SQLQuery
 		return statement.executeQuery();
 	}
 	
+	//Find customer creditcard information and verify if it exists in database.
+	public static boolean isValidCreditCard(Connection dbcon, String cc_id, String expiration)
+	{
+		return false;
+	}
+	
+	//helper function for isValidCreditCard
+	private static boolean isCreditCardExpired(String expiration)
+	{
+		return false;
+	}
+	
+	//Verifies that the creditcard is owned by exactly 1 person in the database.
+	public static boolean isUniqueCreditCardAccount(Connection dbcon, String first_name, String last_name, String cc_id, String expiration)
+	throws SQLException
+	{
+		return false;
+	}
+	
 	
 }

@@ -128,7 +128,7 @@
 		
 		<hr>
 		
-		<!-- total cost display ~ if cart is not empty or null -->
+		<!-- total cost display ~ if cart is not null -->
 		<c:if test="${not empty cart}">
 			<span>
 				<form action="/CustomerInformation/index.jsp" method="GET">
