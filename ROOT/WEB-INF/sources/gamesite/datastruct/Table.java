@@ -6,7 +6,7 @@ public class Table implements Iterable<HashMap<String,String>> {
 
     public Table (String newName,String keyName) {
         name = newName;
-        rows = new HashMap<String,HashMap<String,String>>();
+        rows = new LinkedHashMap<String,HashMap<String,String>>();
         key = keyName;
     }
 
@@ -41,7 +41,7 @@ public class Table implements Iterable<HashMap<String,String>> {
 
     //String key in outer HashMap is a primary key to find a particular
     //row by.
-    public HashMap<String,HashMap<String,String>> rows;
+    public LinkedHashMap<String,HashMap<String,String>> rows;
     public final String name;
     //primary key of table for quick searching of particular
     //row
