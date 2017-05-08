@@ -9,7 +9,8 @@ import java.util.concurrent.*;
 
 import gamesite.model.QueryUtils;
 import gamesite.model.SQLExceptionHandler;
-import gamesite.utils.DBConnection;
+import gamesite.utils.*;
+import gamesite.datastruct.*;
 
 public class SearchResults {
     private static String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
@@ -36,11 +37,13 @@ public class SearchResults {
             boolean descend, int match) throws SQLException, java.lang.Exception {
         ArrayList<HashMap<String,String>> results = new ArrayList<HashMap<String,String>> ();
         Connection dbconn = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
         try {
             dbconn=DBConnection.create();
-            PreparedStatement statement = dbconn.prepareStatement(query);
+            statement = dbconn.prepareStatement(query);
             setSearchTerms(statement,game,year,publisher,genre,platform,match);
-            ResultSet rs = statement.executeQuery();
+            rs = statement.executeQuery();
             while (rs.next()) {
                 results.add(QueryUtils.tableRow(rs));
             }
@@ -49,6 +52,12 @@ public class SearchResults {
         } catch (java.lang.Exception ex) {
             throw ex;
         } finally {
+            if (rs!=null) {
+                rs.close();
+            }
+            if (statement!=null) {
+                statement.close();
+            }
 			DBConnection.close(dbconn);
         }
         return results;
@@ -121,51 +130,65 @@ public class SearchResults {
         return results;
     }
 
-    /*private NTreeNode<ArrayList<HashMap<String,String>>> searchNode (Connection conn, NTreeNode<String> parent, String key) 
-        throws SQLExceptionHandler, java.lang.Exception {
-        String query = "";
+    private Table siblingData (NTreeNode<Table> root, NTreeNode<Table> child, 
+            String rootId) throws SQLExceptionHandler, java.lang.Exception {
+        Connection conn = null;
+        ResultSet result = null;
+        Table sibData = new Table(child.data.name,"id");
         try {
+            conn = DBConnection.create();
             //TODO
-            String joinTable;
-            String parentTable;
-            query = "SELECT DISTINCT "+parent.data+".* FROM "+parent.data+" JOIN "+joinTable
-                +" ON id="+key+" WHERE "+parent.data+"="+key;
-                +"";
-            PreparedStatement statement = conn.prepareStatement(query);
-            ResultSet rs = statement.executeQuery();
-            ArrayList<HashMap<String,String>> rows;
-            while (rs.next()) {
-                rows.add(tableRow(rs));
-            }
-            NTreeNode<ArrayList<HashMap<String,String>>> root = new NTreeNode<ArrayList<HashMap<String,String>>>(rows);
-            for (NTreeNode<String> child : parent) {
-                root.addChild(searchNode(conn,child));
-            }
-            return root;
+            /*result = SQLQuery.getTableInfo(dbcon,
+                    Integer.parseInt(rootId),root.data.name);*/
         } catch (SQLException ex) {
-            throw new SQLExceptionHandler(ex,query);
+            throw new SQLExceptionHandler(ex," SQLQuery.getTableInfo(conn, "
+                    +rootId+", "+root.data.name+")");
+        } finally {
+            if (result!=null) {
+                result.close();
+            }
+            DBConnection.close(conn);
         }
-    }*/
+        return sibData;
+    }
 
-    /*public NTreeNode<ArrayList<HashMap<String,String>>> masterSearch (String table, String limit, String offset,
+    private NTreeNode<Table> rootSearch (NTreeNode<Table> root,
+            NTreeNode<String> siblings) throws SQLExceptionHandler, java.lang.Exception {
+        for (NTreeNode<String> sib : siblings.children) {
+            root.addChild(new NTreeNode<Table>(new Table(sib.data,"id")));
+        }
+        for (HashMap<String,String> row : root.data) {
+            for (NTreeNode<Table> child : root.children) {
+                Table newData = siblingData(root,child,row.get("id"));
+                for (HashMap<String, String> newRow : newData) {
+                    child.data.addRow(newRow);
+                }
+            }
+        }
+        for (NTreeNode<String> sibling : siblings.children) {
+            for (NTreeNode<Table> child : root.children) {
+                if (child.data.name.equals(sibling.data)) {
+                    rootSearch(child,sibling);
+                    break;
+                }
+            }
+        }
+        return root;
+    }
+
+    public NTreeNode<Table> masterSearch (String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher, String order, 
             boolean descend, int match) throws SQLExceptionHandler, java.lang.Exception {
-        NTreeNode<String> siblings = QueryUtils.getSiblings(table);
-        NTreeNode<ArrayList<HashMap<String,String>>> resultsRoot = new NTreeNode<Array<HashMap<String,String>>>(
-                search(table,limit,offset,game,year,genre,platform,publisher,order,descend,match));
-        Connection dbcon = null;
-        //NTreeNode<ArrayList<HashMap<String,String>>> parent = resultsRoot;
-        try {
-            dbcon = QueryUtils.createConn();
-            for
-            searchNode(dbcon,siblings);
-        } finally {
-            if (dbcon!=null) {
-                dbcon.close();
-            }
+        NTreeNode<Table> root = new NTreeNode<Table>(new Table(table,"id"));
+        ArrayList<HashMap<String,String>> rootTable = search(table,limit,offset,game,
+                year,genre,platform,publisher,order,descend,match);
+        for (HashMap<String,String> row : rootTable) {
+            root.data.addRow(row);
         }
-        return resultsRoot;
-    }*/
+        NTreeNode<String> siblings = QueryUtils.getSiblings(table);
+        rootSearch(root,siblings);
+        return root;
+    }
 
     public int getCount(String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher,
