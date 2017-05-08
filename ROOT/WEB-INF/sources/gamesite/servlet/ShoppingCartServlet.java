@@ -19,7 +19,6 @@ import gamesite.utils.SQLQuery;
 // 2. authenticate user credentials
 // 3. query for certain items to be found in the database. i.e. game id, genre id.
 
-//TODO(HARVEY): create java beans class ShoppingCartItem
 public class ShoppingCartServlet extends HttpServlet
 {	
 	public String getServletInfo()
@@ -34,18 +33,11 @@ public class ShoppingCartServlet extends HttpServlet
 		ShoppingCart cart = null;
 		HttpSession session = request.getSession();
 		
-		//critical section ~ retrieve the list of items in cart if it already exists
-		//if not, create a new cart with the item added to it.
 		synchronized(session)
 		{
-			//http://stackoverflow.com/questions/509076/how-do-i-address-unchecked-cast-warnings
-			//Note: This will always be a <String,Integer> typed hashmap
-			//@SuppressWarnings("unchecked")
-			//Map<String,Integer> temp = (HashMap<String,Integer>)session.getAttribute("cartList");
-			
 			cart = (ShoppingCart)session.getAttribute("cart");
 			
-			//if  cartList from the cart does not already exist, create one
+			//initialize a new cart if session doesn't already have one
 			if(cart == null)
 			{
 				cart = new ShoppingCart();
@@ -80,8 +72,7 @@ public class ShoppingCartServlet extends HttpServlet
 						
 						System.out.println("Successfully placed: " + item.getGameName() + " into cart");
 					}
-				
-					
+			
 					DBConnection.close(dbcon);
 				}
 				catch (SQLException ex)
@@ -102,10 +93,11 @@ public class ShoppingCartServlet extends HttpServlet
 				    out.println("<br />\n"+returnLink+"</P></BODY></HTML>");
 					out.close();	
 				}
+				catch (Exception ex)
+				{
+					ex.printStackTrace();
+				}
 				
-				//System.out.println("id: " + id);
-				//Integer quantity = cartList.get(id) == null ? 0 : (Integer) cartList.get(id);
-				//cart.put(id, ++quantity);
 			}
 		}
 		else

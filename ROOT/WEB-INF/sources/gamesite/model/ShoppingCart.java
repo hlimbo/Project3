@@ -19,7 +19,6 @@ public class ShoppingCart
 	}
 	
 	public HashMap<String,ShoppingCartItem> getItems() { return items; }
-	//use this function to clear the cart.
 	public void setItems(HashMap<String, ShoppingCartItem> items) { this.items = items; }
 	
 	public void put(String gameId, ShoppingCartItem item)
@@ -65,5 +64,16 @@ public class ShoppingCart
 		}
 		
 		return totalPrice;
+	}
+	
+	//removes all items from cart
+	public void clear()
+	{
+		items.clear();
+	}
+	
+	public boolean isEmpty()
+	{
+		return items.isEmpty();
 	}
 }

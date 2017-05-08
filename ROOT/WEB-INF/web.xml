@@ -89,7 +89,7 @@
 
   <servlet>
 	<servlet-name>ClearCartServlet</servlet-name>
-	<servlet-class>ClearCart</servlet-class>
+	<servlet-class>gamesite.servlet.ClearCartServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>

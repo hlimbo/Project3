@@ -100,6 +100,24 @@
 		
 		<hr>
 		
+		<!-- total cost display ~ if cart is not empty or null -->
+		<c:if test="${not empty cart}">
+			<span>
+				<form action="/CustomerInformation/index.jsp" method="GET">
+					<button name="checkout">Continue to Checkout</button>
+				</form>
+				<p class="total"> Total Cost: $<c:out value="${cart.getTotalPrice()}" />.00 </p>
+			</span>
+			
+			<!-- clearing the cart contents : TODO(HARVEY): Refactor this soon -->
+			<form action="/ShoppingCart/clear-cart" method="GET">
+                <% for (Map.Entry<String,String> parsedParam : parsedParams.entrySet()) { %>
+                <%= "<input type=\"hidden\" name=\""+parsedParam.getKey()+"\" value=\""+parsedParam.getValue()+"\" />"%>
+                <% } %>
+				<button name="clearCart">Clear Cart</button>
+			</form>
+		</c:if>
+		
 		<!-- back to previous page -->
 		<% if( request.getParameter("previousPage") != null ){%>
 			<% String previousPage = (String)request.getParameter("previousPage"); %>
