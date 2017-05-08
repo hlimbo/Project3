@@ -10,10 +10,10 @@ import java.sql.*;
 
 public class DBConnection
 {
-	public static Connection create() throws SQLException
+	public static Connection create() throws SQLException, java.lang.Exception
 	{
 		//since we have jdbc 5.0, we don't need to create a new instance
-		//Class.forName("com.mysql.jdbc.Driver").newInstance();
+		Class.forName("com.mysql.jdbc.Driver").newInstance();
 		
 		String user = "user";
 		String password = "password";
