@@ -2,7 +2,7 @@ package gamesite.datastruct;
 
 import java.util.*;
 
-public class Table {
+public class Table implements Iterable {
 
     public Table (String newName,String keyName) {
         name = newName;
@@ -10,8 +10,16 @@ public class Table {
         key = keyName;
     }
 
-    public getRow(String keyValue) {
+    public HashMap<String,String> getRow(String keyValue) {
         return rows.get(keyValue);
+    }
+
+    public HashMap<String,String> addRow(HashMap<String,String> row) {
+        return rows.put(row.get(key),row);
+    }
+
+    public Iterator<HashMap<String,String>> iterator () {
+            return rows.values().iterator();
     }
 
     //String key in outer HashMap is a primary key to find a particular
