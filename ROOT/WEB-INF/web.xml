@@ -60,7 +60,7 @@
 
   <servlet>
     <servlet-name>ShoppingCartServlet</servlet-name>
-    <servlet-class>ShoppingCart</servlet-class>
+    <servlet-class>gamesite.servlet.ShoppingCartServlet</servlet-class>
 	
 	<!-- <servlet-name>ShoppingCartDisplayServlet</servlet-name>
 	<servlet-class>ShoppingCartDisplay</servlet-class> -->

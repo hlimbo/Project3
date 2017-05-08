@@ -25,6 +25,7 @@ public class DBConnection
 	
 	public static void close(Connection dbcon) throws SQLException
 	{
-		dbcon.close();
+		if(dbcon != null)
+			dbcon.close();
 	}
 }
