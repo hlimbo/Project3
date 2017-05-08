@@ -38,71 +38,71 @@ public class SearchServlet extends HttpServlet
             Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
             Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
 	    String resString = "";
-        //for (Map.Entry<String,String> field : results.get(i).entrySet()) {
-            //String colName = field.getKey();
-            //String value = field.getValue();
-            //handle nulls and empty values here
-            if (ignores.containsKey(colName) && ignores.get(colName)) {
-                return "";
+        if (ignores.containsKey(colName) && ignores.get(colName)) {
+            return "";
+        }
+		resString+=" <span class=\""+table+"_"+colName+"\">";
+        if (value==null || value.trim().compareTo("") == 0) {
+            if (images.containsKey(colName) && images.get(colName)){
+                resString+="<img src=\""
+                    +"http://upload.wikimedia.org/wikipedia/"
+                    +"commons/thumb/5/51/"
+                    +"Star_full.svg/11px-Star_full.svg.png\" />";
             }
-			resString+=" <span class=\""+table+"_"+colName+"\">";
-            if (value==null || value.trim().compareTo("") == 0) {
-                if (images.containsKey(colName) && images.get(colName)){
-                    resString+="<img src=\""
-                        +"http://upload.wikimedia.org/wikipedia/"
-                        +"commons/thumb/5/51/"
-                        +"Star_full.svg/11px-Star_full.svg.png\" />";
-                }
-                return "";
+		    resString+="</span> ";
+            return resString;
+        }
+        if  (link.containsKey(colName) && link.get(colName)) {
+            try {
+		        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
+                    "&"+colName+"="+URLEncoder.encode(value,"UTF-8")+"\">";
+            } catch (UnsupportedEncodingException error) {
+		        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
+                    "&"+colName+"="+value.replaceAll("[^\\w]","_")+"\">";
             }
-            if  (link.containsKey(colName) && link.get(colName)) {
-                try {
-			        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
-                        "&"+colName+"="+URLEncoder.encode(value,"UTF-8")+"\">";
-                } catch (UnsupportedEncodingException error) {
-			        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
-                        "&"+colName+"="+value.replaceAll("[^\\w]","_")+"\">";
-                }
-                resString+=value;
-                resString+="</a>";
-            } else if  (externalLinks.containsKey(colName) && externalLinks.get(colName)) {
-			    resString+="<a href=\"http://"+value+"\">"+value+"</a>";
-            } else if (images.containsKey(colName) && images.get(colName)){
-                resString+="<img src=\"http://"+value+"\" />";
-            } else {
-                resString+=value;
-            }
-			resString+="</span> ";
-        //}
+            resString+=value;
+            resString+="</a>";
+        } else if  (externalLinks.containsKey(colName) && externalLinks.get(colName)) {
+		    resString+="<a href=\"http://"+value+"\">"+value+"</a>";
+        } else if (images.containsKey(colName) && images.get(colName)){
+            resString+="<img src=\"http://"+value+"\" />";
+        } else {
+            resString+=value;
+        }
+		resString+="</span> ";
         return resString;
 	}
 
     // Use http GET
 
-    private String ntreeToHtml (NTreeNode<Table> root, HttpServletRequest request,
+    private String ntreeToHtml (NTreeNode<Table> root, HttpServletRequest request, String id,
             Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
             Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
         String result = "";
         for (HashMap<String,String> row : root.data) {
-            result+="<div class=\""+root.data.name+"_row\">";
-            for (String field : row.keySet()) {
-                if (!field.endsWith("_id")) {
-                    result+=fieldValue(field,row.get(field),root.data.name,
-                            link,images,externalLinks,ignores);
+            if (id==null || id.equals(row.get("id"))) {
+                result+="<div class=\""+root.data.name+"_row\">";
+                for (String field : row.keySet()) {
+                    if (!field.endsWith("_id")) {
+                        result+=fieldValue(field,row.get(field),root.data.name,
+                                link,images,externalLinks,ignores);
+                    }
                 }
-            }
-            for (String field : row.keySet()) {
-                if (field.endsWith("_id")) {
-                    String childTable = QueryUtils.getTableFromRelationIdName(field);
-                    for (NTreeNode<Table> child : root.children) {
-                        if (child.data.name.equals(childTable)) {
-                            result+=ntreeToHtml(child,request,link,images,externalLinks,ignores);
+                for (String field : row.keySet()) {
+                    if (field.endsWith("_id")) {
+                        String childTable = QueryUtils.getTableFromRelationIdName(field);
+                        for (NTreeNode<Table> child : root.children) {
+                            if (child.data.name.equals(childTable)) {
+                                result+=ntreeToHtml(child,request,row.get(field),link,images,externalLinks,ignores);
+                            }
                         }
                     }
                 }
+                if (root.data.name.equals("games")) {
+                    result+=cartButton(row.get("id"),"1",request);
+                }
+                result+="</div>\n";
             }
-            result+=cartButton(row.get("id"),"1",request);
-            result+="</div>\n";
         }
         return result;
     }
@@ -235,78 +235,7 @@ public class SearchServlet extends HttpServlet
             } else {
                 requestUrl+="&";
             }
-            results+=ntreeToHtml(rows,request,links,images,externalLinks,ignores);
-            /* 
-            results+="<tr>";
-            if (!rows.data.isEmpty()) {
-                //TODO get column names in table
-                for (String column : rows.data.rows.values()) {
-                    if (ignores.containsKey(column) && ignores.get(column)) {
-                        continue;
-                    }
-                    results+="<td><a class=\"sortColumn\" href=\"/search/query"+requestUrl+"order="+column
-                        +requestUrlEnd+"\">"+column+"</a></td>\n";
-                }
-            }
-            results+="</tr>";*/
-            /*if (table.trim().compareToIgnoreCase("games")==0) {
-                ArrayList<String> records= new ArrayList<String>();
-                ArrayList<Integer> gameIDs = new ArrayList<Integer>();
-                //get game fields
-                for (int i=0;i<rows.size();++i) {
-                    records.add("<tr>"+tableRow(rows,i,"games",links,images,externalLinks,ignores)+"</tr>");
-                    gameIDs.add(Integer.parseInt(rows.get(i).get("id")));
-                }*/
-                //get publishers
-                /*Connection dbcon = QueryUtils.createConn();
-                for (int i=0;i<gameIDs.size();++i) {
-                    //query="SELECT DISTINCT publisher FROM publishers JOIN publishers_of_games ON id=publisher_id WHERE game_id=?";
-                    query="SELECT DISTINCT publisher, platform FROM publishers "
-                        +"JOIN publishers_of_games ON publishers.id=publisher_id "
-                        +"JOIN platforms ON platforms.id=platform_id WHERE game_id=?";
-                    PreparedStatement pubStatement =dbcon.prepareStatement(query);
-                    pubStatement.setInt(1,gameIDs.get(i));
-                    ResultSet rs = pubStatement.executeQuery();
-                    records.set(i,records.get(i)+"<tr><td>publishers: </td><td>");
-                    while (rs.next()) {
-                        records.set(i,records.get(i)+"\n<ul style=\""
-                                +"list-style-type:none;\">"
-                                +tableRow(rs,links,
-                                    images,externalLinks,
-                                    ignores).replaceAll("<td>","<li style=\"display:inline;margin 20px\">"
-                                        ).replaceAll("</td>","</li> ")+"</ul>");
-                    }
-                    records.set(i,records.get(i)+"</td></tr>");
-                    rs.close()
-                }
-                //get genres
-                for (int i=0;i<gameIDs.size();++i) {
-                    query="SELECT genre FROM genres JOIN genres_of_games ON id=genre_id WHERE game_id=?";
-                    PreparedStatement genStatement =dbcon.prepareStatement(query);
-                    genStatement.setInt(1,gameIDs.get(i));
-                    ResultSet rs = genStatement.executeQuery();
-                    records.set(i,records.get(i)+"<tr><td>genres: </td><td><ul>");
-                    while (rs.next()) {
-                        records.set(i,records.get(i)+tableRow(rs,links,
-                                    images,externalLinks,
-                                    ignores).replaceAll("<td>","<li>").replaceAll("</td>","</li>"));
-                    }
-                    records.set(i,records.get(i)+"</ul></td></tr>");
-                    rs.close()
-                }
-                dbcon.close()*/
-                /*int i=0;
-                for (String record : records) {
-                    results+=record;
-                    results+=cartButton(Integer.toString(gameIDs.get(i)),"1",request);
-                    ++i;
-                }*/
-            /*} else {
-                for (int i=0;i<rows.size();++i) {
-                    results+="<tr>"+tableRow(rows,i,table,links,images,externalLinks,ignores)+"</tr>";
-                }
-            }*/
-            //results+="</TABLE>";
+            results+=ntreeToHtml(rows,request,null,links,images,externalLinks,ignores);
 
             String nextJSP = request.getParameter("nextPage");
             if (nextJSP == null) {

@@ -56,18 +56,21 @@ public class SearchResultsTest {
     public void masterSearchTest () {
         NTreeNode<Table> tables;
         try {
+            Integer count;
             tables = SearchResults.getInstance().masterSearch("publishers","1",
                     "0","","","","","Nintendo","id",false,1);
             assertNotNull(tables.data);
             assertFalse("tables empty",tables.data.isEmpty());
+            assertEquals("publishers table is not publishers","publishers",tables.data.name);
             //tables should be games, publishers, genres, and platforms
             assertFalse("number of tables do not match",
                 tables.data.size()==4);
+            count=0;
             for (HashMap<String,String> row : tables.data) {
-                assertEquals("Nintendo not found in publisher table",row.get("publisher"),"Nintendo");
-                assertFalse("publisher table contains more than 1 row",
-                    row.size()==1);
+                assertEquals("Nintendo not found in publisher table","Nintendo",row.get("publisher"));
+                ++count;
             }
+            assertEquals("Too many publishers or zero publishers in games table",(long)1,(long)count);
             for (NTreeNode<Table> child : tables.children) {
                 Table table = child.data;
                 if (table.name.equals("games")) {
@@ -80,6 +83,20 @@ public class SearchResultsTest {
                     throw new Exception("Unknown table in tables of masterSearch");
                 }
             }
+            tables = SearchResults.getInstance().masterSearch("games","1",
+                    "0","Wii Sports","","","","","id",false,1);
+            assertNotNull(tables.data);
+            assertFalse("tables empty",tables.data.isEmpty());
+            assertEquals("games table is not games","games",tables.data.name);
+            //tables should be games, publishers, genres, and platforms
+            assertFalse("number of tables do not match",
+                tables.data.size()==4);
+            count=0;
+            for (HashMap<String,String> row : tables.data) {
+                assertEquals("Wii Sports not found in game table",row.get("name"),"Wii Sports");
+                ++count;
+            }
+            assertEquals("Too many games or zero games in games table",(long)1,(long)count);
         } catch (SQLExceptionHandler ex) {
             System.out.println(ex.getErrorMessage());
         } catch (java.lang.Exception e) {

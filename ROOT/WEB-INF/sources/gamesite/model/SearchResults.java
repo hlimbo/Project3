@@ -171,7 +171,7 @@ public class SearchResults {
             for (Integer sibId : sibIds) {
                 queryId = sibId.toString();
                 result = SQLQuery.getTableInfo(conn,
-                        sibId,root.data.name);
+                        sibId,child.data.name);
                 while (result.next()) {
                     sibData.addRow(QueryUtils.tableRow(result));
                 }
@@ -181,7 +181,7 @@ public class SearchResults {
                 throw new SQLExceptionHandler(ex,itemQuery);
             } else {
                 throw new SQLExceptionHandler(ex," SQLQuery.getTableInfo(conn, "
-                    +queryId+", "+root.data.name+")");
+                    +queryId+", "+child.data.name+")");
             }
         } finally {
             if (result!=null) {
