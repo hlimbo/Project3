@@ -68,6 +68,18 @@ public class SearchResultsTest {
                 assertFalse("publisher table contains more than 1 row",
                     row.size()==1);
             }
+            for (NTreeNode<Table> child : tables.children) {
+                Table table = child.data;
+                if (table.name.equals("games")) {
+                    assertTrue("Wii Sports not found",table.find("name","Wii Sports"));
+                } else if (table.name.equals("genres")) {
+                    assertTrue("Sports not found",table.find("genre","Sports"));
+                } else if (table.name.equals("platforms")) {
+                    assertTrue("Wii not found",table.find("platform","Wii"));
+                } else {
+                    throw new Exception("Unknown table in tables of masterSearch");
+                }
+            }
         } catch (SQLExceptionHandler ex) {
             System.out.println(ex.getErrorMessage());
         } catch (java.lang.Exception e) {
