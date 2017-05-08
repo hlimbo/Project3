@@ -174,9 +174,9 @@ public class SearchServlet extends HttpServlet
             }
 
             String matchParameter = (String) request.getParameter("match");
-            boolean useSubMatch = false;
-            if (matchParameter != null && matchParameter.compareToIgnoreCase("true") == 0) {
-                useSubMatch = true;
+            boolean useSubMatch = true;
+            if (matchParameter != null && matchParameter.toLowerCase().trim().equals("true")) {
+                useSubMatch = false;
             }
 
             String game = (String) request.getParameter("name");
@@ -185,7 +185,7 @@ public class SearchServlet extends HttpServlet
             String genre = (String) request.getParameter("genre");
             String platform = (String) request.getParameter("platform");
 
-            NTreeNode<Table> rows;
+            NTreeNode<Table> rows=null;
             int searchCount=-1;
             if (useSubMatch) {
                 rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
@@ -201,7 +201,6 @@ public class SearchServlet extends HttpServlet
             request.setAttribute("searchCount",searchCount);
 
             String results = "";
-            //results+="<TABLE border>";
 
             // Iterate through each row of rs
             Hashtable<String,Boolean> links = new Hashtable<String,Boolean>();

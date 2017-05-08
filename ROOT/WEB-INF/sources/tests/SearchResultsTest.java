@@ -31,6 +31,13 @@ public class SearchResultsTest {
             assertFalse("table empty",table.isEmpty());
             assertEquals("table entry not equal to Wii Sports",table.get(0).get("name"),"Wii Sports");
             assertNotEquals("table entry check not failing",table.get(0).get("name"),"TESTABLE_INCORRECT_VALUE");
+            //exact match for Wii Sports
+            table = SearchResults.getInstance().search("games","1",
+                    "0","Wii Sports","","","","","id",false,2);
+            assertNotNull("table null",table);
+            assertFalse("table empty",table.isEmpty());
+            assertEquals("table entry not equal to Wii Sports",table.get(0).get("name"),"Wii Sports");
+            assertNotEquals("table entry check not failing",table.get(0).get("name"),"TESTABLE_INCORRECT_VALUE");
         } catch (SQLExceptionHandler ex) {
             System.out.println(ex.getErrorMessage());
         } catch (java.lang.Exception e) {
@@ -83,6 +90,7 @@ public class SearchResultsTest {
                     throw new Exception("Unknown table in tables of masterSearch");
                 }
             }
+            tables.data=null;
             tables = SearchResults.getInstance().masterSearch("games","1",
                     "0","Wii Sports","","","","","id",false,1);
             assertNotNull(tables.data);
@@ -97,6 +105,32 @@ public class SearchResultsTest {
                 ++count;
             }
             assertEquals("Too many games or zero games in games table",(long)1,(long)count);
+            for (NTreeNode<Table> child : tables.children) {
+                Table table = child.data;
+                if (table.name.equals("publishers")) {
+                    assertTrue("Nintendo not found",table.find("publisher","Nintendo"));
+                } else if (table.name.equals("genres")) {
+                    assertTrue("Sports not found",table.find("genre","Sports"));
+                } else if (table.name.equals("platforms")) {
+                    assertTrue("Wii not found",table.find("platform","Wii"));
+                } else {
+                    throw new Exception("Unknown table in tables of masterSearch");
+                }
+            }
+            tables.data=null;
+            tables = SearchResults.getInstance().masterSearch("games","5",
+                    "0","M","","","","","id",false,1);
+            assertNotNull(tables.data);
+            assertFalse("tables empty",tables.data.isEmpty());
+            assertEquals("games table is not games","games",tables.data.name);
+            //tables should be games, publishers, genres, and platforms
+            assertFalse("number of tables do not match",
+                tables.data.size()==4);
+            count=0;
+            for (HashMap<String,String> row : tables.data) {
+                ++count;
+            }
+            assertTrue("Zero games in games table",count>0);
         } catch (SQLExceptionHandler ex) {
             System.out.println(ex.getErrorMessage());
         } catch (java.lang.Exception e) {

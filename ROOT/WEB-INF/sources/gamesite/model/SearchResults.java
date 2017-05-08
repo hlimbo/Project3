@@ -120,9 +120,7 @@ public class SearchResults {
                 if (results != null) {
                     cache.putIfAbsent(query,results);
                     return results;
-                } else {
-                    results = new ArrayList<HashMap<String,String>>();
-                }
+                } 
             } catch (SQLException ex) {
                 throw new SQLExceptionHandler(ex,query);
             }
