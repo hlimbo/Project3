@@ -22,6 +22,14 @@ public class Table implements Iterable<HashMap<String,String>> {
             return rows.values().iterator();
     }
 
+    public boolean isEmpty () {
+        return rows.isEmpty();
+    }
+
+    public int size () {
+        return rows.size();
+    }
+
     //String key in outer HashMap is a primary key to find a particular
     //row by.
     public HashMap<String,HashMap<String,String>> rows;

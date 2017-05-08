@@ -200,8 +200,14 @@ public class SearchResults {
         for (HashMap<String,String> row : root.data) {
             for (NTreeNode<Table> child : root.children) {
                 Table newData = siblingData(root,child,row.get("id"));
+                String siblingIdField = QueryUtils.getRelationIdName(child.data.name);
                 for (HashMap<String, String> newRow : newData) {
                     child.data.addRow(newRow);
+                    if (row.containsKey(siblingIdField)) {
+                        row.put(siblingIdField,row.get(siblingIdField)+","+newRow.get("id"));
+                    } else {
+                        row.put(siblingIdField,newRow.get("id"));
+                    }
                 }
             }
         }
