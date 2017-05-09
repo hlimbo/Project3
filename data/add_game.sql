@@ -8,8 +8,17 @@ BEGIN
     DECLARE genreID INTEGER;
     DECLARE publisherID INTEGER;
     DECLARE doRollback BOOL DEFAULT 0;
-    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION SET doRollback = 1;
+    DECLARE nullFound CONDITION FOR SQLSTATE '45000';
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION 
+        BEGIN
+            ROLLBACK;
+            RESIGNAL nullFound;
+        END;
     START TRANSACTION;
+    IF newName IS NULL THEN
+        SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Name can not be null', MYSQL_ERRNO='1001';
+    END IF;
     SET countFound = (SELECT COUNT(*) FROM games WHERE name=newName AND year=newYear);
     IF countFound = 0 THEN
         INSERT INTO games (name, year, price) VALUES (newName,newYear,newPrice);
@@ -41,11 +50,6 @@ BEGIN
     SET countFound = (SELECT COUNT(*) FROM publishers_of_games WHERE publisher_id = publisherID AND platform_id = platformID AND game_id = gameID);
     IF countFound = 0 THEN 
         INSERT INTO publishers_of_games (publisher_id, platform_id, game_id) VALUES (publisherID,platformID,gameID);
-    END IF;
-    IF doRollback THEN
-        ROLLBACK;
-    ELSE
-        COMMIT;
     END IF;
 END
 //

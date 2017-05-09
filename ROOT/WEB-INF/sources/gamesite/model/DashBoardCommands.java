@@ -13,7 +13,8 @@ public class DashBoardCommands {
         return commandResult;
     }
 
-    public LinkedHashMap<String,HashMap<String,String>> getMeta () throws SQLException, java.lang.Exception {
+    public LinkedHashMap<String,HashMap<String,String>> getMeta () 
+        throws SQLExceptionHandler, SQLException, java.lang.Exception {
         LinkedHashMap<String,HashMap<String,String>> types = new LinkedHashMap<String,HashMap<String,String>>();
         Connection conn = null;
         try {
@@ -22,6 +23,8 @@ public class DashBoardCommands {
             for (String table : tables) {
                 types.put(table,QueryUtils.getColumns(conn,table));
             }
+        } catch(SQLExceptionHandler ex) {
+            throw ex;
         } catch(SQLException ex) {
             throw ex;
         } catch(java.lang.Exception ex) {
@@ -32,8 +35,18 @@ public class DashBoardCommands {
         return types;
     }
 
-    public String insertStar () {
-        String commandResult = null;
-        return commandResult;
+    public void insertStar () throws SQLExceptionHandler, SQLException, java.lang.Exception {
+        Connection conn = null;
+        try {
+            conn = DBConnection.create();
+        } catch(SQLExceptionHandler ex) {
+            throw ex;
+        } catch(SQLException ex) {
+            throw ex;
+        } catch(java.lang.Exception ex) {
+            throw ex;
+        }finally {
+            DBConnection.close(conn);
+        }
     }
 }
