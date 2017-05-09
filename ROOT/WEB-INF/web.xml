@@ -60,7 +60,7 @@
 
   <servlet>
     <servlet-name>ShoppingCartServlet</servlet-name>
-    <servlet-class>ShoppingCart</servlet-class>
+    <servlet-class>gamesite.servlet.ShoppingCartServlet</servlet-class>
 	
 	<!-- <servlet-name>ShoppingCartDisplayServlet</servlet-name>
 	<servlet-class>ShoppingCartDisplay</servlet-class> -->
@@ -89,7 +89,7 @@
 
   <servlet>
 	<servlet-name>ClearCartServlet</servlet-name>
-	<servlet-class>ClearCart</servlet-class>
+	<servlet-class>gamesite.servlet.ClearCartServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
@@ -99,7 +99,7 @@
 
     <servlet>
     	<servlet-name>DeleteItemServlet</servlet-name>
-    	<servlet-class>DeleteItem</servlet-class>
+    	<servlet-class>gamesite.servlet.DeleteItemServlet</servlet-class>
     </servlet>
       
     <servlet-mapping>
@@ -109,7 +109,7 @@
 	
    <servlet>
     	<servlet-name>UpdateQuantityServlet</servlet-name>
-    	<servlet-class>UpdateQuantity</servlet-class>
+    	<servlet-class>gamesite.servlet.UpdateQuantityServlet</servlet-class>
     </servlet>
       
     <servlet-mapping>
