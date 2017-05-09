@@ -71,6 +71,7 @@ public class CustomerInformation extends HttpServlet
 					return;
 				}
 				
+				//TODO("HARVEY"): Change to shoppingcart data structure
 				HashMap<String,Integer> cart = (HashMap<String,Integer>)session.getAttribute("cartList");
 				String gameIdQuery = "SELECT id FROM games WHERE id = ?";
 				String insertQuery = "INSERT INTO sales (customer_id, salesdate, game_id) VALUES( ?, CURDATE(), ?)";
