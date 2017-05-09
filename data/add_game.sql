@@ -19,6 +19,18 @@ BEGIN
         SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT = 'Name can not be null', MYSQL_ERRNO='1001';
     END IF;
+    IF newYear IS NULL THEN
+        SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Year can not be null', MYSQL_ERRNO='1001';
+    END IF;
+    IF newPrice IS NULL THEN
+        SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Price can not be null', MYSQL_ERRNO='1001';
+    END IF;
+    IF newPlatform IS NULL THEN
+        SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Platform can not be null', MYSQL_ERRNO='1001';
+    END IF;
     SET countFound = (SELECT COUNT(*) FROM games WHERE name=newName AND year=newYear);
     IF countFound = 0 THEN
         INSERT INTO games (name, year, price) VALUES (newName,newYear,newPrice);
