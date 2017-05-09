@@ -139,8 +139,8 @@ public class SearchResults {
         String itemQuery = null;
         Table sibData = new Table(child.data.name,"id");
         try {
-            ArrayList<String> tables = QueryUtils.getTables();
             conn = DBConnection.create();
+            ArrayList<String> tables = QueryUtils.getTables(conn);
             //By SQL schema convention, relationship tables are named by
             //table1_of_table2
             String relationName = root.data.name+"_of_"+child.data.name;
@@ -232,8 +232,16 @@ public class SearchResults {
         for (HashMap<String,String> row : rootTable) {
             root.data.addRow(row);
         }
-        NTreeNode<String> siblings = QueryUtils.getSiblings(table);
-        rootSearch(root,siblings);
+        Connection dbconn = null;
+        try {
+            dbconn = DBConnection.create();
+            NTreeNode<String> siblings = QueryUtils.getSiblings(dbconn,table);
+            rootSearch(root,siblings);
+        } catch (SQLException ex) {
+            throw ex;
+        } finally {
+            dbconn.close();
+        }
         return root;
     }
 
