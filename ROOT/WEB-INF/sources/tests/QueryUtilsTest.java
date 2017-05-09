@@ -31,12 +31,13 @@ import java.util.*;
 import gamesite.datastruct.NTreeNode;
 
 //testing class
-import gamesite.model.QueryUtils;
+import gamesite.model.*;
+import gamesite.utils.*;
 
 public class QueryUtilsTest
 {	
 	@Test
-	public void test_for_size_GetTables()
+	public void test_for_size_GetTables() throws SQLException
 	{
 		//Assumption getting the tables from gamedb
 		ArrayList<String> expectedTables = new ArrayList<String>();
@@ -51,9 +52,11 @@ public class QueryUtilsTest
 		expectedTables.add("publishers_of_games");
 		expectedTables.add("sales");
 		
+        Connection dbconn=null;
 		try
 		{
-			ArrayList<String> tables = QueryUtils.getTables();
+            dbconn = DBConnection.create();
+			ArrayList<String> tables = QueryUtils.getTables(dbconn);
 			assertEquals("failure - tables are not the same size", tables.size(), expectedTables.size());		
 		}
 		catch (SQLException e)
@@ -63,12 +66,14 @@ public class QueryUtilsTest
 		catch (java.lang.Exception e)
 		{
 			e.printStackTrace();
-		}
+		} finally {
+            DBConnection.close(dbconn);
+        }
 	
 	}
 	
 	@Test 
-	public void test_for_equality_GetTables()
+	public void test_for_equality_GetTables() throws SQLException
 	{
 		//Assumption getting the tables from gamedb
 		ArrayList<String> expectedTables = new ArrayList<String>();
@@ -83,9 +88,11 @@ public class QueryUtilsTest
 		expectedTables.add("publishers_of_games");
 		expectedTables.add("sales");
 		
+        Connection dbconn=null;
 		try
 		{
-			ArrayList<String> tables = QueryUtils.getTables();
+            dbconn = DBConnection.create();
+			ArrayList<String> tables = QueryUtils.getTables(dbconn);
 			assertEquals("failure - tables do not contain the same table names", tables, expectedTables);
 		}
 		catch (SQLException e)
@@ -95,21 +102,25 @@ public class QueryUtilsTest
 		catch (java.lang.Exception e)
 		{
 			e.printStackTrace();
-		}
+		} finally {
+            DBConnection.close(dbconn);
+        }
 		
 	}
 	
 	@Test
-	public void testGetSiblings()
+	public void testGetSiblings() throws SQLException
 	{
 		NTreeNode<String> expectedTables = new NTreeNode<String>("games");
 		expectedTables.addChild(new NTreeNode<String>("publishers"));
 		expectedTables.addChild(new NTreeNode<String>("platforms"));
 		expectedTables.addChild(new NTreeNode<String>("genres"));
 
+        Connection dbconn=null;
 		try 
         {
-			NTreeNode<String> tables = QueryUtils.getSiblings("games");
+            dbconn = DBConnection.create();
+			NTreeNode<String> tables = QueryUtils.getSiblings(dbconn,"games");
 			assertEquals("failure - sibling roots do not contain the same data", tables.data, expectedTables.data);		
             for (NTreeNode<String> sibling : expectedTables.children) {
                 assertTrue(tables.children.contains(sibling));
@@ -122,7 +133,9 @@ public class QueryUtilsTest
         catch (java.lang.Exception e) 
         {
 			e.printStackTrace();
-		}
+		} finally {
+            DBConnection.close(dbconn);
+        }
     }
 	
 }

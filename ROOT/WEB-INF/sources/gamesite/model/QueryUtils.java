@@ -97,51 +97,39 @@ public class QueryUtils {
         return idName.substring(0,idName.length()-3)+"s";
     }
 
-    public static ArrayList<String> getTables () throws SQLExceptionHandler, java.lang.Exception {
-        Connection dbcon = null;
-        try {
-            ArrayList<String> tables = new ArrayList<String>();
-            dbcon = DBConnection.create();
-            DatabaseMetaData dbmeta = dbcon.getMetaData();
-            ResultSet tableMeta = dbmeta.getTables(dbcon.getCatalog(),null,"%",null);
-            while (tableMeta.next()) {
-                tables.add(tableMeta.getString("TABLE_NAME"));
-            } 
-            return tables;
-        } finally {
-            DBConnection.close(dbcon);
-        }
+    public static ArrayList<String> getTables (Connection dbcon) throws SQLExceptionHandler, java.lang.Exception {
+        ArrayList<String> tables = new ArrayList<String>();
+        DatabaseMetaData dbmeta = dbcon.getMetaData();
+        ResultSet tableMeta = dbmeta.getTables(dbcon.getCatalog(),null,"%",null);
+        while (tableMeta.next()) {
+            tables.add(tableMeta.getString("TABLE_NAME"));
+        } 
+        return tables;
     }
 
-    public static NTreeNode<String> getSiblings (String firstTable) throws SQLExceptionHandler, java.lang.Exception {
+    public static NTreeNode<String> getSiblings (Connection dbcon, String firstTable) throws SQLExceptionHandler, java.lang.Exception {
         NTreeNode<String> siblings = new NTreeNode<String>(firstTable);
         HashMap<String,Boolean> visited = new HashMap<String,Boolean> ();
         LinkedList<NTreeNode<String>> tableQueue = new LinkedList<NTreeNode<String>> ();
         tableQueue.add(siblings);
         visited.put(firstTable,true);
-        Connection dbcon = null;
-        ArrayList<String> potentialSiblings = getTables();
-        try {
-            dbcon = DBConnection.create();
-            while (!tableQueue.isEmpty()) {
-                NTreeNode<String> node = tableQueue.remove();
-                String table = node.data.trim().toLowerCase();
-                for (String sibling : potentialSiblings) {
-                    if (sibling.indexOf(table) != -1) {
-                        //find sibling table by SQL schema convention of relationship tables
-                        String next = sibling.replaceFirst(table,"").replaceFirst("_of_","");
-                        if (potentialSiblings.contains(next) && !visited.containsKey(next)) {
-                            NTreeNode<String> nextNode = new NTreeNode<String>(next);
-                            tableQueue.add(nextNode);
-                            visited.put(next,true);
-                            node.addChild(nextNode);
-                        }
+        ArrayList<String> potentialSiblings = getTables(dbcon);
+        while (!tableQueue.isEmpty()) {
+            NTreeNode<String> node = tableQueue.remove();
+            String table = node.data.trim().toLowerCase();
+            for (String sibling : potentialSiblings) {
+                if (sibling.indexOf(table) != -1) {
+                    //find sibling table by SQL schema convention of relationship tables
+                    String next = sibling.replaceFirst(table,"").replaceFirst("_of_","");
+                    if (potentialSiblings.contains(next) && !visited.containsKey(next)) {
+                        NTreeNode<String> nextNode = new NTreeNode<String>(next);
+                        tableQueue.add(nextNode);
+                        visited.put(next,true);
+                        node.addChild(nextNode);
                     }
                 }
             }
-            return siblings;
-        } finally {
-            DBConnection.close(dbcon);
         }
+        return siblings;
     }
 }
