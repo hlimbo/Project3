@@ -61,24 +61,17 @@
   <servlet>
     <servlet-name>ShoppingCartServlet</servlet-name>
     <servlet-class>gamesite.servlet.ShoppingCartServlet</servlet-class>
-	
-	<!-- <servlet-name>ShoppingCartDisplayServlet</servlet-name>
-	<servlet-class>ShoppingCartDisplay</servlet-class> -->
   </servlet>
 
 
   <servlet-mapping>
-   <servlet-name>ShoppingCartServlet</servlet-name>
-   <url-pattern>/ShoppingCart/view-shopping-cart</url-pattern>
-  
-	<!-- <servlet-name>ShoppingCartDisplayServlet</servlet-name>
-	<url-pattern>/servlet/customer-info</url-pattern> -->
-  
+	<servlet-name>ShoppingCartServlet</servlet-name>
+	<url-pattern>/ShoppingCart/view-shopping-cart</url-pattern>
   </servlet-mapping>
 
   <servlet>
     <servlet-name>CustomerInformationServlet</servlet-name>
-    <servlet-class>CustomerInformation</servlet-class>
+    <servlet-class>gamesite.servlet.CustomerInformationServlet</servlet-class>
   </servlet>
 
 
