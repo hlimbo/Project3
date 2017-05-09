@@ -38,8 +38,9 @@ else
             for file in $(ls $master_path/$web_app_name/WEB-INF/lib/*.jar); do
                 printf ":$file" >> javaMakefile
             done
+            printf ":$master_path/$web_app_name/WEB-INF/classes" >> javaMakefile
             printf " $master_path/$web_app_name/WEB-INF/sources/$source_name" >> javaMakefile
-			make -f javaMakefile
+			make -f javaMakefile --quiet
 			rm javaMakefile
 		else
 			echo "file not found: $master_path/$web_app_name/WEB-INF/sources/$source_name"
