@@ -107,6 +107,17 @@ public class QueryUtils {
         return tables;
     }
 
+    public static HashMap<String,String> getColumns (Connection conn,String tableName) throws SQLExceptionHandler, java.lang.Exception {
+        HashMap<String,String> result = new HashMap<String,String>();
+        conn = DBConnection.create();
+        DatabaseMetaData metadataDB = conn.getMetaData();
+		ResultSet tableColumns = metadataDB.getColumns(conn.getCatalog(),null,tableName, "%");
+        while(tableColumns.next()) {
+            result.put(tableColumns.getString("COLUMN_NAME"),tableColumns.getString("TYPE_NAME"));
+        }
+        return result;
+    }
+
     public static NTreeNode<String> getSiblings (Connection dbcon, String firstTable) throws SQLExceptionHandler, java.lang.Exception {
         NTreeNode<String> siblings = new NTreeNode<String>(firstTable);
         HashMap<String,Boolean> visited = new HashMap<String,Boolean> ();
