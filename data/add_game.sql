@@ -1,25 +1,14 @@
 DELIMITER //
 
-CREATE PROCEDURE add_game (newName, newYear, newPrice, newPlatform, newPublisher, newGenre)
+CREATE PROCEDURE add_game (IN newName VARCHAR(50), IN newYear VARCHAR(50), IN newPrice VARCHAR(50), IN newPlatform VARCHAR(50), IN newPublisher VARCHAR(50), IN newGenre VARCHAR(50))
 BEGIN
-    DECLARE;
-    SELECT name FROM games WHERE name=newName;
-    IF THEN
+    DECLARE nameFound INTEGER;
+    SET nameFound = (SELECT COUNT(*) FROM games WHERE name=newName AND year=newYear);
+    IF nameFound > 0 THEN
         INSERT INTO games (name, year, price) VALUES (newName,newYear,newPrice);
-    END
-    SELECT genre FROM genres WHERE genre=newGenre;
-    IF THEN
-        INSERT INTO genres (genre) VALUES (newGenre);
-    END
-    SELECT publisher FROM publishers WHERE publisher=newPublisher;
-    IF THEN
-        INSERT INTO publishers (publisher) VALUES (newPublisher);
-    END
-    SELECT platform FROM platforms WHERE platform=newPlatform;
-    IF THEN
-        INSERT INTO platforms (publisher) VALUES (newPlatform);
-    END
+    END IF;
 END
 //
 
 DELIMITER ;
+
