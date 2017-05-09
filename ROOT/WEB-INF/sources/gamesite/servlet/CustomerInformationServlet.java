@@ -1,5 +1,4 @@
 package gamesite.servlet;
-/* A servlet to display the contents of the MySQL movieDB database */
 
 import java.io.*;
 import java.net.*;
@@ -9,11 +8,12 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-
+import gamesite.model.ShoppingCart;
+import gamesite.model.ShoppingCartItem;
 import gamesite.utils.DBConnection;
 import gamesite.utils.SQLQuery;
 
-public class CustomerInformation extends HttpServlet
+public class CustomerInformationServlet extends HttpServlet
 {
 	
     public String getServletInfo()
@@ -66,38 +66,35 @@ public class CustomerInformation extends HttpServlet
 				else
 				{
 					System.out.println("Customer's identity could not be verified in the database");
+					
+					statement.close();
+					DBConnection.close(dbcon);		
+					
 					session.setAttribute("invalidFlag","Customer's identity: " + first_name +  " could not be verified in the database");
 					response.sendRedirect("/CustomerInformation/confirmationPage.jsp");
 					return;
 				}
 				
-				//TODO("HARVEY"): Change to shoppingcart data structure
-				HashMap<String,Integer> cart = (HashMap<String,Integer>)session.getAttribute("cartList");
-				String gameIdQuery = "SELECT id FROM games WHERE id = ?";
+				ShoppingCart cart = (ShoppingCart)session.getAttribute("cart");
+				//String gameIdQuery = "SELECT id FROM games WHERE id = ?";
 				String insertQuery = "INSERT INTO sales (customer_id, salesdate, game_id) VALUES( ?, CURDATE(), ?)";
-				PreparedStatement gameIDStatement = dbcon.prepareStatement(gameIdQuery);
 				PreparedStatement insertStatement = dbcon.prepareStatement(insertQuery);
 				//used to verify if the game id is a valid id in the database.
 				if(cart != null && !cart.isEmpty())
 				{
-					for(Map.Entry<String,Integer> item : cart.entrySet())
+					//insert every game bought in cart into the sales table.
+					for(Map.Entry<String,ShoppingCartItem> entry : cart.itemSet())
 					{
-						gameIDStatement.setInt(1, Integer.valueOf(item.getKey()));
-						ResultSet gameIdSet = gameIDStatement.executeQuery();
-						if(gameIdSet.next())
+						Integer gameID = Integer.valueOf(entry.getKey());						
+						insertStatement.setInt(1, customerID);
+						insertStatement.setInt(2, gameID);
+						
+						//insert game into sales table x times where x = quantity bought
+						for(int i = 0;i < entry.getValue().getQuantity(); ++i)
 						{
-							int gameID = gameIdSet.getInt(1);
-                            int quantity = item.getValue();
-							insertStatement.setInt(1, customerID);
-							insertStatement.setInt(2, gameID);
-                            for (int qIndex=0;qIndex<quantity;++qIndex) {
-							    insertStatement.executeUpdate();
-                            }
+							insertStatement.executeUpdate();
 						}
-						else
-						{
-							System.out.println("Game ID: " + item.getKey() + " does not exist in the games table");
-						}
+						
 					}
 				}
 				else
@@ -105,6 +102,7 @@ public class CustomerInformation extends HttpServlet
 					System.out.println("Cart is empty or has not been initialized");
 				}
 				
+				insertStatement.close();
 				session.setAttribute("first_name",first_name);				
 				response.sendRedirect("/CustomerInformation/confirmationPage.jsp");
 			}
@@ -128,11 +126,9 @@ public class CustomerInformation extends HttpServlet
 				}
 			}
 			
-			  statement.close();
-			  result.close();
-			  
-              DBConnection.close(dbcon);
-            }
+				statement.close();
+				DBConnection.close(dbcon);
+			}
         catch (SQLException ex) {
               while (ex != null) {
                     System.out.println ("SQL Exception:  " + ex.getMessage ());

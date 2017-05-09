@@ -78,7 +78,7 @@
 
   <servlet>
     <servlet-name>CustomerInformationServlet</servlet-name>
-    <servlet-class>CustomerInformation</servlet-class>
+    <servlet-class>gamesite.servlet.CustomerInformationServlet</servlet-class>
   </servlet>
 
 

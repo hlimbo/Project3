@@ -1,10 +1,4 @@
-<%@ page import="java.util.*" %>
-<%@ page import="java.io.*" %>
-<%@ page import="java.net.*" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="java.text.*" %>
-<%@ page import="javax.servlet.*" %>
-<%@ page import="javax.servlet.http.*" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <HTML>
 	<HEAD>
@@ -13,61 +7,38 @@
 	</HEAD>
 	
 	<BODY>
-	
-		<!-- HARDCODING... TODO(HARVEY): move to  java servlet -->
-		<% String loginUser = "user"; %>
-		<% String loginPasswd = "password"; %>
-		<% String loginUrl = "jdbc:mysql://localhost:3306/gamedb"; %>
-		<% Connection dbcon = null; %>
-		<% try { %>
-		<% Class.forName("com.mysql.jdbc.Driver").newInstance(); %>
-		<% dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd); %>
-		<% } catch (SQLException e) { %>
-		<% e.printStackTrace(); } %>
-	
-	
+		
 		<H1>Confirmation Page</H1>
-		<% if (session.getAttribute("cartList") == null) { %>
+		<c:if test="${empty cart || cart.isEmpty()}">
 			<p> Shopping cart is empty!!!!!! </p>
-		<% }  else { %>
+		</c:if>
+		<c:if test="${not empty cart && !cart.isEmpty()}">
+			<p> <c:out value="${first_name}" />, You bought something special </p>
+			
+			<table class="table">
+				<thead>
+					<th>ID</th>
+					<th>Game Name</th>
+					<th>Price</th>
+					<th>Quantity</th>
+				</thead>
+				
+				<tbody>
+				<c:forEach var="entry" items="${cart.getItems()}">
+					<tr>
+						<td> <c:out value="${entry.key}" /> </td>
+						<td> <c:out value="${entry.value.getGameName()}" /> </td>
+						<td> <c:out value="${entry.value.getPrice()}" /> </td>
+						<td> <c:out value="${entry.value.getQuantity()}" /> </td>
+					</tr>
+				</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
 		
-		<p> <%= session.getAttribute("first_name") %>, You bought something special </p>
+		<!-- clear the cart after successful purchase TODO(HARVEY): On the next project, implement this using ajax -->
+		${cart.clear()}
 		
-		<table class="table">
-		<thead>
-			<th>ID</th>
-			<th>Game Name</th>
-			<th>Price</th>
-			<th>Quantity</th>
-		</thead>
-		
-		<tbody>
-		<!-- TODO(HARVEY): Move to java servlet where it can forward/redirect to this page to display the cart contents! -->
-		<% HashMap<String,Integer> cart = (HashMap<String,Integer>)session.getAttribute("cartList"); %>	
-		<% String itemQuery = "SELECT * FROM games WHERE id=?"; %>
-		<% PreparedStatement statement = dbcon.prepareStatement(itemQuery); %>
-		<% for(Map.Entry<String,Integer> item : cart.entrySet()) { %>
-			<% statement.setInt(1, Integer.valueOf(item.getKey())); %>
-			<% ResultSet set = statement.executeQuery(); %>
-			<% if(set.next()) { %>
-				<tr>
-					<td><%= item.getKey() %></td>
-					<td><%= set.getString("name") %> </td>
-					<td><%= set.getInt("price") %> </td>
-					<td><%= item.getValue() %> </td>
-				</tr>
-			<% } } %>
-		
-		</tbody>
-		</table>
-		
-			<!-- clear the cart after successful purchase -->
-			<% cart.clear(); %>
-			<% cart = null; %>
-			<% session.setAttribute("cartList", null); %>
-			<% dbcon.close(); %>
-		
-		<% } %>
 		
 		<!-- back to home page -->
 		<form action="/index.jsp" method="GET">
