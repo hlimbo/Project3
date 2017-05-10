@@ -18,6 +18,9 @@ public class DashBoardServlet extends HttpServlet {
         return "Servlet for employee interface";
     }
 
+    private static String htmlHeader="<html><head><title>Employee Dashboard</title></head><body>"; 
+    private static String htmlFooter="</body></html>";
+
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
         HashMap<String,String> params = ParameterParse.getQueryParameters(request.getQueryString());
@@ -26,6 +29,7 @@ public class DashBoardServlet extends HttpServlet {
             PrintWriter writer=null;
             try {
                 writer = response.getWriter();
+                writer.println(htmlHeader);
                 switch (command) {
                     case "add_game":
                         DashBoardCommands.addGame(params.get("name"),
@@ -40,17 +44,20 @@ public class DashBoardServlet extends HttpServlet {
                     case "meta":
                         LinkedHashMap<String, HashMap<String, String>> meta = DashBoardCommands.getMeta();
                         for (String table : meta.keySet()) {
-                            writer.write("<h3>);
+                            writer.write("<h3 class=\"meta_table\">");
                             writer.write(table);
                             writer.write("</h3>");
+                            writer.write("<p class=\"meta_columns\">");
                             for (HashMap<String, String> column : meta.get(table)) {
                                 HtmlFormat.printHtmlRow (writer,column);
                             }
+                            writer.write("</p>");
                         }
                         break;
                     default:
                         break;
                 }
+                writer.println(htmlFooter);
             } catch (SQLExceptionHandler ex) {
                 writer.println(SQLExceptionFormat.toHtml(ex));
             } catch (SQLException ex) {
