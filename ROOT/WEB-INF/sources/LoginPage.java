@@ -9,6 +9,9 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import recaptcha.VerifyUtils;
+import gamesite.utils.DBConnection;
+
 public class LoginPage extends HttpServlet
 {
     public String getServletInfo()
@@ -21,59 +24,68 @@ public class LoginPage extends HttpServlet
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException
     {
-        String loginUser = "user";
-        String loginPasswd = "password";
-        String loginUrl = "jdbc:mysql://localhost:3306/gamedb";
+        
 
-        response.setContentType("text/html");    // Response mime type
-		
+
+	
         try
-           {
-              //Class.forName("org.gjt.mm.mysql.Driver");
-              Class.forName("com.mysql.jdbc.Driver").newInstance();
+	   {
+		response.setContentType("text/html");    // Response mime type
+		
+		String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+		boolean valid = VerifyUtils.verify(gRecaptchaResponse);
+		if(!valid)
+		{
+			PrintWriter out = response.getWriter();
+			out.println("<HTML>" + "<head><title>" + "GameDB: Error" + "</title></head><body>" +
+					"<p>Recaptcha wrong!</p></body></html>");
+			out.println("recaptcha response: " + gRecaptchaResponse);
+			out.close();
+			return;
+		}
 
-              Connection dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd);
 				
-			  Statement statement = dbcon.createStatement();	
-				
-			  String email = request.getParameter("email");
-			  email.trim();
-			  String password = request.getParameter("password");
-              String query = "SELECT * from customers where email = '" + email + "'" + " and password = '" + password + "'";
-			  ResultSet result = statement.executeQuery(query);
-			
-			//use a session key for the client.
-			HttpSession session = request.getSession();
-			
-			boolean rnext = result.next();
-			if(rnext)
+		Connection dbcon = DBConnection.create();
+		Statement statement = dbcon.createStatement();	
+
+		String email = request.getParameter("email");
+		email = email.trim();
+		String password = request.getParameter("password");
+		String query = "SELECT * from customers where email = '" + email + "'" + " and password = '" + password + "'";
+		ResultSet result = statement.executeQuery(query);
+
+		//use a session key for the client.
+		HttpSession session = request.getSession();
+
+		boolean rnext = result.next();
+		if(rnext)
+		{
+			System.out.println("Success!");
+			Cookie cookie = new Cookie("login-cookie", session.getId());
+			cookie.setComment("Cook on client side used to identify the current user login");
+			//TODO(HARVEY):cookie.setDomain("");
+			//TODO(HARVEY): review cookie.setPath()
+			response.addCookie(cookie);
+			session.setAttribute("first_name",result.getString("first_name"));
+			response.sendRedirect("/LoginPage/LoginSuccess.jsp");
+		}
+		else
+		{
+			try
 			{
-				System.out.println("Success!");
-				Cookie cookie = new Cookie("login-cookie", session.getId());
-				cookie.setComment("Cook on client side used to identify the current user login");
-				//TODO(HARVEY):cookie.setDomain("");
-				//TODO(HARVEY): review cookie.setPath()
-				response.addCookie(cookie);
-				session.setAttribute("first_name",result.getString("first_name"));
-				response.sendRedirect("/LoginPage/LoginSuccess.jsp");
+				System.out.println("Invalid username or password");
+				session.setAttribute("invalidLoginFlag", "Invalid email or password");
+				response.sendRedirect("/LoginPage");
 			}
-			else
+			catch (IOException e)
 			{
-				try
-				{
-					System.out.println("Invalid username or password");
-					session.setAttribute("invalidLoginFlag", "Invalid email or password");
-					response.sendRedirect("/LoginPage");
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
+				e.printStackTrace();
 			}
-			
-			  result.close();
-              dbcon.close();
-            }
+		}
+
+		result.close();
+		DBConnection.close(dbcon);
+    	}
         catch (SQLException ex) {
               while (ex != null) {
                     System.out.println ("SQL Exception:  " + ex.getMessage ());
