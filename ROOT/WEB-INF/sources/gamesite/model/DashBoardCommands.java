@@ -9,7 +9,7 @@ import gamesite.utils.DBConnection;
 
 public class DashBoardCommands {
 
-    public boolean addGame (String name, String year, String price, String platform,
+    public static boolean addGame (String name, String year, String price, String platform,
             String publisher, String genre) 
             throws SQLExceptionHandler, SQLException, java.lang.Exception {
         Connection conn = null;
@@ -35,7 +35,7 @@ public class DashBoardCommands {
         return true;
     }
 
-    public LinkedHashMap<String,HashMap<String,String>> getMeta () 
+    public static LinkedHashMap<String,HashMap<String,String>> getMeta () 
             throws SQLExceptionHandler, SQLException, java.lang.Exception {
         LinkedHashMap<String,HashMap<String,String>> types = new LinkedHashMap<String,HashMap<String,String>>();
         Connection conn = null;
@@ -57,7 +57,7 @@ public class DashBoardCommands {
         return types;
     }
 
-    public boolean insertPublisher(String pubAndYear) throws SQLExceptionHandler, SQLException, java.lang.Exception {
+    public static boolean insertPublisher(String pubAndYear) throws SQLExceptionHandler, SQLException, java.lang.Exception {
         pubAndYear = pubAndYear.trim();
         String publisher = "";
         String year = null;

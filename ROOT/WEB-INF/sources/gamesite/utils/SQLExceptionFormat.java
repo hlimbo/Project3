@@ -6,7 +6,7 @@ import java.io.*;
 import gamesite.model.SQLExceptionHandler;
 import gamesite.utils.ExceptionFormat;
 
-class SQLExceptionFormat extends ExceptionFormat {
+public class SQLExceptionFormat extends ExceptionFormat {
     //Ensures static class
     protected SQLExceptionFormat () {}
 

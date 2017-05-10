@@ -1,3 +1,5 @@
+package gamesite.servlet;
+
 import java.util.*;
 
 class ParameterParse {
