@@ -109,5 +109,15 @@
     	<servlet-name>UpdateQuantityServlet</servlet-name>
         <url-pattern>/ShoppingCart/update-quantity</url-pattern>
     </servlet-mapping>
+	
+	<servlet>
+		<servlet-name>TomcatFormReCaptchaServlet</servlet-name>
+        <servlet-class>recaptcha.TomcatFormReCaptcha</servlet-class>
+    </servlet>
+
+	<servlet-mapping>
+      <servlet-name>TomcatFormReCaptchaServlet</servlet-name>
+      <url-pattern>/servlet/TomcatFormReCaptcha</url-pattern>
+	</servlet-mapping>
 
 </web-app>
