@@ -21,10 +21,18 @@
     <body>
         <script src="/jsScripts/jquery.js"></script>
         <script>
-                $.get("test.html",{
+                $.get("/dashboard_command",{
                     command : "meta"
-                }).done(function () {
-                    alert("done");
+                }).done(function (data) {
+                    xmlDoc = $.parseXML(data);
+                    $xml = $( xmlDoc );
+                    tables = $xml.find('meta_table');
+                    tableList = "<ul>";
+                    for (i=0;i<tables.length;i++) {
+                        tableList+="<li>"+tables.eq(i).text()+"</li>";
+                    }
+                    tableList += "</ul>";
+                    $('#data_container').append(tableList);
                 }).fail(function(data, status) {
                     alert("failed with "+status);
                 });
