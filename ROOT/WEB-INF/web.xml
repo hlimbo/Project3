@@ -49,7 +49,7 @@
 
   <servlet>
     <servlet-name>LoginFormServlet</servlet-name>
-    <servlet-class>LoginPage</servlet-class>
+    <servlet-class>gamesite.servlet.LoginPageServlet</servlet-class>
   </servlet>
 
 

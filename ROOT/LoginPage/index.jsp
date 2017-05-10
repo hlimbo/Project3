@@ -1,19 +1,19 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <HTML>
 <HEAD>
   <TITLE>GameDB Login</TITLE>
+  <script src='https://www.google.com/recaptcha/api.js'></script>
 </HEAD>
 
 <BODY BGCOLOR="#FDF5E6">
 
 <H1 ALIGN="CENTER">GameDB Login Page</H1>
 
-
-<!-- can only obtain values from httprequest and httpresponse -->
-<% if ( session.getAttribute("invalidLoginFlag") != null){ %>
-	<p><%= session.getAttribute("invalidLoginFlag") %></p>
-	 <% session.setAttribute("invalidLoginFlag", null); %>
-<% } %>
+<c:if test="${not empty invalidLoginFlag && invalidLoginFlag != 'null'}" >
+	<p><c:out value="${invalidLoginFlag}" /></p>
+	<c:set var="invalidLoginFlag" scope="request" value="null" />
+</c:if>
 
 <FORM ACTION="/servlet/loginSuccess" METHOD="POST">
   Email: <INPUT type="email" name="email" required><BR>
