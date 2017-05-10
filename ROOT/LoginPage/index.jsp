@@ -3,6 +3,7 @@
 <HTML>
 <HEAD>
   <TITLE>GameDB Login</TITLE>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <script src='https://www.google.com/recaptcha/api.js'></script>
 </HEAD>
 
@@ -12,7 +13,7 @@
 
 <c:if test="${not empty invalidLoginFlag && invalidLoginFlag != 'null'}" >
 	<p><c:out value="${invalidLoginFlag}" /></p>
-	<c:set var="invalidLoginFlag" scope="request" value="null" />
+	<c:set var="invalidLoginFlag" scope="session" value="null" />
 </c:if>
 
 <FORM ACTION="/servlet/loginSuccess" METHOD="POST">
