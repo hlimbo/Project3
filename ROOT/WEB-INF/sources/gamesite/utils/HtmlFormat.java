@@ -21,7 +21,8 @@ public class HtmlFormat {
             spanTag="<span>";
         }
         for (Map.Entry<String,String> column : row.entrySet()) {
-                html+=" "+spanTag+column.getKey()+column.getValue()+"</span> ";
+                html+=spanTag+"<span class=\"key\">"+column.getKey()+"</span> "
+                    +"<span class=\"value\">"+column.getValue()+"</span></span> ";
         }
         html+="</div>\n";
         return html;

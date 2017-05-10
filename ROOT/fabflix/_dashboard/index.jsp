@@ -21,11 +21,15 @@
     <body>
         <script src="/jsScripts/jquery.js"></script>
         <script>
-                $(document).ready(function () {
-                    $("#helloWorldTest").html("Welcome Employee");
+                $.get("test.html",{
+                    command : "meta"
+                }).done(function () {
+                    alert("done");
+                }).fail(function(data, status) {
+                    alert("failed with "+status);
                 });
         </script>
-        <div id="helloWorldTest">
+        <div id="data_container">
         </div>
     </body>
 </html>

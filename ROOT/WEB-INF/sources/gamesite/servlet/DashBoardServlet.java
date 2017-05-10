@@ -66,7 +66,7 @@ public class DashBoardServlet extends HttpServlet {
                 }
                 //writer.println(htmlFooter);
                 writer.println("<status>success</status>");
-                writer.println("<status code>1</status code>");
+                writer.println("<status_code>1</status_code>");
                 writer.println(xmlFooter);
             } catch (SQLExceptionHandler ex) {
                 //writer.println(SQLExceptionFormat.toHtml(ex));

@@ -13,7 +13,8 @@ public class XmlFormat {
 	    xml+="<"+rowClass+">\n   ";
         for (Map.Entry<String,String> column : row.entrySet()) {
                 xml+=" "+"<"+columnClass+">"
-                    +column.getKey()+column.getValue()
+                    +"<key>"+column.getKey()+"</key><value>"
+                    +column.getValue()+"</value>"
                     +"</"+columnClass+">";
         }
         xml+="</"+rowClass+">\n";
