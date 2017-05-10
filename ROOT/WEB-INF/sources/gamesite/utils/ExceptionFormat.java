@@ -24,11 +24,15 @@ public class ExceptionFormat {
             return "</exception>";
     }
 
+    protected static String escapeChars (String str) {
+        return str.replaceAll("<","&#60;").replaceAll(">","&#62;");
+    }
+
     public static String getHtmlTrace (Exception ex) {
         StackTraceElement [] trace = ex.getStackTrace();
         String traceString = "";
         for (StackTraceElement stackTop : trace) {
-            traceString+=stackTop.toString()+"\n";
+            traceString+= escapeChars(stackTop.toString())+"\n";
         }
         return traceString;
     }
@@ -41,7 +45,9 @@ public class ExceptionFormat {
         StackTraceElement [] trace = ex.getStackTrace();
         String traceString = "<trace>";
         for (StackTraceElement stackTop : trace) {
-            traceString+="<stack>"+stackTop.toString()+"</stack>\n";
+            traceString+="<stack>"
+                +escapeChars(stackTop.toString())
+                +"</stack>\n";
         }
         traceString += "</trace>";
         return traceString;
