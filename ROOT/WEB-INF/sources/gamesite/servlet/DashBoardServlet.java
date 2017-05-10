@@ -20,8 +20,6 @@ public class DashBoardServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
-        //TODO Parse parameters and then send to another class to handle
-        //the processing of the commands
         HashMap<String,String> params = ParameterParse.getQueryParameters(request.getQueryString());
         if (params.containsKey("command")) {
             String command = params.get("command");
@@ -33,12 +31,22 @@ public class DashBoardServlet extends HttpServlet {
                         DashBoardCommands.addGame(params.get("name"),
                                 params.get("year"),params.get("price"),params.get("platform"),
                                 params.get("publisher"),params.get("genre"));
+                        writer.println("<p>Successfully added game.</p>");
                         break;
                     case "insert_publisher":
                         DashBoardCommands.insertPublisher(params.get("publisher"));
+                        writer.println("<p>Successfully added publisher.</p>");
                         break;
                     case "meta":
-                        DashBoardCommands.getMeta();
+                        LinkedHashMap<String, HashMap<String, String>> meta = DashBoardCommands.getMeta();
+                        for (String table : meta.keySet()) {
+                            writer.write("<h3>);
+                            writer.write(table);
+                            writer.write("</h3>");
+                            for (HashMap<String, String> column : meta.get(table)) {
+                                HtmlFormat.printHtmlRow (writer,column);
+                            }
+                        }
                         break;
                     default:
                         break;
