@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Tomcat Test Form</TITLE>
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<script>
+function onSubmit(token) {
+	document.getElementById("example-form").submit();
+}
+</script>
+</HEAD>
+
+<BODY BGCOLOR="#FDF5E6">
+	<H1 ALIGN="CENTER">Tomcat Test Invisible reCAPTCHA</H1>
+
+	<FORM ACTION="/TomcatFormReCaptcha/servlet/TomcatFormReCaptcha"
+		METHOD="POST" ID="example-form">
+		
+		
+		Last Name: <INPUT TYPE="TEXT" NAME="lastname"><BR> Credit
+		Card Number: <INPUT TYPE="PASSWORD" NAME="cardnum"><BR>
+		<button
+			class="g-recaptcha"
+			data-sitekey="[MY_SITE_KEY]"
+			data-callback="onSubmit">
+			Submit Order
+		</button>
+
+	</FORM>
+
+</BODY>
+</HTML>
