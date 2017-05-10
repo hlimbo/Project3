@@ -24,7 +24,7 @@ public class SQLExceptionFormat extends ExceptionFormat {
     }
 
     public static String toXml (SQLException ex) {
-        return xmlHeader()+"<exception_class>SQLExceptionHandler</exception_class>\n"
+        return xmlHeader()+"<exception_class>SQLException</exception_class>\n"
             +getXmlTrace(ex)+"\n"+xmlFooter();
     }
 }

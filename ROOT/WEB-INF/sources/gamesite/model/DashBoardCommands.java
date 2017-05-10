@@ -22,7 +22,7 @@ public class DashBoardCommands {
             addStmt.setString(4,platform.trim());
             addStmt.setString(5,publisher.trim());
             addStmt.setString(6,genre.trim());
-            addStmt.executeQuery();
+            addStmt.executeUpdate();
         } catch(SQLExceptionHandler ex) {
             throw ex;
         } catch(SQLException ex) {
@@ -71,21 +71,24 @@ public class DashBoardCommands {
             publisher = pubAndYear;
         }
         Connection conn = null;
+        String query ="";
         try {
             conn = DBConnection.create();
             PreparedStatement insert;
             if (year != null) {
-                insert = conn.prepareStatement("INSERT INTO publishers (publisher, founded) VALUES (?,?)");
+                query = "INSERT INTO publishers (publisher, founded) VALUES (?,?)";
+                insert = conn.prepareStatement(query);
                 insert.setString(2,year);
             } else {
-                insert = conn.prepareStatement("INSERT INTO publishers (publisher, founded) VALUES (?,null)");
+                query = "INSERT INTO publishers (publisher, founded) VALUES (?,null)";
+                insert = conn.prepareStatement(query);
             }
             insert.setString(1,publisher);
-            insert.executeQuery();
+            insert.executeUpdate();
         } catch(SQLExceptionHandler ex) {
             throw ex;
         } catch(SQLException ex) {
-            throw ex;
+            throw new SQLExceptionHandler(ex,query);
         } catch(java.lang.Exception ex) {
             throw ex;
         }finally {

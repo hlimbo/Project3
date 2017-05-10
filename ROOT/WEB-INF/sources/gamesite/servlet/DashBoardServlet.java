@@ -23,6 +23,11 @@ public class DashBoardServlet extends HttpServlet {
     private static String xmlHeader="<?xml version=\"1.0\" encoding=\"UTF-8\"?><dashboard_status>";
     private static String xmlFooter="</dashboard_status>";
 
+    public void writeSuccess(PrintWriter writer) {
+        writer.println("<status>success</status>");
+        writer.println("<status_code>1</status_code>");
+    }
+
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
         HashMap<String,String> params = ParameterParse.getQueryParameters(request.getQueryString());
@@ -39,9 +44,11 @@ public class DashBoardServlet extends HttpServlet {
                                 params.get("year"),params.get("price"),params.get("platform"),
                                 params.get("publisher"),params.get("genre"));
                         //writer.println("<p>Successfully added game.</p>");
+                        writeSuccess(writer);
                         break;
                     case "insert_publisher":
                         DashBoardCommands.insertPublisher(params.get("publisher"));
+                        writeSuccess(writer);
                         //writer.println("<p>Successfully added publisher.</p>");
                         break;
                     case "meta":
@@ -60,14 +67,13 @@ public class DashBoardServlet extends HttpServlet {
                             XmlFormat.printXmlRows (writer,meta.get(table),"meta_columns","meta_column");
                             writer.write("</meta_info>");
                         }
+                        writeSuccess(writer);
                         break;
                     default:
+                        writer.println("<status>unknown command</status>");
+                        writer.println("<status_code>-1</status_code>");
                         break;
                 }
-                //writer.println(htmlFooter);
-                writer.println("<status>success</status>");
-                writer.println("<status_code>1</status_code>");
-                writer.println(xmlFooter);
             } catch (SQLExceptionHandler ex) {
                 //writer.println(SQLExceptionFormat.toHtml(ex));
                 writer.println(SQLExceptionFormat.toXml(ex));
@@ -78,6 +84,8 @@ public class DashBoardServlet extends HttpServlet {
                 //writer.println(ExceptionFormat.toHtml(ex));
                 writer.println(SQLExceptionFormat.toXml(ex));
             } finally {
+                //writer.println(htmlFooter);
+                writer.println(xmlFooter);
                 writer.close();
             }
         }
