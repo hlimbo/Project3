@@ -7,13 +7,13 @@ public class HtmlFormat {
     //Ensures this is a static class
     protected HtmlFormat () {}
 
-    public String htmlRow (HashMap<String,String> row, String rowClass, String columnClass) {
-        String htmlRow = "";
+    public static String htmlRows (HashMap<String,String> row, String rowClass, String columnClass) {
+        String html = "";
         String spanTag = null;
         if (rowClass!=null) {
-	        htmlRow+="<div class=\""+rowClass+"\" >\n   ";
+	        html+="<div class=\""+rowClass+"\" >\n   ";
         } else {
-	        htmlRow+="<div>";
+	        html+="<div>";
         }
         if (columnClass!=null) {
             spanTag="<span class=\""+columnClass+"\">";
@@ -21,30 +21,30 @@ public class HtmlFormat {
             spanTag="<span>";
         }
         for (Map.Entry<String,String> column : row.entrySet()) {
-                htmlRow+=" "+spanTag+column.getKey()+column.getValue()+"</span> ";
+                html+=" "+spanTag+column.getKey()+column.getValue()+"</span> ";
         }
-        htmlRow+="</div>\n";
-        return htmlRow;
+        html+="</div>\n";
+        return html;
     }
 
-    public String htmlRow (HashMap<String,String> row, String rowClass) {
-        return htmlRow(row, rowClass, null);
+    public static String htmlRows (HashMap<String,String> row, String rowClass) {
+        return htmlRows(row, rowClass, null);
     }
 
-    public String htmlRow (HashMap<String,String> row) {
-        return htmlRow(row, null, null);
+    public static String htmlRows (HashMap<String,String> row) {
+        return htmlRows(row, null, null);
     }
 
-    public void printHtmlRow (PrintWriter writer, HashMap<String,String> row,
+    public static void printHtmlRows (PrintWriter writer, HashMap<String,String> row,
             String rowClass, String columnClass) {
-        writer.println(htmlRow(row, rowClass, columnClass));
+        writer.println(htmlRows(row, rowClass, columnClass));
     }
 
-    public void printHtmlRow (PrintWriter writer, HashMap<String,String> row, String rowClass) {
-        printHtmlRow(writer, row, rowClass, null);
+    public static void printHtmlRows (PrintWriter writer, HashMap<String,String> row, String rowClass) {
+        printHtmlRows(writer, row, rowClass, null);
     }
 
-    public void printHtmlRow (PrintWriter writer, HashMap<String,String> row) {
-        printHtmlRow(writer, row, null, null);
+    public static void printHtmlRows (PrintWriter writer, HashMap<String,String> row) {
+        printHtmlRows(writer, row, null, null);
     }
 }

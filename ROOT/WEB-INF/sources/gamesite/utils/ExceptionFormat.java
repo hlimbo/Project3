@@ -16,7 +16,15 @@ public class ExceptionFormat {
             return "</P></BODY></HTML>";
     }
 
-    public static String getTrace (Exception ex) {
+    public static String xmlHeader () {
+        return "<exception>";
+    }
+
+    public static String xmlFooter () {
+            return "</exception>";
+    }
+
+    public static String getHtmlTrace (Exception ex) {
         StackTraceElement [] trace = ex.getStackTrace();
         String traceString = "";
         for (StackTraceElement stackTop : trace) {
@@ -26,6 +34,21 @@ public class ExceptionFormat {
     }
 
     public static String toHtml (Exception ex) {
-        return htmlHeader()+"\n"+ex.getMessage()+"\n"+getTrace(ex)+"\n"+htmlFooter();
+        return htmlHeader()+"\n"+ex.getMessage()+"\n"+getHtmlTrace(ex)+"\n"+htmlFooter();
+    }
+
+    public static String getXmlTrace (Exception ex) {
+        StackTraceElement [] trace = ex.getStackTrace();
+        String traceString = "<trace>";
+        for (StackTraceElement stackTop : trace) {
+            traceString+="<stack>"+stackTop.toString()+"</stack>\n";
+        }
+        traceString += "</trace>";
+        return traceString;
+    }
+
+    public static String toXml (Exception ex) {
+        return xmlHeader()+"<exception_class>Exception</exception_class>\n"
+            +"<msg>"+ex.getMessage()+"</msg>\n"+getXmlTrace(ex)+"\n"+xmlFooter();
     }
 }

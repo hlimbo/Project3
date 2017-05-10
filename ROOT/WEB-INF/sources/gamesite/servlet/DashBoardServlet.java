@@ -20,6 +20,8 @@ public class DashBoardServlet extends HttpServlet {
 
     private static String htmlHeader="<html><head><title>Employee Dashboard</title></head><body>"; 
     private static String htmlFooter="</body></html>";
+    private static String xmlHeader="<?xml version=\"1.0\" encoding=\"UTF-8\"?><dashboard_status>";
+    private static String xmlFooter="</dashboard_status>";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
@@ -29,41 +31,52 @@ public class DashBoardServlet extends HttpServlet {
             PrintWriter writer=null;
             try {
                 writer = response.getWriter();
-                writer.println(htmlHeader);
+                //writer.println(htmlHeader);
+                writer.println(xmlHeader);
                 switch (command) {
                     case "add_game":
                         DashBoardCommands.addGame(params.get("name"),
                                 params.get("year"),params.get("price"),params.get("platform"),
                                 params.get("publisher"),params.get("genre"));
-                        writer.println("<p>Successfully added game.</p>");
+                        //writer.println("<p>Successfully added game.</p>");
                         break;
                     case "insert_publisher":
                         DashBoardCommands.insertPublisher(params.get("publisher"));
-                        writer.println("<p>Successfully added publisher.</p>");
+                        //writer.println("<p>Successfully added publisher.</p>");
                         break;
                     case "meta":
                         LinkedHashMap<String, HashMap<String, String>> meta = DashBoardCommands.getMeta();
                         for (String table : meta.keySet()) {
-                            writer.write("<h3 class=\"meta_table\">");
+                            /*writer.write("<h3 class=\"meta_table\">");
                             writer.write(table);
                             writer.write("</h3>");
                             writer.write("<p class=\"meta_columns\">");
-                            for (HashMap<String, String> column : meta.get(table)) {
-                                HtmlFormat.printHtmlRow (writer,column);
-                            }
-                            writer.write("</p>");
+                            HtmlFormat.printHtmlRows (writer,column);
+                            writer.write("</p>");*/
+                            writer.write("<meta_info>");
+                            writer.write("<meta_table>");
+                            writer.write(table);
+                            writer.write("</meta_table>");
+                            XmlFormat.printXmlRows (writer,meta.get(table),"meta_columns","meta_column");
+                            writer.write("</meta_info>");
                         }
                         break;
                     default:
                         break;
                 }
-                writer.println(htmlFooter);
+                //writer.println(htmlFooter);
+                writer.println("<status>success</status>");
+                writer.println("<status code>1</status code>");
+                writer.println(xmlFooter);
             } catch (SQLExceptionHandler ex) {
-                writer.println(SQLExceptionFormat.toHtml(ex));
+                //writer.println(SQLExceptionFormat.toHtml(ex));
+                writer.println(SQLExceptionFormat.toXml(ex));
             } catch (SQLException ex) {
-                writer.println(SQLExceptionFormat.toHtml(ex));
+                //writer.println(SQLExceptionFormat.toHtml(ex));
+                writer.println(SQLExceptionFormat.toXml(ex));
             } catch (java.lang.Exception ex)  {
-                writer.println(ExceptionFormat.toHtml(ex));
+                //writer.println(ExceptionFormat.toHtml(ex));
+                writer.println(SQLExceptionFormat.toXml(ex));
             } finally {
                 writer.close();
             }
