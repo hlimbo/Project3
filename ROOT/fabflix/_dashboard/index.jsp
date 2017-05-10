@@ -19,11 +19,13 @@
     </head>
 
     <body>
-        <script src="jquery.js"></script>
+        <script src="/jsScripts/jquery.js"></script>
         <script>
-                window.onload = function () {
-                alert("Welcome Employee");
-                };
+                $(document).ready(function () {
+                    $("#helloWorldTest").html("Welcome Employee");
+                });
         </script>
+        <div id="helloWorldTest">
+        </div>
     </body>
 </html>
