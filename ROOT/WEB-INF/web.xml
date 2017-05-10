@@ -120,4 +120,14 @@
 	<url-pattern>/servlet/TomcatFormReCaptcha</url-pattern>
 </servlet-mapping>
 
+   <servlet>
+    	<servlet-name>DashBoardServlet</servlet-name>
+    	<servlet-class>gamesite.servlet.DashBoardServlet</servlet-class>
+    </servlet>
+      
+    <servlet-mapping>
+    	<servlet-name>DashBoardServlet</servlet-name>
+        <url-pattern>/dashboard_command</url-pattern>
+    </servlet-mapping>
+
 </web-app>
