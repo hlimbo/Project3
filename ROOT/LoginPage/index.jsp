@@ -21,6 +21,7 @@
   <CENTER>
     <INPUT TYPE="SUBMIT" VALUE="Login">
   </CENTER>
+  <div class="g-recaptcha" data-sitekey="6LeuvCAUAAAAAB68t-UTWj7SyL02eIYRd3MOswzm"></div>
 </FORM>
 
 </BODY>
