@@ -32,7 +32,7 @@ public class TomcatFormReCaptcha extends HttpServlet
         PrintWriter out = response.getWriter();
 
 	String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-	System.out.println("gRecaptchaResponse=" + gRecaptchaResponse);
+	out.println("gRecaptchaResponse=" + gRecaptchaResponse);
 	// Verify CAPTCHA.
 	boolean valid = VerifyUtils.verify(gRecaptchaResponse);
 	if (!valid) {
@@ -52,8 +52,8 @@ public class TomcatFormReCaptcha extends HttpServlet
         response.setContentType("text/html");    // Response mime type
 
 
-        out.println("<HTML><HEAD><TITLE>MovieDB</TITLE></HEAD>");
-        out.println("<BODY><H1>MovieDB</H1>");
+        out.println("<HTML><HEAD><TITLE>GameDB</TITLE></HEAD>");
+        out.println("<BODY><H1>GameDB</H1>");
 
         try
            {
@@ -66,16 +66,19 @@ public class TomcatFormReCaptcha extends HttpServlet
 
 	      String lastname = request.getParameter("lastname");
               String query = "SELECT * from games where name = '" + lastname + "'";
+		
 
+		out.println(query);
               // Perform the query
               ResultSet rs = statement.executeQuery(query);
 
-              out.println("<TABLE border>");
-
+              out.println("<TABLE>");
+		out.println("HELLO");
               // Iterate through each row of rs
               while (rs.next())
               {
-                  String m_ID = rs.getString("id");
+		 out.println("stuff");
+                  Integer m_ID = rs.getInt("id");
                   String m_FN = rs.getString("name");
                   String m_LN = rs.getString("url");
                   out.println("<tr>" +
