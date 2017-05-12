@@ -21,15 +21,19 @@
     <body>
         <input id="meta" type="button" value="Get Meta Data" />
         <script src="/jsScripts/jquery.js"></script>
+        <script src="/jsScripts/utils.js"></script>
         <script>
-                $('#meta').click( function () {$.get("/dashboard_command",{
+            $('#meta').click( function () {
+                $('#data_container').empty();
+                $('#data_container').append('Performing Request...');
+                $.get("/dashboard_command",{
                     command : "meta"
                 }).done(function (data) {
                     xmlDoc = $.parseXML(data);
                     $xml = $( xmlDoc );
                     error = $xml.find("exception");
-                    if (error.length > 0) {
-                        errors="<ul>";
+                    if (printXmlException($xml,'#data_container')) {
+                        /*errors="<ul>";
                         for (i=0;i<error.length;i++) {
                             stack = error.find("stack");
                             for (j=0;j<stack.length;j++) {
@@ -38,7 +42,7 @@
                         }
                         errors+="</ul>";
                         $('#data_container').empty();
-                        $('#data_container').append(errors);
+                        $('#data_container').append(errors);*/
                     } else {
                         tables = $xml.find('meta_table');
                         tableList = "<ul>";
@@ -51,7 +55,8 @@
                     }
                 }).fail(function(data, status) {
                     alert("failed with "+status);
-                })});
+                })
+            });
         </script>
         <div id="data_container">
         </div>
