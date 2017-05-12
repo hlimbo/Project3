@@ -32,18 +32,7 @@
                     xmlDoc = $.parseXML(data);
                     $xml = $( xmlDoc );
                     error = $xml.find("exception");
-                    if (printXmlException($xml,'#data_container')) {
-                        /*errors="<ul>";
-                        for (i=0;i<error.length;i++) {
-                            stack = error.find("stack");
-                            for (j=0;j<stack.length;j++) {
-                                errors+="<li>"+stack.eq(j).text()+"</li>";
-                            }
-                        }
-                        errors+="</ul>";
-                        $('#data_container').empty();
-                        $('#data_container').append(errors);*/
-                    } else {
+                    if (!printXmlException($xml,'#data_container')) {
                         tables = $xml.find('meta_table');
                         tableList = "<ul>";
                         for (i=0;i<tables.length;i++) {
