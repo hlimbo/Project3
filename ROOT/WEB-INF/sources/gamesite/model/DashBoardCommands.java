@@ -57,7 +57,10 @@ public class DashBoardCommands {
         return types;
     }
 
-    public static boolean insertPublisher(String pubAndYear) throws SQLExceptionHandler, SQLException, java.lang.Exception {
+    public static int insertPublisher(String pubAndYear) throws SQLExceptionHandler, SQLException, java.lang.Exception {
+        if (pubAndYear == null) {
+            return -1;
+        }
         pubAndYear = pubAndYear.trim();
         String publisher = "";
         String year = null;
@@ -94,6 +97,6 @@ public class DashBoardCommands {
         }finally {
             DBConnection.close(conn);
         }
-        return true;
+        return 1;
     }
 }

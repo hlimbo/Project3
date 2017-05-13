@@ -28,6 +28,12 @@ public class DashBoardServlet extends HttpServlet {
         writer.println("<status_code>1</status_code>");
     }
 
+    public void writeFailure(PrintWriter writer, String code, String msg) {
+        writer.println("<status>failure</status>");
+        writer.println("<status_code>"+code+"</status_code>");
+        writer.println("<message>"+msg+"</message>");
+    }
+
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
         HashMap<String,String> params = ParameterParse.getQueryParameters(request.getQueryString());
@@ -36,20 +42,25 @@ public class DashBoardServlet extends HttpServlet {
             PrintWriter writer=null;
             try {
                 writer = response.getWriter();
-                //writer.println(htmlHeader);
                 writer.println(xmlHeader);
                 switch (command) {
                     case "add_game":
                         DashBoardCommands.addGame(params.get("name"),
                                 params.get("year"),params.get("price"),params.get("platform"),
                                 params.get("publisher"),params.get("genre"));
-                        //writer.println("<p>Successfully added game.</p>");
                         writeSuccess(writer);
                         break;
                     case "insert_publisher":
-                        DashBoardCommands.insertPublisher(params.get("publisher"));
-                        writeSuccess(writer);
-                        //writer.println("<p>Successfully added publisher.</p>");
+                        Integer inserted = DashBoardCommands.insertPublisher(params.get("publisher"));
+                        if (inserted==1) {
+                            writeSuccess(writer);
+                        } else {
+                            switch(inserted) {
+                                case -1:
+                                    writeFailure(writer,inserted.toString()
+                                        ,"Publisher can not be empty");
+                            }
+                        }
                         break;
                     case "meta":
                         LinkedHashMap<String, HashMap<String, String>> meta = DashBoardCommands.getMeta();
@@ -75,16 +86,12 @@ public class DashBoardServlet extends HttpServlet {
                         break;
                 }
             } catch (SQLExceptionHandler ex) {
-                //writer.println(SQLExceptionFormat.toHtml(ex));
                 writer.println(SQLExceptionFormat.toXml(ex));
             } catch (SQLException ex) {
-                //writer.println(SQLExceptionFormat.toHtml(ex));
                 writer.println(SQLExceptionFormat.toXml(ex));
             } catch (java.lang.Exception ex)  {
-                //writer.println(ExceptionFormat.toHtml(ex));
                 writer.println(SQLExceptionFormat.toXml(ex));
             } finally {
-                //writer.println(htmlFooter);
                 writer.println(xmlFooter);
                 writer.close();
             }

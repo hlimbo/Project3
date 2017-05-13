@@ -19,10 +19,14 @@
     </head>
 
     <body>
+        <form>
+        Game Name: <input hidden="hidden" id="gameName" type="text" value="" /> 
+        Publisher Name: <input hidden="hidden" id="publisherName" type="text" value="" /> 
         <input id="addGame" type="button" value="Add Game" /> 
         <input id="insertPublisher" type="button" value="Insert Publisher" />
         <input id="meta" type="button" value="Get Database Meta Data" />
-        <input id="menuReturn" type="button" value="Back to Main Menu" />
+        <input hidden="hidden" id="menuReturn" type="button" value="Back to Main Menu" />
+        </form>
         <script src="/jsScripts/jquery.js"></script>
         <script src="/jsScripts/utils.js"></script>
         <script>
@@ -41,15 +45,38 @@
                 $('#insertPublisher').show();
                 $('#meta').show();
                 $('#menuReturn').hide();
+                $('#gameName').show();
+                $('#publisherName').show();
                 $('#data_container').hide();
+            }
+            function handleFailure (data, status) {
+                alert("failed with "+status);
             }
             $('#addGame').click( function () {
                 hideMenu();
-                $('#data_container').empty();
-                $('#data_container').append('Performing Request...');
             });
             $('#insertPublisher').click( function () {
                 hideMenu();
+                $('#publisherName').show();
+                $.get("/dashboard_command",{
+                    command : "insert_publisher",
+                    publisher : $('#publisherName').val()
+                }).done(function (data) {
+                    xmlDoc = $.parseXML(data);
+                    $xml = $( xmlDoc );
+                    error = $xml.find("exception");
+                    if (!printXmlException($xml,'#data_container')) {
+                        insertCode = $xml.find("status_code").text();
+                        if (insertCode == 1) {
+                            $('#data_container').empty();
+                            $('#data_container').append("Publisher inserted into table.");
+                        } else {
+                            failureMessage = $xml.find("message").text();
+                            $('#data_container').empty();
+                            $('#data_container').append(failureMessage);
+                        }
+                    }
+                }).fail(handleFailure);
             });
             $('#meta').click( function () {
                 hideMenu();
@@ -76,9 +103,7 @@
                         $('#data_container').empty();
                         $('#data_container').append(tableList);
                     }
-                }).fail(function(data, status) {
-                    alert("failed with "+status);
-                })
+                }).fail(handleFailure);
             });
             $('#menuReturn').click( function () {
                 showMenu();
