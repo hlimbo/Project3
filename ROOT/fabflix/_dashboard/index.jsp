@@ -20,44 +20,62 @@
 
     <body>
         <form>
-        Game Name: <input hidden="hidden" id="gameName" type="text" value="" /> 
-        Publisher Name: <input hidden="hidden" id="publisherName" type="text" value="" /> 
-        <input id="addGame" type="button" value="Add Game" /> 
-        <input id="insertPublisher" type="button" value="Insert Publisher" />
+            <div hidden="hidden" id="addGameFields">
+                <div class="label"> Game Name: <input  id="gameName" type="text" value="" /></div>
+                <input id="addGame" type="button" value="Add" /> 
+            </div>
+            <div hidden="hidden" id="insertPublisherFields">
+                <div class="label"> Publisher Name: <input id="publisherName" type="text" value="" /></div>
+                <input id="insertPublisher" type="button" value="Add" />
+            </div>
+        <input id="menuAddGame" type="button" value="Add Game" /> 
+        <input id="menuInsertPublisher" type="button" value="Add Publisher" />
         <input id="meta" type="button" value="Get Database Meta Data" />
+        <div hidden="hidden" id="data_container"></div>
         <input hidden="hidden" id="menuReturn" type="button" value="Back to Main Menu" />
         </form>
         <script src="/jsScripts/jquery.js"></script>
         <script src="/jsScripts/utils.js"></script>
         <script>
             function hideMenu () {
-                $('#addGame').hide();
-                $('#insertPublisher').hide();
+                $('#menuAddGame').hide();
+                $('#menuInsertPublisher').hide();
                 $('#meta').hide();
                 $('#menuReturn').show();
                 $('#data_container').empty();
                 $('#data_container').show();
-                $('#data_container').append('Performing Request...');
+            }
+            function showMenu () {
+                $('#addGameFields').hide();
+                $('#insertPublisherFields').hide();
+                $('#menuReturn').hide();
+                $('#data_container').hide();
+                $('#menuAddGame').show();
+                $('#menuInsertPublisher').show();
+                $('#meta').show();
             }
             showMenu();
-            function showMenu () {
-                $('#addGame').show();
-                $('#insertPublisher').show();
-                $('#meta').show();
-                $('#menuReturn').hide();
-                $('#gameName').show();
-                $('#publisherName').show();
-                $('#data_container').hide();
-            }
             function handleFailure (data, status) {
                 alert("failed with "+status);
             }
+            $('#menuAddGame').click( function () {
+                hideMenu();
+                $('#addGameFields').show();
+            });
             $('#addGame').click( function () {
                 hideMenu();
+                $('#addGameFields').show();
+                $('#data_container').append('Performing Request...');
+            });
+            $('#menuInsertPublisher').click( function () {
+                hideMenu();
+                $('#insertPublisherFields').show();
             });
             $('#insertPublisher').click( function () {
                 hideMenu();
+                $('#insertPublisherFields').show();
                 $('#publisherName').show();
+                $('#data_container').append('Performing Request...');
                 $.get("/dashboard_command",{
                     command : "insert_publisher",
                     publisher : $('#publisherName').val()
@@ -80,6 +98,7 @@
             });
             $('#meta').click( function () {
                 hideMenu();
+                $('#data_container').append('Performing Request...');
                 $.get("/dashboard_command",{
                     command : "meta"
                 }).done(function (data) {
@@ -109,7 +128,5 @@
                 showMenu();
             });
         </script>
-        <div id="data_container">
-        </div>
     </body>
 </html>
