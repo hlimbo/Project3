@@ -62,6 +62,9 @@ public class DashBoardCommands {
             return -1;
         }
         pubAndYear = pubAndYear.trim();
+        if (pubAndYear.equals("")) {
+            return -1;
+        }
         String publisher = "";
         String year = null;
         Pattern yearPattern = Pattern.compile("\\d+$");
