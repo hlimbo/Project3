@@ -9,6 +9,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import gamesite.utils.*;
+import gamesite.utils.LoginHandler;
 import gamesite.model.DashBoardCommands;
 import gamesite.model.SQLExceptionHandler;
 
@@ -94,6 +95,35 @@ public class DashBoardServlet extends HttpServlet {
             } finally {
                 writer.println(xmlFooter);
                 writer.close();
+            }
+        } else if (params.containsKey("email") && params.containsKey("password")) {
+            PrintWriter writer = null;
+            try {
+                writer = response.getWriter();
+			    int login = LoginHandler.login(request,response,"employees");
+                writer.println(xmlHeader);
+                switch (login) {
+                    case 1:
+                        writeSuccess(writer);
+                        break;
+                    case -1:
+                        writeFailure(writer,"-1","Please complete the ReCaptcha");
+                        break;
+                    case -2:
+                        writeFailure(writer,"-2","Invalid email or password");
+                        break;
+                }
+                writer.println(xmlFooter);
+            } catch (SQLExceptionHandler ex) {
+                writer.println(SQLExceptionFormat.toXml(ex));
+            } catch (SQLException ex) {
+                writer.println(SQLExceptionFormat.toXml(ex));
+            } catch (java.lang.Exception ex)  {
+                writer.println(SQLExceptionFormat.toXml(ex));
+            } finally {
+                if (writer != null) {
+                    writer.close();
+                }
             }
         }
     }

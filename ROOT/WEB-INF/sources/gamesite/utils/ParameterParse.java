@@ -1,4 +1,4 @@
-package gamesite.servlet;
+package gamesite.utils;
 
 import java.util.*;
 import java.net.*;
