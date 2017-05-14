@@ -16,6 +16,9 @@
         <meta charset="UTF-8" />
 		<TITLE>Employee Dashboard</TITLE>
 <style>
+    ul.metaTable {
+        display: inline-block;
+    }
     ul.metaTable li{
         color: blue;
     }

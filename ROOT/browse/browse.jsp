@@ -4,7 +4,7 @@ Browse
 <ul>
     <%  ArrayList<String> tables = new ArrayList<String>();
         Hashtable<String,String> ignores = new Hashtable<String,String> ();
-        ignores.put("game","8");
+        ignores.put("games","8");
         ignores.put("publishers","068");
         tables.add("games");
         tables.add("publishers");
