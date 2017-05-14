@@ -43,7 +43,11 @@ public class DisplayServlet extends HttpServlet
                 URLEncoder.encode(fieldValue,"UTF-8");
             return("<td>"+column+": <a href=\""+fieldUrl+"\">"+fieldValue+"</a></td>");
         } else if (images.containsKey(column) && images.get(column)){
-            return ("<td><img src=\"http://"+fieldValue+"\" /></td>");
+            if (fieldValue.startsWith("/art")) {
+                return ("<td><img src=\""+fieldValue+"\" /></td>");
+            } else {
+                return ("<td><img src=\"http://"+fieldValue+"\" /></td>");
+            }
         } else if (externalLinks.containsKey(column) && externalLinks.get(column)) {
             return("<td>"+column+": <a href=\"http://"+fieldValue+"\">"+fieldValue+"</a></td>");
         }else {
@@ -196,9 +200,10 @@ public class DisplayServlet extends HttpServlet
                     String fieldValue = rs.getString(i);
                     if (fieldValue == null) {
                         if (images.containsKey(columnName) && images.get(columnName)) {
-                            fieldValue="upload.wikimedia.org/wikipedia/"
+                            /*fieldValue="upload.wikimedia.org/wikipedia/"
                                 +"commons/thumb/5/51/"
-                                +"Star_full.svg/11px-Star_full.svg.png";
+                                +"Star_full.svg/11px-Star_full.svg.png";*/
+                            fieldValue="/art/game_nologo.svg";
                         } else {
                             continue;
                         }   

@@ -105,10 +105,11 @@ public class SearchServlet extends HttpServlet
             }
             if (value==null || value.trim().compareTo("") == 0) {
                 if (images.containsKey(colName) && images.get(colName)){
-                    resString+="<td><img src=\""
+                    /*resString+="<td><img src=\""
                         +"http://upload.wikimedia.org/wikipedia/"
                         +"commons/thumb/5/51/"
-                        +"Star_full.svg/11px-Star_full.svg.png\" /></td>";
+                        +"Star_full.svg/11px-Star_full.svg.png\" /></td>"*/;
+                    resString+="<td><img src=\"/art/game_nologo.svg\"/></td>";
                 }
                 continue;
             }
