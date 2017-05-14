@@ -12,12 +12,8 @@ public class DashBoardCommands {
     public static int addGame (String name, String year, String price, String platform,
             String publisher, String genre) 
             throws SQLExceptionHandler, SQLException, java.lang.Exception {
-        /*if (name == null || year == null || price == null 
-                || platform == null || publisher == null 
-                || genre == null) {
-            return -1;
-        }*/
         Connection conn = null;
+        String founded = "";
         try {
             conn = DBConnection.create();
             PreparedStatement addStmt = conn.prepareStatement("CALL add_game(?,?,?,?,?,?)");

@@ -63,6 +63,7 @@ BEGIN
     IF countFound = 0 THEN 
         INSERT INTO publishers_of_games (publisher_id, platform_id, game_id) VALUES (publisherID,platformID,gameID);
     END IF;
+    COMMIT;
 END
 //
 
