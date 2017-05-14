@@ -18,6 +18,8 @@
 <style>
     ul.metaTable {
         display: inline-block;
+        border-style: solid;
+        border-color: green black black black;
     }
     ul.metaTable li{
         color: blue;
