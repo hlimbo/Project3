@@ -40,7 +40,7 @@ public class SAXParserExample extends DefaultHandler {
         parseDocument();
         printData();
 		
-		System.out.println("characters callback count: " + charactersEventCount);
+		/*System.out.println("characters callback count: " + charactersEventCount);
 		System.out.println("startElement callback count: " + startElementEventCount);
 		System.out.println("endElement callback count: " + endElementEventCount);
     
@@ -62,7 +62,7 @@ public class SAXParserExample extends DefaultHandler {
 		System.out.println("values size: " + values.size());
 		System.out.println("char count: " + charCount);
 		System.out.println("actual char count: " + actualCharCount);
-		
+		*/
 		for(int i = 0;i < values.size(); ++i)
 		{
 			System.out.println( (i+1) + "\t" + values.get(i));
@@ -105,8 +105,10 @@ public class SAXParserExample extends DefaultHandler {
     }
 
     //Event Handlers
+	@Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         
+		System.out.println("startElement: " + uri + ", " + localName + ", " + qName);
 		++startElementEventCount;
 		//reset
         tempVal = "";
@@ -117,6 +119,7 @@ public class SAXParserExample extends DefaultHandler {
         }
     }
 
+	@Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         tempVal = new String(ch, start, length);
 		charCount += length;
@@ -124,6 +127,7 @@ public class SAXParserExample extends DefaultHandler {
 		++charactersEventCount;
     }
 
+	@Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
 		
 		++endElementEventCount;
@@ -140,7 +144,7 @@ public class SAXParserExample extends DefaultHandler {
         }
 
     }
-
+	
     public static void main(String[] args) {
         SAXParserExample spe = new SAXParserExample();
         spe.runExample();
