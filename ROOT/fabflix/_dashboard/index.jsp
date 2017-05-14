@@ -21,9 +21,6 @@
         border-style: solid;
         border-color: green black black black;
     }
-    ul.metaTable li{
-        color: blue;
-    }
     ul.metaTable li.metaTableName {
         color: green;
     }
