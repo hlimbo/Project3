@@ -104,10 +104,18 @@ public class GamesParser extends DefaultHandler
 			tempGame.setPlatform(tempVal);
 	}
 	
-	/* public static void main(String[] args)
+	//execution time for 2 million game records ~ 6 seconds
+	public static void main(String[] args)
 	{
 		GamesParser gameParser = new GamesParser();
+		long startTime = System.nanoTime();
 		gameParser.parseDocument("newGames/newGames.xml");
+		long endTime = System.nanoTime();		
+		long elapsedTime = endTime - startTime;
+		
+		long timeInMilli = elapsedTime / 1000000;
+		System.out.println("Parse execution time: " + timeInMilli);
 		gameParser.printSize();
-	} */
+		
+	}
 }
