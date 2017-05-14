@@ -18,7 +18,6 @@ public class DomParserExample
 {
 	List<Employee> myEmpls;
 	Document dom;
-	
-	
-	
+    public static void main (String [] args) {
+    }
 }
