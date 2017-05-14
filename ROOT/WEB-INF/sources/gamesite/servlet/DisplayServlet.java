@@ -125,7 +125,7 @@ public class DisplayServlet extends HttpServlet
             String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
             //duplicates due to games on multiple platforms, with multiple genres, or etc...
             String query = "SELECT DISTINCT "+table+".* FROM games, publishers, platforms, genres, "+masterTable+" WHERE "
-                +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id AND "+table+"."+column+"=?";
+                +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id AND genres.id=genre_id AND "+table+"."+column+"=?";
             statement = dbcon.prepareStatement(query);
             statement.setString(1,columnValue);
 

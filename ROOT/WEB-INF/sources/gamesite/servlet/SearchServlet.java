@@ -235,7 +235,7 @@ public class SearchServlet extends HttpServlet
                 String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
                 //duplicates due to games on multiple platforms, with multiple genres, or etc...
                 query = "SELECT DISTINCT "+table+".* FROM games, publishers, platforms, genres, "+masterTable+" WHERE "
-                    +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id";
+                    +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id AND genres.id=genre_id";
                 query+=addSearchTerm(request,"name",useSubMatch);
                 query+=addSearchTerm(request,"year",useSubMatch);
                 query+=addSearchTerm(request,"publisher",useSubMatch);
