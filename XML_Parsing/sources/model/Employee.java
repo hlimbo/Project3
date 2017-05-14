@@ -9,7 +9,7 @@ public class Employee
 	
 	public Employee() {}
 	
-	public Employee(String type, String name, int id, int age)
+	public Employee(String name, int id, int age, String type)
 	{
 		this.type = type;
 		this.name = name;
@@ -26,5 +26,11 @@ public class Employee
 	public void setName(String name) { this.name = name; }
 	public void setID(int id) { this.id = id; }
 	public void setAge(int age) { this.age = age; }
+	
+	@Override
+	public String toString()
+	{
+		return "Employee Details - Name:" + name + ", Type:" + type + ", Id:" + id + ", Age:" + age;
+	}
 		
 }
