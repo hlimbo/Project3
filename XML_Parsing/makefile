@@ -1,2 +1,3 @@
 all:
-	javac -d classes -cp .:classes sources/DomParserExample.java
+	javac -d classes -cp .:classes DomParserExample.java
+	javac -d classes -cp .:classes Employee.java
