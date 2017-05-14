@@ -54,3 +54,12 @@ First Name: Tina
 Last Name: Watson
 Credit Card Number: 0000574018613373  
 Expiration Date: 2018-11-12
+
+Special Characters in Search
+------------------------------------------------------------
+The search engine uses SQL LIKE in the backend. As such,
+you able to use '%' like a wildcard to match any amount
+of characters at where the '%' is. To match only one
+character of any character, '_' can be used instead.
+As example, both M_rio and M%io will match Mario.
+
