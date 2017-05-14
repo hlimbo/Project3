@@ -10,7 +10,7 @@
 if [ "$1" == "--help" ] && [ $# -eq 1 ]; then
 	echo "Usage: unitTest [ filename.class ]"
 	echo "Description: Runs any compiled java class file in the Tomcat Webapps workspace"
-	echo "e.g. unitTest CalculatorTest.class"
+	echo "e.g. unitTest CalculatorTest"
 	exit 0
 fi
 

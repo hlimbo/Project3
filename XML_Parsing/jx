@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#This script is responsible for compiling java xml parser program files
+
+
+if [ "$1" == "--help" ]; then
+	echo "Usage: $0 [ path/to/javafile ]"
+	echo "e.g. $0 testpackage/foo.java"
+	echo "This script is responsible for compiling java xml parser program files"
+	exit 0
+fi
+
+if [ $# -ne 1 ]; then
+	echo "Usage: $0 [ path/to/javafile ]"
+	echo "Type $0 --help for more information"
+	exit 1
+fi
+
+#Note: script user needs to have git installed in his/her machine
+MASTER=$(git rev-parse --show-toplevel | sed 's_^C\:_/c_g')
+SOURCE=$MASTER"/XML_Parsing/sources"
+CLASSPATH=$MASTER"/XML_Parsing/classes"
+
+source_file=$1
+
+if [ ! -f "$SOURCE/$source_file" ]; then
+	echo "file not found: $SOURCE/$source_file"
+	exit 1
+fi
+
+#if the file exists, compile it using a temporary make file to run javac command
+printf "all:\n\tjavac -d $CLASSPATH -cp $CLASSPATH $SOURCE/$source_file" > makefile
+
+make --quiet
+rm makefile
