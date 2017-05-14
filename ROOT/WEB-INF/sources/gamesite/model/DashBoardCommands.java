@@ -13,7 +13,7 @@ public class DashBoardCommands {
             String publisher, String genre) 
             throws SQLExceptionHandler, SQLException, java.lang.Exception {
         Connection conn = null;
-        String founded = "";
+        int returnCode=1;
         try {
             conn = DBConnection.create();
             PreparedStatement addStmt = conn.prepareStatement("CALL add_game(?,?,?,?,?,?)");
@@ -23,7 +23,16 @@ public class DashBoardCommands {
             addStmt.setString(4,platform.trim());
             addStmt.setString(5,publisher.trim());
             addStmt.setString(6,genre.trim());
-            addStmt.executeUpdate();
+            try {
+                addStmt.executeUpdate();
+            } catch (SQLException ex) {
+                //Invalid year
+                if (ex!=null && ex.getErrorCode()==1264) {
+                    returnCode=-2;
+                } else {
+                    throw ex;
+                }
+            }
         } catch(SQLExceptionHandler ex) {
             throw ex;
         } catch(SQLException ex) {
@@ -33,7 +42,7 @@ public class DashBoardCommands {
         }finally {
             DBConnection.close(conn);
         }
-        return 1;
+        return returnCode;
     }
 
     public static LinkedHashMap<String,HashMap<String,String>> getMeta () 
