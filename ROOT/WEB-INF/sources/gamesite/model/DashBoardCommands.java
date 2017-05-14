@@ -12,22 +12,39 @@ public class DashBoardCommands {
     public static int addGame (String name, String year, String price, String platform,
             String publisher, String genre) 
             throws SQLExceptionHandler, SQLException, java.lang.Exception {
-        /*if (name == null || year == null || price == null 
-                || platform == null || publisher == null 
-                || genre == null) {
-            return -1;
-        }*/
         Connection conn = null;
+        int returnCode=1;
         try {
             conn = DBConnection.create();
             PreparedStatement addStmt = conn.prepareStatement("CALL add_game(?,?,?,?,?,?)");
             addStmt.setString(1,name.trim());
             addStmt.setString(2,year.trim());
             addStmt.setString(3,price.trim());
-            addStmt.setString(4,platform.trim());
-            addStmt.setString(5,publisher.trim());
-            addStmt.setString(6,genre.trim());
-            addStmt.executeUpdate();
+            if (platform==null) {
+                addStmt.setString(4,null);
+            } else {
+                addStmt.setString(4,platform.trim());
+            }
+            if (publisher==null) {
+                addStmt.setString(5,null);
+            } else {
+                addStmt.setString(5,publisher.trim());
+            }
+            if (genre==null) {
+                addStmt.setString(6,null);
+            } else {
+                addStmt.setString(6,genre.trim());
+            }
+            try {
+                addStmt.executeUpdate();
+            } catch (SQLException ex) {
+                //Invalid year
+                if (ex!=null && ex.getErrorCode()==1264) {
+                    returnCode=-2;
+                } else {
+                    throw ex;
+                }
+            }
         } catch(SQLExceptionHandler ex) {
             throw ex;
         } catch(SQLException ex) {
@@ -37,7 +54,7 @@ public class DashBoardCommands {
         }finally {
             DBConnection.close(conn);
         }
-        return 1;
+        return returnCode;
     }
 
     public static LinkedHashMap<String,HashMap<String,String>> getMeta () 

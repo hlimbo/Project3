@@ -27,6 +27,10 @@ BEGIN
         SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT = 'Price can not be null', MYSQL_ERRNO='1001';
     END IF;
+    IF newPrice < 0 THEN
+        SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Price can not be negative', MYSQL_ERRNO='1001';
+    END IF;
     IF newPlatform IS NULL THEN
         SIGNAL SQLSTATE '45000' 
             SET MESSAGE_TEXT = 'Platform can not be null', MYSQL_ERRNO='1001';
@@ -34,35 +38,44 @@ BEGIN
     SET countFound = (SELECT COUNT(*) FROM games WHERE name=newName AND year=newYear);
     IF countFound = 0 THEN
         INSERT INTO games (name, year, price) VALUES (newName,newYear,newPrice);
+        SELECT 'Game Inserted' AS 'Transaction Progress';
     END IF;
     SET countFound = (SELECT COUNT(id) FROM platforms WHERE platform = newPlatform);
     IF countFound = 0 THEN 
         INSERT INTO platforms (platform) VALUES (newPlatform);
+        SELECT 'Platform Inserted' AS 'Transaction Progress';
     END IF;
     SET platformID = (SELECT id FROM platforms WHERE platform = newPlatform);
     SET gameID = (SELECT id FROM games WHERE name = newName AND year = newYear);
     SET countFound = (SELECT COUNT(*) FROM platforms_of_games WHERE platform_id = platformID AND game_id = gameID);
     IF countFound = 0 THEN 
         INSERT INTO platforms_of_games (game_id, platform_id) VALUES (gameID, platformID);
+        SELECT 'Platform Game Relationship Added' AS 'Transaction Progress';
     END IF;
     SET countFound = (SELECT COUNT(*) FROM genres WHERE genre = newGenre);
     IF countFound = 0 THEN 
         INSERT INTO genres (genre) VALUES (newGenre);
+        SELECT 'Genre Inserted' AS 'Transaction Progress';
     END IF;
     SET genreID = (SELECT id FROM genres WHERE genre = newGenre);
     SET countFound = (SELECT COUNT(*) FROM genres_of_games WHERE genre_id = genreID AND game_id = gameID);
     IF countFound = 0 THEN 
         INSERT INTO genres_of_games (game_id, genre_id) VALUES (gameID, genreID);
+        SELECT 'Genre Game Relationship Added' AS 'Transaction Progress';
     END IF;
     SET countFound = (SELECT COUNT(*) FROM publishers WHERE publisher = newPublisher);
     IF countFound = 0 THEN 
         INSERT INTO publishers (publisher) VALUES (newPublisher);
+        SELECT 'Publisher Inserted' AS 'Transaction Progress';
     END IF;
     SET publisherID = (SELECT id FROM publishers WHERE publisher = newPublisher);
     SET countFound = (SELECT COUNT(*) FROM publishers_of_games WHERE publisher_id = publisherID AND platform_id = platformID AND game_id = gameID);
     IF countFound = 0 THEN 
         INSERT INTO publishers_of_games (publisher_id, platform_id, game_id) VALUES (publisherID,platformID,gameID);
+        SELECT 'Publisher Game Relationship Added' AS 'Transaction Progress';
     END IF;
+    COMMIT;
+    SELECT 'Commit complete. Data saved' AS 'Transaction Progress';
 END
 //
 

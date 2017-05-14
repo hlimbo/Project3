@@ -46,10 +46,18 @@ public class DashBoardServlet extends HttpServlet {
                 writer.println(xmlHeader);
                 switch (command) {
                     case "add_game":
-                        DashBoardCommands.addGame(params.get("name"),
+                        Integer status = DashBoardCommands.addGame(params.get("name"),
                                 params.get("year"),params.get("price"),params.get("platform"),
                                 params.get("publisher"),params.get("genre"));
-                        writeSuccess(writer);
+                        switch(status) {
+                            case 1:
+                                writeSuccess(writer);
+                                break;
+                            case -2:
+                                writeFailure(writer,status.toString()
+                                        ,"Either invalid year or price value");
+                                break;
+                        }
                         break;
                     case "insert_publisher":
                         Integer inserted = DashBoardCommands.insertPublisher(params.get("publisher"));

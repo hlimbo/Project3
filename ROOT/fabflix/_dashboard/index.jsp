@@ -15,6 +15,19 @@
     <head>
         <meta charset="UTF-8" />
 		<TITLE>Employee Dashboard</TITLE>
+<style>
+    ul.metaTable {
+        display: inline-block;
+        border-style: solid;
+        border-color: green black black black;
+    }
+    ul.metaTable li.metaTableName {
+        color: green;
+    }
+    li {
+        list-style-type: none;
+    }
+</style>
     </head>
 
     <body>
@@ -85,10 +98,10 @@
                             insertCode = $xml.find("status_code").text();
                             if (insertCode == 1) {
                                 $('#data_container').empty();
-                                $('#data_container').append("Game inserted into tables.");
+                                $('#data_container').append("Call successful. Necessary updates and inserts performed.");
                             } else if (insertCode == 2) {
                                 $('#data_container').empty();
-                                $('#data_container').append("Game updated in tables.");
+                                $('#data_container').append("Updated in tables.");
                             } else {
                                 failureMessage = $xml.find("message").text();
                                 $('#data_container').empty();
