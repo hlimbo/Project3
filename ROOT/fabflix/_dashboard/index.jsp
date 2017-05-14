@@ -15,6 +15,17 @@
     <head>
         <meta charset="UTF-8" />
 		<TITLE>Employee Dashboard</TITLE>
+<style>
+    ul.metaTable li{
+        color: blue;
+    }
+    ul.metaTable li.metaTableName {
+        color: green;
+    }
+    li {
+        list-style-type: none;
+    }
+</style>
     </head>
 
     <body>
