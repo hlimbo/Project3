@@ -15,29 +15,30 @@
     <head>
         <meta charset="UTF-8" />
 		<TITLE>Employee Dashboard</TITLE>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-        <script src='https://www.google.com/recaptcha/api.js'></script>
     </head>
 
     <body>
         <script src="/jsScripts/jquery.js"></script>
         <script src="/jsScripts/utils.js"></script>
         <c:if test='${sessionScope.employee != null}'>
-            <form>
-                <div hidden="hidden" id="addGameFields">
-                    <div class="label"> Game Name: <input  id="gameName" type="text" value="" /></div>
-                    <input id="addGame" type="button" value="Add" /> 
-                </div>
-                <div hidden="hidden" id="insertPublisherFields">
-                    <div class="label"> Publisher Name: <input id="publisherName" type="text" value="" /></div>
-                    <input id="insertPublisher" type="button" value="Add" />
-                </div>
+            <form hidden="hidden" id="addGameFields">
+                <div class="label"> Game Name: <input  id="gameName" type="text" value="" required /></div>
+                <div class="label"> Year: <input  id="gameYear" type="number" value="" required /></div>
+                <div class="label"> Price: <input  id="gamePrice" type="number" value="" required /></div>
+                <div class="label"> Platform: <input id="gamePlatform" type="text" value="" required /></div>
+                <div class="label"> Publisher: <input id="gamePublisher" type="text" value="" required /></div>
+                <div class="label"> Genre: <input id="gameGenre" type="text" value="" required /></div>
+                <input id="addGame" type="submit" value="Add" /> 
+            </form>
+            <form hidden="hidden" id="insertPublisherFields">
+                <div class="label"> Publisher Name: <input id="publisherName" type="text" value="" required /></div>
+                <input id="insertPublisher" type="submit" value="Add" />
+            </form>
             <input id="menuAddGame" type="button" value="Add Game" /> 
             <input id="menuInsertPublisher" type="button" value="Add Publisher" />
             <input id="meta" type="button" value="Get Database Meta Data" />
-            <div hidden="hidden" id="data_container"></div>
             <input hidden="hidden" id="menuReturn" type="button" value="Back to Main Menu" />
-            </form>
+            <div hidden="hidden" id="data_container"></div>
             <script>
                 function hideMenu () {
                     $('#menuAddGame').hide();
@@ -64,16 +65,44 @@
                     hideMenu();
                     $('#addGameFields').show();
                 });
-                $('#addGame').click( function () {
+                $('#addGameFields').submit( function (ev) {
+                    ev.preventDefault();
                     hideMenu();
                     $('#addGameFields').show();
                     $('#data_container').append('Performing Request...');
+                    $.get("/dashboard_command",{
+                        command : "add_game",
+                        name : $('#gameName').val(),
+                        year : $('#gameYear').val(),
+                        price : $('#gamePrice').val(),
+                        publisher : $('#gamePublisher').val(),
+                        platform : $('#gamePlatform').val(),
+                        genre: $('#gameGenre').val()
+                    }).done(function (data) {
+                        xmlDoc = $.parseXML(data);
+                        $xml = $( xmlDoc );
+                        if (!printXmlException($xml,'#data_container')) {
+                            insertCode = $xml.find("status_code").text();
+                            if (insertCode == 1) {
+                                $('#data_container').empty();
+                                $('#data_container').append("Game inserted into tables.");
+                            } else if (insertCode == 2) {
+                                $('#data_container').empty();
+                                $('#data_container').append("Game updated in tables.");
+                            } else {
+                                failureMessage = $xml.find("message").text();
+                                $('#data_container').empty();
+                                $('#data_container').append(failureMessage);
+                            }
+                        }
+                    }).fail(handleFailure);
                 });
                 $('#menuInsertPublisher').click( function () {
                     hideMenu();
                     $('#insertPublisherFields').show();
                 });
-                $('#insertPublisher').click( function () {
+                $('#insertPublisherFields').submit( function (ev) {
+                    ev.preventDefault();
                     hideMenu();
                     $('#insertPublisherFields').show();
                     $('#publisherName').show();
@@ -89,6 +118,9 @@
                             if (insertCode == 1) {
                                 $('#data_container').empty();
                                 $('#data_container').append("Publisher inserted into table.");
+                            } else if (insertCode == 2) {
+                                $('#data_container').empty();
+                                $('#data_container').append("Publisher already existed.");
                             } else {
                                 failureMessage = $xml.find("message").text();
                                 $('#data_container').empty();
@@ -109,9 +141,9 @@
                             tables = $xml.find('meta_info');
                             tableList = "";
                             for (i=0;i<tables.length;i++) {
-                                tableList += "<ul>";
+                                tableList += "<ul class=\"metaTable\">";
                                 table = tables.eq(i);
-                                tableList+="<li>"+table.find('meta_table').text()+"</li>\n";
+                                tableList+="<li class=\"metaTableName\">"+table.find('meta_table').text()+"</li>\n";
                                 columns = table.find('meta_column');
                                 for (j=0;j<columns.length;j++) {
                                     tableList+="<li>"+columns.eq(j).find('key').text()
@@ -130,6 +162,7 @@
             </script>
         </c:if>
         <c:if test='${sessionScope.employee == null}'>
+            <script src='https://www.google.com/recaptcha/api.js'></script>
             <div hidden="hidden" id="data_container"></div>
             Email: <input id="loginEmail" type="email" name="email" required /><br />
             Password: <input id="loginPassword" type="password" name="password" required /><br />

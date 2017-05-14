@@ -9,9 +9,14 @@ import gamesite.utils.DBConnection;
 
 public class DashBoardCommands {
 
-    public static boolean addGame (String name, String year, String price, String platform,
+    public static int addGame (String name, String year, String price, String platform,
             String publisher, String genre) 
             throws SQLExceptionHandler, SQLException, java.lang.Exception {
+        /*if (name == null || year == null || price == null 
+                || platform == null || publisher == null 
+                || genre == null) {
+            return -1;
+        }*/
         Connection conn = null;
         try {
             conn = DBConnection.create();
@@ -32,7 +37,7 @@ public class DashBoardCommands {
         }finally {
             DBConnection.close(conn);
         }
-        return true;
+        return 1;
     }
 
     public static LinkedHashMap<String,HashMap<String,String>> getMeta () 
@@ -65,14 +70,20 @@ public class DashBoardCommands {
         if (pubAndYear.equals("")) {
             return -1;
         }
+        int returnCode = 1;
         String publisher = "";
         String year = null;
-        Pattern yearPattern = Pattern.compile("\\d+$");
-        Matcher yearMatch = yearPattern.matcher(pubAndYear);
-        //if pubAndYear ends in numbers
-        if (yearMatch.matches()) {
-            year = yearMatch.group();
-            publisher = pubAndYear.substring(0,yearMatch.start());
+        Pattern yearPattern = Pattern.compile("\\d{1,2}|\\d{4}");
+        String[] parts = pubAndYear.split(";");
+        if (parts.length > 1) {
+            Matcher yearMatch = yearPattern.matcher(parts[parts.length-1].trim());
+            //if pubAndYear ends in numbers
+            if (yearMatch.matches()) {
+                year = yearMatch.group();
+                publisher = pubAndYear.substring(0,pubAndYear.lastIndexOf(';'));
+            } else {
+                publisher=pubAndYear;
+            }
         } else {
             publisher = pubAndYear;
         }
@@ -80,17 +91,41 @@ public class DashBoardCommands {
         String query ="";
         try {
             conn = DBConnection.create();
-            PreparedStatement insert;
-            if (year != null) {
-                query = "INSERT INTO publishers (publisher, founded) VALUES (?,?)";
-                insert = conn.prepareStatement(query);
-                insert.setString(2,year);
+            PreparedStatement count;
+            query = "SELECT COUNT(*) FROM publishers WHERE publisher = ?";
+            count = conn.prepareStatement(query);
+            count.setString(1,publisher);
+            ResultSet rs = count.executeQuery();
+            rs.next();
+            int exists = rs.getInt(1);
+            rs.close();
+            count.close();
+            if (exists == 0) {
+                PreparedStatement insert;
+                if (year != null) {
+                    query = "INSERT INTO publishers (publisher, founded) VALUES (?,?)";
+                    insert = conn.prepareStatement(query);
+                    insert.setString(2,year);
+                } else {
+                    query = "INSERT INTO publishers (publisher, founded) VALUES (?,null)";
+                    insert = conn.prepareStatement(query);
+                }
+                insert.setString(1,publisher);
+                try {
+                    insert.executeUpdate();
+                } catch (SQLException ex) {
+                    //Invalid year
+                    if (ex!=null && ex.getErrorCode()==1264) {
+                        returnCode=-2;
+                    } else {
+                        throw ex;
+                    }
+                } finally {
+                    insert.close();
+                }
             } else {
-                query = "INSERT INTO publishers (publisher, founded) VALUES (?,null)";
-                insert = conn.prepareStatement(query);
+                returnCode = 2;
             }
-            insert.setString(1,publisher);
-            insert.executeUpdate();
         } catch(SQLExceptionHandler ex) {
             throw ex;
         } catch(SQLException ex) {
@@ -100,6 +135,6 @@ public class DashBoardCommands {
         }finally {
             DBConnection.close(conn);
         }
-        return 1;
+        return returnCode;
     }
 }

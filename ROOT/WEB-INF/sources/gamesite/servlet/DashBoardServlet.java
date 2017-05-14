@@ -57,9 +57,22 @@ public class DashBoardServlet extends HttpServlet {
                             writeSuccess(writer);
                         } else {
                             switch(inserted) {
+                                case -2:
+                                    writeFailure(writer,inserted.toString()
+                                        ,"Invalid year value");
+                                    break;
                                 case -1:
                                     writeFailure(writer,inserted.toString()
                                         ,"Publisher can not be empty");
+                                    break;
+                                case 2:
+                                    writeFailure(writer,inserted.toString()
+                                        ,"Publisher already exists");
+                                    break;
+                                default:
+                                    writeFailure(writer,inserted.toString()
+                                        ,"Unexpected insertion error");
+                                    break;
                             }
                         }
                         break;

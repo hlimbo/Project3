@@ -1,12 +1,14 @@
 function printXmlException ($xml,tag) {
     error = $xml.find("exception");
     if (error.length > 0) {
-        errors="<ul>";
+        errors="<ul class=\"exception\">";
+        message = error.find("msg");
         for (i=0;i<error.length;i++) {
-            stack = error.find("stack");
-            for (j=0;j<stack.length;j++) {
-                errors+="<li>"+stack.eq(j).text()+"</li>";
-            }
+            errors+="<li>"+message.eq(i).text()+"</li>";
+        }
+        stack = error.find("stack");
+        for (i=0;i<stack.length;i++) {
+            errors+="<li>"+stack.eq(i).text()+"</li>";
         }
         errors+="</ul>";
         $(tag).empty();
