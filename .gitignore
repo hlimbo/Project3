@@ -1,6 +1,9 @@
 *.classpath
 # *.class
 
+# newGames folder
+XML_Parsing/newGames/*
+
 *.DS_Store
 
 # Mobile Tools for Java (J2ME)
