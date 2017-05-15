@@ -20,6 +20,9 @@ fi
 MASTER=$(git rev-parse --show-toplevel | sed 's_^C\:_/c_g')
 SOURCE=$MASTER"/XML_Parsing/sources"
 CLASSPATH=$MASTER"/XML_Parsing/classes"
+LIB=$MASTER"/lib"
+sql_connector="mysql-connector-java-5.1.41-bin.jar"
+
 
 source_file=$1
 
@@ -29,7 +32,7 @@ if [ ! -f "$SOURCE/$source_file" ]; then
 fi
 
 #if the file exists, compile it using a temporary make file to run javac command
-printf "all:\n\tjavac -d $CLASSPATH -cp $CLASSPATH $SOURCE/$source_file" > makefile
+printf "all:\n\tjavac -d $CLASSPATH -cp $CLASSPATH:$LIB/$sql_connector $SOURCE/$source_file" > makefile
 
 make --quiet
 rm makefile

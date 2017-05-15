@@ -1,4 +1,6 @@
-import model.SimpleGame;
+package xml;
+
+import xml.model.SimpleGame;
 
 import java.io.IOException;
 import java.util.ArrayList;

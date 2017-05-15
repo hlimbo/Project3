@@ -1,4 +1,4 @@
-package model;
+package xml.model;
 
 //platform of games
 public class Gplt
