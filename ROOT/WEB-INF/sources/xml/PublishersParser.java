@@ -2,6 +2,9 @@ package xml;
 
 import xml.model.Pub;
 import xml.model.Gplt;
+import gamesite.utils.DBConnection;
+
+import java.sql.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -108,13 +111,41 @@ public class PublishersParser extends DefaultHandler
 				tempRecord.gameTitle = tempVal;
 			else if(qName.equalsIgnoreCase(PLT))
 				tempRecord.platform = tempVal;				
+	}
+
+	public void insertIntoDatabase()
+	{
+		try
+		{
+			//create a db connection
+			Connection dbcon = DBConnection.create();
+
+			//write insert sql query ~ WRONG
+			String insertQuery = "INSERT INTO publishers (publisher, founded) VALUES (?,?)";
+		
+			//Create a preparedStatement via db connection ~ WRONG
+			PreparedStatement insertStatement = dbcon.prepareStatement(insertQuery);
+			//loop through every entry in publishers and set the prepared  statments params accordingly
+	
+			//close db connection
+			DBConnection.close(dbcon);
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch(java.lang.Exception e)
+		{
+			e.printStackTrace();
+		}
 	}	
 	
 	public static void main(String[] args)
 	{
 		PublishersParser pr = new PublishersParser();
 		long startTime = System.currentTimeMillis();
-		pr.parseDocument("newGames/pubs.xml");
+		pr.parseDocument(args[0] + "/pubs.xml");
+		//pr.parseDocument("newGames/pubs.xml");
 		long endTime = System.currentTimeMillis();	
 		long elapsedTime = endTime - startTime;	
 		pr.printData();

@@ -3,13 +3,13 @@
 #Bash script that runs java class files
 
 if [ "$1" == "--help" ]; then
-	echo "Usage: $0 [ path/to/java_class_file ]"
-	echo "e.g. $0 testpackage/TestClass"
+	echo "Usage: $0 [ path/to/java_class_file ] [ path/to/xml_file ]"
+	echo "e.g. $0 testpackage/TestClass /c/users/Test.xml"
 	exit 0
 fi
 
-if [ $# -ne 1 ]; then
-	echo "Usage: $0 [ path/to/java_class_file ]"
+if [ $# -ne 2 ]; then
+	echo "Usage: $0 [ path/to/java_class_file ] [ path/to/xml_file ]"
 	echo "Type $0 --help for more information"
 	exit 1
 fi
@@ -20,6 +20,7 @@ if [ "$OSTYPE"  == "linux-gnu" ]; then
 fi
 CLASSPATH=$MASTER"/ROOT/WEB-INF/classes"
 class_file=$1".class"
+xml_path=$2
 
 #check if file does not exist
 #if [ ! -f "$CLASSPATH/$class_file" ]; then
@@ -28,6 +29,6 @@ class_file=$1".class"
 #fi
 
 
-printf "all:\n\tjava -cp $CLASSPATH $1" > makefile
+printf "all:\n\tjava -cp $CLASSPATH $1 $2" > makefile
 make --quiet
 rm makefile

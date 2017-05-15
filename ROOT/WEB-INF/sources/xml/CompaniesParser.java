@@ -3,6 +3,9 @@ package xml;
 import xml.model.Company;
 import xml.model.Developer;
 import xml.model.Publisher;
+import gamesite.utils.DBConnection;
+
+import java.sql.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -141,12 +144,49 @@ public class CompaniesParser extends DefaultHandler
 		}
 			
 	}
+	
+	//only inserting publishers..
+	public void insertIntoDatabase()
+	{
+		try
+		{
+			//create a db connection
+			Connection dbcon = DBConnection.create();
+
+			//write insert sql query
+			String insertQuery = "INSERT INTO publishers (publisher, founded) VALUES (?,?)";
+		
+			//Create a preparedStatement via db connection
+			PreparedStatement insertStatement = dbcon.prepareStatement(insertQuery);
+			//loop through every entry in publishers and set the prepared  statments params accordingly
+			Iterator<Publisher> it = publishers.iterator();
+			while(it.hasNext())//naive way of inserting items into the games database.
+			{
+				Publisher publisherRecord = it.next();
+				insertStatement.setString(1, publisherRecord.getName());
+				insertStatement.setString(2, publisherRecord.getFoundedYear());
+				insertStatement.executeUpdate();
+			}
+			//close db connection
+			DBConnection.close(dbcon);
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch(java.lang.Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 	public static void main(String[] args)
 	{
+		
 		CompaniesParser c = new CompaniesParser();
 		long startTime = System.nanoTime();
-		c.parseDocument("newGames/companies.xml");
+		c.parseDocument(args[0] + "/companies.xml");
+		//c.parseDocument("newGames/companies.xml");
 		long endTime = System.nanoTime();	
 		long elapsedTime = (endTime - startTime) / 1000000;
 		

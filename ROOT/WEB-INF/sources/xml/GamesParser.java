@@ -1,7 +1,9 @@
 package xml;
 
 import xml.model.SimpleGame;
+import gamesite.utils.DBConnection;
 
+import java.sql.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -108,17 +110,41 @@ public class GamesParser extends DefaultHandler
 	
 	public void insertIntoDatabase()
 	{
-		//create a db connection
+		try
+		{
+			//create a db connection
+			Connection dbcon = DBConnection.create();
+
+			//write insert sql query
+			String insertQuery = "INSERT INTO games (name, year, price) VALUES (?,?,?)";
 		
-		//write insert sql query
+			//Create a preparedStatement via db connection
+			PreparedStatement insertStatement = dbcon.prepareStatement(insertQuery);
+			Integer defaultGamePrice = 12;
+			//loop through every entry in games and set the prepared  statments params accordingly
+			Iterator<SimpleGame> it = games.iterator();
+			while(it.hasNext())//naive way of inserting items into the games database.
+			{
+				SimpleGame gameRecord = it.next();
+				insertStatement.setString(1, gameRecord.getGameTitle());
+				insertStatement.setString(2, gameRecord.getReleaseYear());
+				insertStatement.setInt(3, defaultGamePrice);
+				insertStatement.executeUpdate();
+			}
+			//close db connection
+			DBConnection.close(dbcon);
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch(java.lang.Exception e)
+		{
+			e.printStackTrace();
+		}
 		
-		//Create a preparedStatement via db connection
-		
-		//loop through every entry in games and set the prepared  statments params accordingly
 		
 		
-		
-		//close db connection
 	}
 	
 	//execution time for 2 million game records ~ 6 seconds
@@ -126,13 +152,14 @@ public class GamesParser extends DefaultHandler
 	{
 		GamesParser gameParser = new GamesParser();
 		long startTime = System.nanoTime();
-		gameParser.parseDocument("newGames/newGames.xml");
+		gameParser.parseDocument(args[0] + "/newGames.xml");
+		//gameParser.parseDocument("newGames/newGames.xml");
 		long endTime = System.nanoTime();		
 		long elapsedTime = endTime - startTime;
-		
+		gameParser.insertIntoDatabase();
 		long timeInMilli = elapsedTime / 1000000;
 		System.out.println("Parse execution time: " + timeInMilli);
-		gameParser.printSize();
+		//gameParser.printData();
 		
 	}
 }

@@ -34,4 +34,17 @@ public class SimpleGame
 	{
 		return id.toString() + ". " + gameTitle + " | " + releaseDate + " | " +  platform;
 	}
+	
+	//Return null if releaseDate is null or empty.
+	public String getReleaseYear()
+	{
+		if(releaseDate != null && !releaseDate.isEmpty())
+		{
+			int lastIndex = releaseDate.lastIndexOf('/');
+			String year = releaseDate.substring(lastIndex);
+			return year;
+		}
+		
+		return null;
+	}
 }
