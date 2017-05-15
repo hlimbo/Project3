@@ -1,17 +1,15 @@
 package xml;
 
-import java.io.*;
-import java.net.*;
 import java.sql.*;
-import java.text.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+//import java.nio.charset.Charset;// for ISO-8859-1 encoding
+
 
 import xml.model.Company;
 import xml.model.Developer;
 import xml.model.Publisher;
 import gamesite.utils.DBConnection;
+
+import java.io.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +22,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
 
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -58,9 +57,16 @@ public class CompaniesParser extends DefaultHandler
 
             //get a new instance of parser
             SAXParser sp = spf.newSAXParser();
+			
+			//set encoding to for ISO-8859-1
+			File file = new File(filename);
+			InputStream inputStream = new FileInputStream(file);
+			Reader reader = new InputStreamReader(inputStream, "ISO-8859-1");	
+			InputSource is = new InputSource(reader);
+			is.setEncoding("ISO-8859-1");
 
             //parse the file and also register this class for call backs
-            sp.parse(filename, this);
+            sp.parse(is, this);
 
         } catch (SAXException se) {
             se.printStackTrace();
@@ -117,7 +123,7 @@ public class CompaniesParser extends DefaultHandler
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException
 	{
-		tempVal = new String(ch, start, length);
+		tempVal = new String(ch , start, length);//Charset.forName("ISO-8859-1").name());
 	}
 	
 	@Override
