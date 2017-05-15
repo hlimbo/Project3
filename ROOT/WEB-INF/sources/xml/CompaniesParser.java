@@ -1,8 +1,8 @@
 package xml;
 
 import java.sql.*;
-//import java.nio.charset.Charset;// for ISO-8859-1 encoding
-
+import java.nio.charset.Charset;
+import java.nio.ByteBuffer;
 
 import xml.model.Company;
 import xml.model.Developer;
@@ -79,25 +79,33 @@ public class CompaniesParser extends DefaultHandler
 	
 	public void printData()
 	{
-		int size = developers.size() + publishers.size();
-		System.out.println("Number of Companies: " + size);
+		//int size = developers.size() + publishers.size();
+		//System.out.println("Number of Companies: " + size);
 		
-		System.out.println("Number of developers: " + developers.size());		
-		Iterator<Developer> it = developers.iterator();
-		while(it.hasNext())
-			System.out.println(it.next().toString());
+		//System.out.println("Number of developers: " + developers.size());		
+		//Iterator<Developer> it = developers.iterator();
+		//while(it.hasNext())
+		//	System.out.println(it.next().toString());
 		
 		System.out.println("Number of publishers: " + publishers.size());
 		Iterator<Publisher> it2 = publishers.iterator();
 		while(it2.hasNext())
-			System.out.println(it2.next().toString());
+		{
+			Publisher publisherRecord = it2.next();
+		String convert = publisherRecord.getName().replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+			System.out.println(convert);
+//			ByteBuffer buffer = Charset.forName("UTF-8").encode(publisherRecord.getName());
+	//		String convertedString = new String(buffer.array(), Charset.forName("UTF-8"));
+		//	System.out.println(convertedString);
+			//System.out.println(publisherRecord.toString());
+		}
 	}
 	
 	public void printSize()
 	{
-		int size = developers.size() + publishers.size();
-		System.out.println("Number of Companies: " + size);
-		System.out.println("Number of developers: " + developers.size());
+		//int size = developers.size() + publishers.size();
+		//System.out.println("Number of Companies: " + size);
+		//System.out.println("Number of developers: " + developers.size());
 		System.out.println("Number of publishers: " + publishers.size());		
 	}
 	
@@ -165,6 +173,9 @@ public class CompaniesParser extends DefaultHandler
 			//create a db connection
 			Connection dbcon = DBConnection.create();
 			
+			//turn off autocommit
+			dbcon.setAutoCommit(false);
+			
 			//write insert sql query
 			String insertQuery = "INSERT INTO publishers (publisher, founded) VALUES (?,?)";
 		
@@ -175,10 +186,19 @@ public class CompaniesParser extends DefaultHandler
 			while(it.hasNext())//naive way of inserting items into the games database.
 			{
 				Publisher publisherRecord = it.next();
-				insertStatement.setString(1, publisherRecord.getName());
+				//remove all special characters not supported by mysql database.
+				String convert = publisherRecord.getName().replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+				insertStatement.setString(1, convert);
 				insertStatement.setString(2, publisherRecord.getFoundedYear());
-				insertStatement.executeUpdate();
+				insertStatement.addBatch();
+				
+				//insertStatement.executeUpdate();
 			}
+			
+			//execute batch
+			insertStatement.executeBatch();
+			dbcon.commit();
+			
 			//close db connection
 			DBConnection.close(dbcon);
 		}
@@ -197,7 +217,7 @@ public class CompaniesParser extends DefaultHandler
 		
 		CompaniesParser c = new CompaniesParser();
 		long startTime = System.nanoTime();
-		c.parseDocument(args[0] + "/companies.xml");
+		c.parseDocument(args[0]);
 		//c.parseDocument("newGames/companies.xml");
 		c.insertIntoDatabase();
 		long endTime = System.nanoTime();	
