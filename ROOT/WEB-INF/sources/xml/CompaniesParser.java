@@ -1,11 +1,17 @@
 package xml;
 
+import java.io.*;
+import java.net.*;
+import java.sql.*;
+import java.text.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+
 import xml.model.Company;
 import xml.model.Developer;
 import xml.model.Publisher;
 import gamesite.utils.DBConnection;
-
-import java.sql.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -152,7 +158,7 @@ public class CompaniesParser extends DefaultHandler
 		{
 			//create a db connection
 			Connection dbcon = DBConnection.create();
-
+			
 			//write insert sql query
 			String insertQuery = "INSERT INTO publishers (publisher, founded) VALUES (?,?)";
 		
@@ -187,13 +193,13 @@ public class CompaniesParser extends DefaultHandler
 		long startTime = System.nanoTime();
 		c.parseDocument(args[0] + "/companies.xml");
 		//c.parseDocument("newGames/companies.xml");
+		c.insertIntoDatabase();
 		long endTime = System.nanoTime();	
 		long elapsedTime = (endTime - startTime) / 1000000;
 		
-		//System.out.println("Parse Execution Time: " + elapsedTime + " ms");
-
-		//c.printSize();
-		c.printData();
+		System.out.println("Parse Execution Time: " + elapsedTime + " ms");
+		c.printSize();
+		//c.printData();
 	}
 	
 }

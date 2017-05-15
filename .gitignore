@@ -3,6 +3,7 @@
 
 # newGames folder
 XML_Parsing/newGames/*
+XML_Parsing/*.zip
 
 *.DS_Store
 

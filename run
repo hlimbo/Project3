@@ -19,6 +19,7 @@ if [ "$OSTYPE"  == "linux-gnu" ]; then
     MASTER=$(git rev-parse --show-toplevel | sed 's/^C\:/c/g')
 fi
 CLASSPATH=$MASTER"/ROOT/WEB-INF/classes"
+LIB=$MASTER"/ROOT/WEB-INF/lib/mysql-connector-java-5.1.41-bin.jar"
 class_file=$1".class"
 xml_path=$2
 
@@ -29,6 +30,6 @@ xml_path=$2
 #fi
 
 
-printf "all:\n\tjava -cp $CLASSPATH $1 $2" > makefile
+printf "all:\n\tjava -cp $CLASSPATH:$LIB $1 $2" > makefile
 make --quiet
 rm makefile
