@@ -104,6 +104,18 @@ public class PublishersParser extends DefaultHandler
 	{
 		tempVal = new String(ch, start, length);
 	}
+
+    public String removeSpecials (String tag, String special) {
+        String specialRegex = "[^\\x20-\\x7e]";
+        if (special.matches(".*"+specialRegex+"+.*")) {
+            System.out.println("ERROR: string "+special+" contains special characters that can not be inserted.");
+            if (tag!=null) {
+                System.out.println("on tag: "+tag);
+            }
+            System.out.println("HANDLE: Removing special characters.");
+        }
+	    return special.replaceAll(specialRegex, " ").replaceAll(" {2,}"," ").trim();
+    }
 	
 	@Override
     public void endElement(String uri, String localName, String qName) throws SAXException
@@ -114,7 +126,7 @@ public class PublishersParser extends DefaultHandler
 				tempPub.setPubID(tempVal);
 			else if(qName.equalsIgnoreCase(P))
 			{
-				String convert = tempVal.replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+				String convert = removeSpecials(P,tempVal);
 				tempPub.setPublisher(convert);
 			}
 			else if(qName.equalsIgnoreCase(FND))
@@ -123,12 +135,12 @@ public class PublishersParser extends DefaultHandler
 				tempPub.addGamePlatformRecord(tempRecord);
 			else if(qName.equalsIgnoreCase(G))
 			{
-				String convert = tempVal.replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+				String convert = removeSpecials(G,tempVal);
 				tempRecord.gameTitle = convert;
 			}
 			else if(qName.equalsIgnoreCase(PLT))
 			{
-				String convert = tempVal.replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+				String convert = removeSpecials(PLT,tempVal);
 				tempRecord.platform = convert;	
 			}
 	}
@@ -150,6 +162,12 @@ public class PublishersParser extends DefaultHandler
 		String selectQuery = "SELECT platform, id FROM platforms";
 		return statement.executeQuery(selectQuery);
 	}
+
+	public ResultSet getPogs(Statement statement) throws SQLException
+	{
+		String selectQuery = "SELECT game_id, publisher_id, platform_id FROM publishers_of_games";
+		return statement.executeQuery(selectQuery);
+    }
 	
 	public HashMap<String,Integer> getMap(ResultSet set) throws SQLException
 	{
@@ -187,7 +205,8 @@ public class PublishersParser extends DefaultHandler
 			HashMap<String,Integer> gameMap = getMap(gameSet);
 			ResultSet platformSet = getPlatforms(statement);	
 			HashMap<String,Integer> platformMap = getMap(platformSet);
-			
+
+		
 			Statement iStatement1 = dbcon.createStatement();
 
 			Integer pubOffset = getQuery(iStatement1,"SELECT COUNT(*) FROM publishers");
@@ -264,7 +283,12 @@ public class PublishersParser extends DefaultHandler
 			ResultSet platformSet2 = getPlatforms(statement);			
 			platformMap = getMap(platformSet2);
 			
-			
+			ResultSet pogSet = getPogs(statement);	
+		    HashMap<String,Integer> pogs = new HashMap<String,Integer>();
+		    while(pogSet.next())
+		    {
+		    	pogs.put(pogSet.getInt(1)+","+pogSet.getInt(2)+","+pogSet.getInt(3),-1);
+		    }
 			
 			
 			//adding all 3 ids into the database.
@@ -277,10 +301,13 @@ public class PublishersParser extends DefaultHandler
 				for (Gplt gp2 : record.getValue()) {
 					Integer gaID = gameMap.get(gp2.gameTitle);
 					Integer plID = platformMap.get(gp2.platform);
-					insertStatement.setInt(1, gaID);
-					insertStatement.setInt(2, pID);
-					insertStatement.setInt(3, plID);
-					insertStatement.addBatch();
+                    if (!pogs.containsKey(gaID+","+pID+","+plID)) {
+					    insertStatement.setInt(1, gaID);
+					    insertStatement.setInt(2, pID);
+					    insertStatement.setInt(3, plID);
+					    insertStatement.addBatch();
+                        pogs.put(gaID+","+pID+","+plID,-1);
+                    }
 				}
 			}
 			
