@@ -74,10 +74,3 @@ of characters at where the '%' is. To match only one
 character of any character, '_' can be used instead.
 As example, both M_rio and M%io will match Mario.
 
-
-
-Compiling XML Parsers
-------------------------------------------------------------
-
-Running XML Parsers
-------------------------------------------------------------
