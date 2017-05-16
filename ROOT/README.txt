@@ -2,7 +2,7 @@ WAR file deployment
 ------------------------------------------------------------
 Before beginning, rename your previous ROOT to something
 else to keep your original data. Afterwards, take the war 
-file and rename it from ccopelan_project2.war to ROOT.war 
+file and rename it from ccopelan_project3.war to ROOT.war 
 and drop it into the webapps folder of your tomcat 
 installation. When the tomcat server is running, it should
 automatically create the ROOT folder after a little bit of 
@@ -20,15 +20,19 @@ Commands:
     cd WEB-INF
     javac -d classes -cp lib/servlet-api.jar:lib/mysql-connector-java-5.1.41-bin.jar:lib/servlet-api.jar sources/*.java
 
+Compilation for XML Parsers
+------------------------------------------------------------
     using the bash run script to run java class files:
 	run xml.CompaniesParser [absolute file name]/companies.xml
 	e.g.
 	run xml.CompaniesParser /c/Users/Harvey/Desktop/UCIHWK/Spring2017/CS122B/project1/apache-tomcat-8.5.13-windows-x64/apache-tomcat-8.5.13/webapps/XML_Parsing/newGames/companies.xml
 	
 	run xml.GamesParser [absolute file name]/newGames.xml
+	e.g.
 	run xml.GamesParser /c/Users/Harvey/Desktop/UCIHWK/Spring2017/CS122B/project1/apache-tomcat-8.5.13-windows-x64/apache-tomcat-8.5.13/webapps/XML_Parsing/newGames/newGames.xml
 
 	run xml.PublishersParser [absolute file name]/pubs.xml
+	e.g.
 	run xml.PublishersParser /c/Users/Harvey/Desktop/UCIHWK/Spring2017/CS122B/project1/apache-tomcat-8.5.13-windows-x64/apache-tomcat-8.5.13/webapps/XML_Parsing/newGames/pubs.xml
 
 Expected MySQL user and password
@@ -36,12 +40,15 @@ Expected MySQL user and password
 The program expects a user called "user" but without the
 quotation marks. This user's password is "password" but
 without the quotation marks. This user should have 
-SELECT,INSERT, UPDATE, and DROP privileges on the gamedb
+SELECT,INSERT, UPDATE, and DROP on the gamedb. In addition
+to those priviledges, the user is expected to have the
+permission to create and call procedures in order to use
+the dashboard.
 
 
 Access local website
 ------------------------------------------------------------
-Go to localhost:8080/ on the machine with the tomcat running
+Go to https://localhost:8443/ on the machine with the tomcat running
 after the ROOT folder was created by tomcat.
 "See WAR file deployment" for directions on installing the
 WAR file.
