@@ -36,6 +36,8 @@ public class GamesParser extends DefaultHandler
 	public static final String ID = "id";
 	public static final String RELEASEDATE = "ReleaseDate";
 	public static final String PRICE = "Price";
+	public static final String GENRES = "Genres";
+	public static final String GENRE = "Genre";
 	//ignore this tag!
 	public static final String SIMILAR = "Similar";
 	
@@ -134,6 +136,8 @@ public class GamesParser extends DefaultHandler
 			isIgnored = true;
 		else if(!isIgnored && qName.equalsIgnoreCase(GAME))
 			tempGame = new SimpleGame();
+		else if(qName.equalsIgnoreCase(GENRES))
+			tempGame.initializeGenreList();
 	}
 	
 	@Override
@@ -161,6 +165,19 @@ public class GamesParser extends DefaultHandler
 			tempGame.setReleaseDate(tempVal);
 		else if(qName.equalsIgnoreCase(PRICE))
 			tempGame.setPrice(Integer.parseInt(tempVal));
+		else if(qName.equalsIgnoreCase(GENRE))
+			tempGame.addGenre(tempVal);
+	}
+	
+	public HashMap<String,Integer> getMap(ResultSet set) throws SQLException
+	{
+		HashMap<String,Integer> map = new HashMap<String,Integer>();
+		while(set.next())
+		{
+			map.put(set.getString(1), set.getInt(2));
+		}
+		
+		return map;
 	}
 	
 	public void insertIntoDatabase()
@@ -173,14 +190,15 @@ public class GamesParser extends DefaultHandler
 			String selectQuery = "SELECT name FROM games";
 			Statement statement = dbcon.createStatement();
 			ResultSet rs = statement.executeQuery(selectQuery);
-			
 			while(rs.next())
 			{
 				gamesMap.put(rs.getString(1), true);
 			}
 			
-			statement.close();
-
+			ResultSet r73 = statement.executeQuery("SELECT genre, id from genres");			
+			HashMap<String,Integer> genreMap = getMap(r73);
+			
+			
 			//turn of autocommit
 			dbcon.setAutoCommit(false);
 			
@@ -216,7 +234,49 @@ public class GamesParser extends DefaultHandler
 			insertStatement.executeBatch();
 			dbcon.commit();
 			
-			insertStatement.close();
+			String insertQuery2 = "INSERT INTO genres (genre) VALUES (?)";
+			PreparedStatement insertStatement2 = dbcon.prepareStatement(insertQuery2);
+			
+			//insert into genres table
+			for(SimpleGame gameRecord : games)
+			{
+				for (String genre : gameRecord.getGenres())
+				{
+					if(!genreMap.containsKey(genre))
+					{
+						insertStatement2.setString(1);
+						insertStatement.addBatch();
+						genreMap.put(genre, -1);
+					}
+				}
+			}
+			
+			insertStatement.executeBatch();
+			dbcon.commit();
+			
+			
+			Statement iStatement1  = dbcon.createStatement();
+			String sQuery = "SELECT name, id FROM games";
+			ResultSet r1 = iStatement1.executeQuery(sQuery);
+			
+			HashMap<String,Integer> gamesMap2 = getMap(r1);
+			
+			Statement iStatement2 = dbcon.createStatement();
+			String sQuery2 = "SELECT genre, id FROM genres";
+			ResultSet r2 = iStatement2.executeQuery(sQuery2);
+			
+			HashMap<String,Integer> genresMap = getMap(r2);
+			
+			
+			
+			
+			String insertQuery3 = "INSERT INTO genres_of_games (game_id, genre_id) VALUES (?, ?)";
+			PreparedStatement insertStatement3 = dbcon.prepareStatement(insertQuery3);
+			
+			insertStatement3.close();
+			insertStatement2.close();
+			insertStatement.close();						
+			statement.close();
 			//close db connection
 			DBConnection.close(dbcon);
 		}

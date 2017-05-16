@@ -1,5 +1,17 @@
 Improvements
 -------------------------------------------------------
-    Naive           | Previous Time |     Optimization        | Optimized time
-* Single SQL Insert |               |  Multiple SQL Insert    |
-* ?
+games.xml:
+parse execution time: roughly 1563743 ms with individual insert sql insert statements.
+parse exeuction time: with batch insert: 6901 ms
+
+with duplication checking no hashmap: 301457 ms
+with duplication checking with hashmap:  3207 ms with new 21318 games added
+
+publishers.xml:
+Execution parse time: 128,655 ms with no batch inserts
+Execution parse time: 4938 ms with batch inserts
+Execution parse time: 1184 ms with duplication checks via hashmaps with 4938 new publishers added.
+
+companies.xml:
+Parse Execution Time: 204842 ms with individual insert statements.
+Parse Execution Time: 904 ms with batch insert

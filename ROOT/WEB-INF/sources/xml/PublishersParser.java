@@ -76,10 +76,10 @@ public class PublishersParser extends DefaultHandler
 	
 	public void printData()
 	{	
-		System.out.println("Publishers Size: " + publishers.size());
 		Iterator<Pub> it = publishers.iterator();
 		while(it.hasNext())
 			System.out.println(it.next().toString());
+		System.out.println("Publishers Size: " + publishers.size());
 	}
 	
 	//Event Handlers

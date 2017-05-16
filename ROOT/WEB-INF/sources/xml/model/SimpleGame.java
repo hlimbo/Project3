@@ -1,5 +1,7 @@
 package xml.model;
 
+
+import java.util.*;
 //class will be used as a model to contain all parsed information from
 //games.xml ~ does not worry about duplicate games e.g. same game but different platform
 
@@ -9,6 +11,7 @@ public class SimpleGame
 	private String gameTitle;
 	private String releaseDate;
 	private Integer price;
+	private ArrayList<String> genres;
 	
 	public SimpleGame() {}
 	public SimpleGame(Integer id, String gameTitle, String releaseDate, Integer price)
@@ -23,11 +26,18 @@ public class SimpleGame
 	public String getGameTitle() { return gameTitle; }
 	public String getReleaseDate() { return releaseDate == null ? "1/1/2017" : releaseDate; }
 	public Integer getPrice() { return price; }
+	public ArrayList<String> getGenres() { return genres; }
+	public void initializeGenreList() { genres = new ArrayList<String>(); }
 	
 	public void setID(Integer id) { this.id = id; }
 	public void setGameTitle(String gameTitle) { this.gameTitle = gameTitle; }
 	public void setReleaseDate(String releaseDate) { this.releaseDate = releaseDate; }
 	public void setPrice(Integer price) { this.price = price; }
+	public void addGenre(String genre)
+	{
+		if(genres != null)
+			genres.add(genre);
+	}
 
 	@Override
 	public String toString()
