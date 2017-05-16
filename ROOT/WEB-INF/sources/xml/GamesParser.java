@@ -168,7 +168,7 @@ public class GamesParser extends DefaultHandler
 	
     public String removeSpecials (String tag, String special) {
         String specialRegex = "[^\\x20-\\x7e]";
-        if (special.matches(specialRegex)) {
+        if (special.matches(".*"+specialRegex+"+.*")) {
             System.out.println("ERROR: string "+special+" contains special characters that can not be inserted.");
             if (tag!=null) {
                 System.out.println("on tag: "+tag);
