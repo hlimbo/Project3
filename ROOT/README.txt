@@ -81,3 +81,8 @@ of characters at where the '%' is. To match only one
 character of any character, '_' can be used instead.
 As example, both M_rio and M%io will match Mario.
 
+XML Optimization Report
+------------------------------------------------------------
+It can be found at the relative url /XML_tuning.txt
+For example, if running on the localhost, it would be at
+    localhost:8443/XML_tuning.txt
