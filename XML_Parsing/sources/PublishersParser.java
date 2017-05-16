@@ -1,10 +1,13 @@
 import model.Pub;
 import model.Gplt;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -12,6 +15,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
 
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -45,9 +49,16 @@ public class PublishersParser extends DefaultHandler
 
             //get a new instance of parser
             SAXParser sp = spf.newSAXParser();
-
+			
+			//set encoding to for ISO-8859-1
+			File file = new File(filename);
+			InputStream inputStream = new FileInputStream(file);
+			Reader reader = new InputStreamReader(inputStream, "ISO-8859-1");	
+			InputSource is = new InputSource(reader);
+			is.setEncoding("ISO-8859-1");
+			
             //parse the file and also register this class for call backs
-            sp.parse(filename, this);
+            sp.parse(is, this);
 
         } catch (SAXException se) {
             se.printStackTrace();

@@ -4,10 +4,15 @@ import xml.model.SimpleGame;
 import gamesite.utils.DBConnection;
 
 import java.sql.*;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -15,6 +20,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
 
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -29,17 +35,29 @@ public class GamesParser extends DefaultHandler
 	public static final String GAMETITLE = "GameTitle";
 	public static final String ID = "id";
 	public static final String RELEASEDATE = "ReleaseDate";
-	public static final String PLATFORM = "Platform";
+	public static final String PRICE = "Price";
+	//ignore this tag!
+	public static final String SIMILAR = "Similar";
 	
 	private List<SimpleGame> games;
+	
+	private Map<String,Boolean> gamesMap;
 	
 	//required to maintain context
 	private SimpleGame tempGame;
 	private String tempVal;
 	
+	//ignore tag flag
+	private boolean isIgnored = false;
+	
+	//debug
+	private List<String> values;
+	
 	public GamesParser()
 	{
 		games = new ArrayList<SimpleGame>();
+		values = new ArrayList<String>();
+		gamesMap = new HashMap<String,Boolean>();
 	}
 	
 	public void parseDocument(String filename)
@@ -51,8 +69,15 @@ public class GamesParser extends DefaultHandler
             //get a new instance of parser
             SAXParser sp = spf.newSAXParser();
 
+			//set encoding to for ISO-8859-1
+			File file = new File(filename);
+			InputStream inputStream = new FileInputStream(file);
+			Reader reader = new InputStreamReader(inputStream, "ISO-8859-1");	
+			InputSource is = new InputSource(reader);
+			is.setEncoding("ISO-8859-1");			
+			
             //parse the file and also register this class for call backs
-            sp.parse(filename, this);
+            sp.parse(is, this);
 
         } catch (SAXException se) {
             se.printStackTrace();
@@ -67,8 +92,33 @@ public class GamesParser extends DefaultHandler
 	{
 		System.out.println("Number of Games: " + games.size());
 		Iterator<SimpleGame> it = games.iterator();
+		
+		int nullGames = 0;
+		int validGames = 0;
+		
 		while(it.hasNext())
-			System.out.println(it.next().toString());
+		{
+			SimpleGame gameRecord = it.next();
+			
+			if(gameRecord.getReleaseDate() == null)
+				gameRecord.setReleaseDate("1/1/2017");
+			
+			boolean isNull = gameRecord.getID() == null || gameRecord.getGameTitle() == null || 
+			gameRecord.getReleaseDate() == null || gameRecord.getPrice() == null;
+			
+			if(isNull)
+				System.out.println(gameRecord.toString());
+			
+			if(isNull)
+				nullGames++;
+			else
+				validGames++;
+			
+			//System.out.println(it.next().toString());
+		}
+		
+		System.out.println("Games with null fields: " + nullGames);
+		System.out.println("Games with valid fields: " + validGames);
 	}
 	
 	public void printSize()
@@ -80,7 +130,9 @@ public class GamesParser extends DefaultHandler
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException 
 	{
-		if(qName.equalsIgnoreCase(GAME))
+		if(qName.equalsIgnoreCase(SIMILAR))
+			isIgnored = true;
+		else if(!isIgnored && qName.equalsIgnoreCase(GAME))
 			tempGame = new SimpleGame();
 	}
 	
@@ -88,13 +140,16 @@ public class GamesParser extends DefaultHandler
 	public void characters(char[] ch, int start, int length) throws SAXException
 	{
 		tempVal = new String(ch, start, length);
+		values.add(tempVal);
 	}
 	
 	@Override
     public void endElement(String uri, String localName, String qName) throws SAXException
 	{
+		if(isIgnored && qName.equalsIgnoreCase(SIMILAR))
+			isIgnored = false;	
 		//add to list when closing xml tag is reached </Game>
-		if(qName.equalsIgnoreCase(GAME))
+		else if(qName.equalsIgnoreCase(GAME))
 			games.add(tempGame);
 		//otherwise if closing xml game tag has not been reached,
 		//set the values to tempGame for the other closing tags e.g. </GameTitle>
@@ -104,8 +159,8 @@ public class GamesParser extends DefaultHandler
 			tempGame.setGameTitle(tempVal);
 		else if(qName.equalsIgnoreCase(RELEASEDATE))
 			tempGame.setReleaseDate(tempVal);
-		else if(qName.equalsIgnoreCase(PLATFORM))
-			tempGame.setPlatform(tempVal);
+		else if(qName.equalsIgnoreCase(PRICE))
+			tempGame.setPrice(Integer.parseInt(tempVal));
 	}
 	
 	public void insertIntoDatabase()
@@ -114,23 +169,54 @@ public class GamesParser extends DefaultHandler
 		{
 			//create a db connection
 			Connection dbcon = DBConnection.create();
+			
+			String selectQuery = "SELECT name FROM games";
+			Statement statement = dbcon.createStatement();
+			ResultSet rs = statement.executeQuery(selectQuery);
+			
+			while(rs.next())
+			{
+				gamesMap.put(rs.getString(1), true);
+			}
+			
+			statement.close();
 
+			//turn of autocommit
+			dbcon.setAutoCommit(false);
+			
 			//write insert sql query
 			String insertQuery = "INSERT INTO games (name, year, price) VALUES (?,?,?)";
 		
 			//Create a preparedStatement via db connection
 			PreparedStatement insertStatement = dbcon.prepareStatement(insertQuery);
-			Integer defaultGamePrice = 12;
 			//loop through every entry in games and set the prepared  statments params accordingly
 			Iterator<SimpleGame> it = games.iterator();
-			while(it.hasNext())//naive way of inserting items into the games database.
+			while(it.hasNext())
 			{
 				SimpleGame gameRecord = it.next();
-				insertStatement.setString(1, gameRecord.getGameTitle());
-				insertStatement.setString(2, gameRecord.getReleaseYear());
-				insertStatement.setInt(3, defaultGamePrice);
-				insertStatement.executeUpdate();
+				
+				//remove special characters from game title if any exists
+				String gameTitle = gameRecord.getGameTitle().replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+				
+				//duplication set
+				if(!gamesMap.containsKey(gameTitle))
+				{
+					insertStatement.setString(1, gameTitle);
+					insertStatement.setString(2, gameRecord.getReleaseYear());
+					insertStatement.setInt(3, gameRecord.getPrice());
+					insertStatement.addBatch();
+					
+					//don't add anymore games with the same title for games that are pending to add in database.
+					gamesMap.put(gameTitle,true);
+				}
+				
 			}
+			
+			//execute batch;
+			insertStatement.executeBatch();
+			dbcon.commit();
+			
+			insertStatement.close();
 			//close db connection
 			DBConnection.close(dbcon);
 		}
@@ -147,19 +233,28 @@ public class GamesParser extends DefaultHandler
 		
 	}
 	
+	public void printStuff()
+	{
+		int i = 1;
+		for(String value : values)
+		{
+			System.out.println((i++) + ". " + value);
+		}
+	}
+	
 	//execution time for 2 million game records ~ 6 seconds
 	public static void main(String[] args)
 	{
 		GamesParser gameParser = new GamesParser();
 		long startTime = System.nanoTime();
-		gameParser.parseDocument(args[0] + "/newGames.xml");
-		//gameParser.parseDocument("newGames/newGames.xml");
+		gameParser.parseDocument(args[0]);
+		gameParser.insertIntoDatabase();
 		long endTime = System.nanoTime();		
 		long elapsedTime = endTime - startTime;
-		gameParser.insertIntoDatabase();
 		long timeInMilli = elapsedTime / 1000000;
 		System.out.println("Parse execution time: " + timeInMilli);
 		//gameParser.printData();
 		
+		//gameParser.printStuff();
 	}
 }

@@ -8,31 +8,31 @@ public class SimpleGame
 	private Integer id;
 	private String gameTitle;
 	private String releaseDate;
-	private String platform;
+	private Integer price;
 	
 	public SimpleGame() {}
-	public SimpleGame(Integer id, String gameTitle, String releaseDate, String platform)
+	public SimpleGame(Integer id, String gameTitle, String releaseDate, Integer price)
 	{
 		this.id = id;
 		this.gameTitle = gameTitle;
 		this.releaseDate = releaseDate;
-		this.platform = platform;
+		this.price = price;
 	}
 	
 	public Integer getID() { return id; }
 	public String getGameTitle() { return gameTitle; }
-	public String getReleaseDate() { return releaseDate; }
-	public String getPlatform() { return platform; }
+	public String getReleaseDate() { return releaseDate == null ? "1/1/2017" : releaseDate; }
+	public Integer getPrice() { return price; }
 	
 	public void setID(Integer id) { this.id = id; }
 	public void setGameTitle(String gameTitle) { this.gameTitle = gameTitle; }
 	public void setReleaseDate(String releaseDate) { this.releaseDate = releaseDate; }
-	public void setPlatform(String platform) { this.platform = platform; }
+	public void setPrice(Integer price) { this.price = price; }
 
 	@Override
 	public String toString()
 	{
-		return id.toString() + ". " + gameTitle + " | " + releaseDate + " | " +  platform;
+		return id.toString() + ". " + gameTitle + " | " + releaseDate + " | " +  price;
 	}
 	
 	//Return null if releaseDate is null or empty.
@@ -41,10 +41,13 @@ public class SimpleGame
 		if(releaseDate != null && !releaseDate.isEmpty())
 		{
 			int lastIndex = releaseDate.lastIndexOf('/');
-			String year = releaseDate.substring(lastIndex);
+			if(lastIndex == -1)
+				return "2017";
+			
+			String year = releaseDate.substring(lastIndex + 1);
 			return year;
 		}
 		
-		return null;
+		return "2017";
 	}
 }
