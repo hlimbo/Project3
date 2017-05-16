@@ -43,8 +43,6 @@ public class GamesParser extends DefaultHandler
 	
 	private List<SimpleGame> games;
 	
-	private Map<String,Boolean> gamesMap;
-	
 	//required to maintain context
 	private SimpleGame tempGame;
 	private String tempVal;
@@ -59,7 +57,6 @@ public class GamesParser extends DefaultHandler
 	{
 		games = new ArrayList<SimpleGame>();
 		values = new ArrayList<String>();
-		gamesMap = new HashMap<String,Boolean>();
 	}
 	
 	public void parseDocument(String filename)
@@ -169,12 +166,16 @@ public class GamesParser extends DefaultHandler
 			tempGame.addGenre(tempVal);
 	}
 	
+    public String removeSpecials (String special) {
+	    return special.replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ").trim();
+    }
+
 	public HashMap<String,Integer> getMap(ResultSet set) throws SQLException
 	{
 		HashMap<String,Integer> map = new HashMap<String,Integer>();
 		while(set.next())
 		{
-			map.put(set.getString(1).toLowerCase(), set.getInt(2));
+			map.put(removeSpecials(set.getString(1)).toLowerCase(), set.getInt(2));
 		}
 		
 		return map;
@@ -187,13 +188,14 @@ public class GamesParser extends DefaultHandler
 			//create a db connection
 			Connection dbcon = DBConnection.create();
 			
-			String selectQuery = "SELECT name FROM games";
+			String selectQuery = "SELECT name, id FROM games";
 			Statement statement = dbcon.createStatement();
 			ResultSet rs = statement.executeQuery(selectQuery);
-			while(rs.next())
+			/*while(rs.next())
 			{
 				gamesMap.put(rs.getString(1), true);
-			}
+			}*/
+            HashMap<String, Integer> gamesMap = getMap(rs);
 			
 			ResultSet r73 = statement.executeQuery("SELECT genre, id from genres");			
 			HashMap<String,Integer> genreMap = getMap(r73);
@@ -214,10 +216,10 @@ public class GamesParser extends DefaultHandler
 				SimpleGame gameRecord = it.next();
 				
 				//remove special characters from game title if any exists
-				String gameTitle = gameRecord.getGameTitle().replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+				String gameTitle = removeSpecials(gameRecord.getGameTitle());
 				
 				//duplication set
-				if(!gamesMap.containsKey(gameTitle))
+				if(!gamesMap.containsKey(gameTitle.toLowerCase()))
 				{
 					insertStatement.setString(1, gameTitle);
 					insertStatement.setString(2, gameRecord.getReleaseYear());
@@ -225,7 +227,7 @@ public class GamesParser extends DefaultHandler
 					insertStatement.addBatch();
 					
 					//don't add anymore games with the same title for games that are pending to add in database.
-					gamesMap.put(gameTitle,true);
+					gamesMap.put(gameTitle.toLowerCase(),-1);
 				}
 				
 			}
@@ -244,18 +246,20 @@ public class GamesParser extends DefaultHandler
 				ArrayList<String> gens = new ArrayList<String>();
 				for (String genre : gameRecord.getGenres())
 				{
-					if(!genreMap.containsKey(genre))
+				    genre = removeSpecials(genre);
+					if(!genreMap.containsKey(genre.toLowerCase()))
 					{
 						insertStatement2.setString(1,genre);
 						insertStatement2.addBatch();
-						genreMap.put(genre, -1);
+						genreMap.put(genre.toLowerCase(), -1);
 					}
 					gens.add(genre);
 				}
+                //System.out.println(gens);
 				gog.put(gameRecord.getGameTitle(),gens);
 			}
 			
-			insertStatement.executeBatch();
+			insertStatement2.executeBatch();
 			dbcon.commit();
 			
 			
@@ -268,18 +272,18 @@ public class GamesParser extends DefaultHandler
 			Statement iStatement2 = dbcon.createStatement();
 			String sQuery2 = "SELECT genre, id FROM genres";
 			ResultSet r2 = iStatement2.executeQuery(sQuery2);
-			
 			HashMap<String,Integer> genresMap = getMap(r2);
 			
 			Statement iStatement3 = dbcon.createStatement();
 			String sQuery3 = "SELECT game_id, genre_id FROM genres_of_games";
-			
 			ResultSet r55 = iStatement3.executeQuery(sQuery3);
-			HashMap<Integer,Integer> gogMap = new HashMap<Integer,Integer>();
+			HashMap<String,Integer> gogMap = new HashMap<String,Integer>();
+
 			while(r55.next())
 			{
-				gogMap.put(r55.getInt(1), r55.getInt(2));
+				gogMap.put(r55.getInt(1)+","+r55.getInt(2),-1);
 			}
+            //System.out.println(gogMap);
 			
 			String insertQuery3 = "INSERT INTO genres_of_games (game_id, genre_id) VALUES (?, ?)";
 			PreparedStatement insertStatement3 = dbcon.prepareStatement(insertQuery3);
@@ -289,19 +293,24 @@ public class GamesParser extends DefaultHandler
 			{
 				for(String g: entry.getValue())
 				{
-					if(!gogMap.containsKey(gamesMap2.get(entry.getKey().toLowerCase())) && gogMap.get(entry.getKey())!=genresMap.get(g)) 
+					if(!gogMap.containsKey(gamesMap2.get(removeSpecials(entry.getKey()).toLowerCase())+","+genresMap.get(removeSpecials(g).toLowerCase()))) 
 					{
-						//if (!gamesMap2.get(entry.getKey().toLowerCase()).equals("")) {
-							insertStatement3.setInt(1,gamesMap2.get(entry.getKey().toLowerCase()));
-							insertStatement3.setInt(2,genresMap.get(g));
-							insertStatement3.addBatch();
-						//}
-						
+						if (gamesMap2.get(removeSpecials(entry.getKey()).toLowerCase())!=null && genresMap.get(removeSpecials(g).toLowerCase())!=null) {
+                            //System.out.println(entry.getKey());
+                            //System.out.println(gamesMap2.get(entry.getKey()));
+                            //System.out.println(genresMap.get(g));
+						    insertStatement3.setInt(1,gamesMap2.get(removeSpecials(entry.getKey().toLowerCase())));
+						    insertStatement3.setInt(2,genresMap.get(removeSpecials(g).toLowerCase()));
+						    insertStatement3.addBatch();
+						} else {
+                            System.out.println("Unable to insert KEY:"+entry.getKey()+"\nVALUE:"+g);
+                        }
+					    gogMap.put(gamesMap2.get(removeSpecials(entry.getKey()).toLowerCase())+","+genresMap.get(removeSpecials(g).toLowerCase()),-1);
 					}
 				}
 			}
 			
-			iStatement3.executeBatch();
+			insertStatement3.executeBatch();
 			dbcon.commit();
 			
 			
