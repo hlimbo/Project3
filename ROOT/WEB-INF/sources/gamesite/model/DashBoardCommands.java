@@ -10,13 +10,29 @@ import gamesite.utils.DBConnection;
 public class DashBoardCommands {
 
     public static int addGame (String name, String year, String price, String platform,
-            String publisher, String genre) 
+            String pubAndYear, String genre) 
             throws SQLExceptionHandler, SQLException, java.lang.Exception {
         Connection conn = null;
         int returnCode=1;
+        String publisher = null;
+        String founded = null;
+        Pattern yearPattern = Pattern.compile("\\d{1,2}|\\d{4}");
+        String[] parts = pubAndYear.split(";");
+        if (parts.length > 1) {
+            Matcher yearMatch = yearPattern.matcher(parts[parts.length-1].trim());
+            //if pubAndYear ends in numbers
+            if (yearMatch.matches()) {
+                founded = yearMatch.group();
+                publisher = pubAndYear.substring(0,pubAndYear.lastIndexOf(';'));
+            } else {
+                publisher=pubAndYear;
+            }
+        } else {
+            publisher = pubAndYear;
+        }
         try {
             conn = DBConnection.create();
-            PreparedStatement addStmt = conn.prepareStatement("CALL add_game(?,?,?,?,?,?)");
+            PreparedStatement addStmt = conn.prepareStatement("CALL add_game(?,?,?,?,?,?,?)");
             addStmt.setString(1,name.trim());
             addStmt.setString(2,year.trim());
             addStmt.setString(3,price.trim());
@@ -27,13 +43,19 @@ public class DashBoardCommands {
             }
             if (publisher==null) {
                 addStmt.setString(5,null);
-            } else {
-                addStmt.setString(5,publisher.trim());
-            }
-            if (genre==null) {
                 addStmt.setString(6,null);
             } else {
-                addStmt.setString(6,genre.trim());
+                addStmt.setString(5,publisher.trim());
+                if (founded==null) {
+                    addStmt.setString(6,null);
+                } else {
+                    addStmt.setString(6,founded.trim());
+                }
+            }
+            if (genre==null) {
+                addStmt.setString(7,null);
+            } else {
+                addStmt.setString(7,genre.trim());
             }
             try {
                 addStmt.executeUpdate();

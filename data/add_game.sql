@@ -1,6 +1,6 @@
 DELIMITER //
 
-CREATE PROCEDURE add_game (IN newName VARCHAR(200), IN newYear YEAR, IN newPrice INTEGER, IN newPlatform VARCHAR(200), IN newPublisher VARCHAR(200), IN newGenre VARCHAR(200))
+CREATE PROCEDURE add_game (IN newName VARCHAR(200), IN newYear YEAR, IN newPrice INTEGER, IN newPlatform VARCHAR(200), IN newPublisher VARCHAR(200), IN newFounded YEAR, IN newGenre VARCHAR(200))
 BEGIN
     DECLARE countFound INTEGER;
     DECLARE platformID INTEGER;
@@ -65,8 +65,14 @@ BEGIN
     END IF;
     SET countFound = (SELECT COUNT(*) FROM publishers WHERE publisher = newPublisher);
     IF countFound = 0 THEN 
-        INSERT INTO publishers (publisher) VALUES (newPublisher);
-        SELECT 'Publisher Inserted' AS 'Transaction Progress';
+        IF newFounded IS NULL THEN
+            INSERT INTO publishers (publisher) VALUES (newPublisher);
+            SELECT 'Publisher Inserted' AS 'Transaction Progress';
+        END IF;
+        IF newFounded IS NOT NULL THEN
+            INSERT INTO publishers (publisher,founded) VALUES (newPublisher,newFounded);
+            SELECT 'Publisher Inserted' AS 'Transaction Progress';
+        END IF;
     END IF;
     SET publisherID = (SELECT id FROM publishers WHERE publisher = newPublisher);
     SET countFound = (SELECT COUNT(*) FROM publishers_of_games WHERE publisher_id = publisherID AND platform_id = platformID AND game_id = gameID);

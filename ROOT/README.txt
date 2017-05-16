@@ -8,6 +8,11 @@ installation. When the tomcat server is running, it should
 automatically create the ROOT folder after a little bit of 
 time.
 
+add_game Procedure
+------------------------------------------------------------
+The add_game procedure can be added to your sql database
+by sourcing the add_game.sql file within the data folder.
+
 Compilation
 ------------------------------------------------------------
 Not required, but if one wishes to compile the class
@@ -86,3 +91,8 @@ XML Optimization Report
 It can be found at the relative url /XML_tuning.txt
 For example, if running on the localhost, it would be at
     localhost:8443/XML_tuning.txt
+
+XML Files
+------------------------------------------------------------
+The XML files can be found in the newGames.zip file within
+the data folder
