@@ -76,6 +76,18 @@ public class CompaniesParser extends DefaultHandler
             ie.printStackTrace();
         }
 	}
+
+    public String removeSpecials (String tag, String special) {
+        String specialRegex = "[^\\x20-\\x7e]";
+        if (special.matches(".*"+specialRegex+"+.*")) {
+            System.out.println("ERROR: string "+special+" contains special characters that can not be inserted.");
+            if (tag!=null) {
+                System.out.println("on tag: "+tag);
+            }
+            System.out.println("HANDLE: Removing special characters.");
+        }
+	    return special.replaceAll(specialRegex, " ").replaceAll(" {2,}"," ").trim();
+    }
 	
 	public void printData()
 	{
@@ -92,7 +104,7 @@ public class CompaniesParser extends DefaultHandler
 		while(it2.hasNext())
 		{
 			Publisher publisherRecord = it2.next();
-		String convert = publisherRecord.getName().replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+		    String convert = removeSpecials(NAME,publisherRecord.getName());
 			System.out.println(convert);
 //			ByteBuffer buffer = Charset.forName("UTF-8").encode(publisherRecord.getName());
 	//		String convertedString = new String(buffer.array(), Charset.forName("UTF-8"));
@@ -187,7 +199,7 @@ public class CompaniesParser extends DefaultHandler
 			{
 				Publisher publisherRecord = it.next();
 				//remove all special characters not supported by mysql database.
-				String convert = publisherRecord.getName().replaceAll("[^\\x20-\\x7e]", " ").replaceAll(" {2,}"," ");
+				String convert = removeSpecials(NAME,publisherRecord.getName());
 				insertStatement.setString(1, convert);
 				insertStatement.setString(2, publisherRecord.getFoundedYear());
 				insertStatement.addBatch();
