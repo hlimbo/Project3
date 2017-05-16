@@ -13,13 +13,17 @@ public class SimpleGame
 	private Integer price;
 	private ArrayList<String> genres;
 	
-	public SimpleGame() {}
+	public SimpleGame() 
+	{
+		initializeGenreList();
+	}
 	public SimpleGame(Integer id, String gameTitle, String releaseDate, Integer price)
 	{
 		this.id = id;
 		this.gameTitle = gameTitle;
 		this.releaseDate = releaseDate;
 		this.price = price;
+		initializeGenreList();
 	}
 	
 	public Integer getID() { return id; }
