@@ -28,7 +28,8 @@ public class SimpleGame
 	
 	public Integer getID() { return id; }
 	public String getGameTitle() { return gameTitle; }
-	public String getReleaseDate() { return releaseDate == null ? "1/1/2017" : releaseDate; }
+	//public String getReleaseDate() { return releaseDate == null ? "1/1/2017" : releaseDate; }
+	public String getReleaseDate() { return releaseDate; }
 	public Integer getPrice() { return price; }
 	public ArrayList<String> getGenres() { return genres; }
 	public void initializeGenreList() { genres = new ArrayList<String>(); }
@@ -56,12 +57,14 @@ public class SimpleGame
 		{
 			int lastIndex = releaseDate.lastIndexOf('/');
 			if(lastIndex == -1)
-				return "2017";
+				return null;
+				//return "2017";
 			
 			String year = releaseDate.substring(lastIndex + 1);
 			return year;
 		}
 		
-		return "2017";
+		return null;
+		//return "2017";
 	}
 }
