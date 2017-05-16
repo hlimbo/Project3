@@ -49,7 +49,7 @@ WAR file.
 Access aws instance
 ------------------------------------------------------------
 At the time of this writing, the ip address and port of the
-aws instance is 34.239.251.18:8080/
+aws instance is https://34.201.42.202:8443/
 
 Example customer and credit card for website demonstration
 ------------------------------------------------------------
@@ -74,3 +74,10 @@ of characters at where the '%' is. To match only one
 character of any character, '_' can be used instead.
 As example, both M_rio and M%io will match Mario.
 
+
+
+Compiling XML Parsers
+------------------------------------------------------------
+
+Running XML Parsers
+------------------------------------------------------------
