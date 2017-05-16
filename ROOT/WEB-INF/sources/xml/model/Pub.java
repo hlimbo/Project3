@@ -8,7 +8,7 @@ public class Pub
 	private String p_id;//id retrieved from pubs.xml file Note: not the same id in the database
 	private String p;//publisher name
 	private String fnd;//foundedYear
-	private List<Gplt> platform_of_game;
+	private ArrayList<Gplt> platform_of_game;
 	
 	public Pub() {}
 	public Pub(String p_id, String p, String fnd)
@@ -51,6 +51,8 @@ public class Pub
 		else
 			System.out.println("Warning: PlatformGameList not initialized! Record not added");
 	}
+	
+	public ArrayList<Gplt> getList() { return platform_of_game; }
 	
 	@Override
 	public String toString()

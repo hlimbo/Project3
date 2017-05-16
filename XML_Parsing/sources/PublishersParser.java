@@ -31,6 +31,8 @@ public class PublishersParser extends DefaultHandler
 	
 	private List<Pub> publishers;
 	
+	private Map<String,Integer> publishersMap;
+	
 	//to maintain context
 	private Pub tempPub;
 	private Gplt tempRecord;
@@ -39,6 +41,7 @@ public class PublishersParser extends DefaultHandler
 	public PublishersParser()
 	{
 		publishers = new ArrayList<Pub>();
+		publishersMap = new HashMap<String,Integer>();
 	}
 	
 	public void parseDocument(String filename)
@@ -123,7 +126,7 @@ public class PublishersParser extends DefaultHandler
 	{
 		PublishersParser pr = new PublishersParser();
 		long startTime = System.currentTimeMillis();
-		pr.parseDocument("newGames/pubs.xml");
+		pr.parseDocument(args[0]);
 		long endTime = System.currentTimeMillis();	
 		long elapsedTime = endTime - startTime;	
 		pr.printData();

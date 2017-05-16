@@ -31,5 +31,5 @@ xml_path=$2
 
 
 printf "all:\n\tjava -cp $CLASSPATH:$LIB $1 $2" > makefile
-make --quiet
+make # --quiet
 rm makefile
