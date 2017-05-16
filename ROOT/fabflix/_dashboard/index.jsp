@@ -98,7 +98,7 @@
                             insertCode = $xml.find("status_code").text();
                             if (insertCode == 1) {
                                 $('#data_container').empty();
-                                $('#data_container').append("Call successful. Necessary updates and inserts performed.");
+                                $('#data_container').append("Call successful. Necessary inserts performed.");
                             } else if (insertCode == 2) {
                                 $('#data_container').empty();
                                 $('#data_container').append("Updated in tables.");
