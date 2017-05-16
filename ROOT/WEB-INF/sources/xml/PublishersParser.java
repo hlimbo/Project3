@@ -168,6 +168,12 @@ public class PublishersParser extends DefaultHandler
 		String selectQuery = "SELECT game_id, publisher_id, platform_id FROM publishers_of_games";
 		return statement.executeQuery(selectQuery);
     }
+
+	public ResultSet getPlgs(Statement statement) throws SQLException
+	{
+		String selectQuery = "SELECT game_id, platform_id FROM platforms_of_games";
+		return statement.executeQuery(selectQuery);
+    }
 	
 	public HashMap<String,Integer> getMap(ResultSet set) throws SQLException
 	{
@@ -289,6 +295,12 @@ public class PublishersParser extends DefaultHandler
 		    {
 		    	pogs.put(pogSet.getInt(1)+","+pogSet.getInt(2)+","+pogSet.getInt(3),-1);
 		    }
+			ResultSet plgSet = getPlgs(statement);	
+		    HashMap<String,Integer> plgs = new HashMap<String,Integer>();
+		    while(plgSet.next())
+		    {
+		    	plgs.put(plgSet.getInt(1)+","+plgSet.getInt(2),-1);
+            }
 			
 			
 			//adding all 3 ids into the database.
@@ -296,6 +308,8 @@ public class PublishersParser extends DefaultHandler
 			String insertQuery = "INSERT INTO publishers_of_games (game_id, publisher_id, platform_id) VALUES (?,?,?)";
 			//Create a preparedStatement via db connection
 			PreparedStatement insertStatement = dbcon.prepareStatement(insertQuery);
+			String plgInsertQry = "INSERT INTO platforms_of_games (game_id, platform_id) VALUES (?,?)";
+			PreparedStatement plgInsert = dbcon.prepareStatement(plgInsertQry);
 			for (Map.Entry<String,ArrayList<Gplt>> record : masterList.entrySet()) {
 				Integer pID = pubMap.get(record.getKey());
 				for (Gplt gp2 : record.getValue()) {
@@ -308,14 +322,20 @@ public class PublishersParser extends DefaultHandler
 					    insertStatement.addBatch();
                         pogs.put(gaID+","+pID+","+plID,-1);
                     }
+                    if (!plgs.containsKey(gaID+","+plID)) {
+					    plgInsert.setInt(1, gaID);
+					    plgInsert.setInt(2, plID);
+					    plgInsert.addBatch();
+                        plgs.put(gaID+","+plID,-1);
+                    }
 				}
 			}
 			
 			//execute batch;
 			insertStatement.executeBatch();
+            plgInsert.executeBatch();
 			dbcon.commit();
-			
-			
+
 			pStatement3.close();
 			pStatement2.close();
 			pStatement1.close();
