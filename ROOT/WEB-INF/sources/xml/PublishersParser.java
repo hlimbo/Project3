@@ -67,10 +67,13 @@ public class PublishersParser extends DefaultHandler
 
         } catch (SAXException se) {
             se.printStackTrace();
+            System.out.println("Attempting to insert data collected up to error.");
         } catch (ParserConfigurationException pce) {
             pce.printStackTrace();
+            System.out.println("Attempting to insert data collected up to error.");
         } catch (IOException ie) {
             ie.printStackTrace();
+            System.out.println("Attempting to insert data collected up to error.");
         }
 	}
 	
