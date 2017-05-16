@@ -20,6 +20,17 @@ Commands:
     cd WEB-INF
     javac -d classes -cp lib/servlet-api.jar:lib/mysql-connector-java-5.1.41-bin.jar:lib/servlet-api.jar sources/*.java
 
+    using the bash run script to run java class files:
+	run xml.CompaniesParser [absolute file name]/companies.xml
+	e.g.
+	run xml.CompaniesParser /c/Users/Harvey/Desktop/UCIHWK/Spring2017/CS122B/project1/apache-tomcat-8.5.13-windows-x64/apache-tomcat-8.5.13/webapps/XML_Parsing/newGames/companies.xml
+	
+	run xml.GamesParser [absolute file name]/newGames.xml
+	run xml.GamesParser /c/Users/Harvey/Desktop/UCIHWK/Spring2017/CS122B/project1/apache-tomcat-8.5.13-windows-x64/apache-tomcat-8.5.13/webapps/XML_Parsing/newGames/newGames.xml
+
+	run xml.PublishersParser [absolute file name]/pubs.xml
+	run xml.PublishersParser /c/Users/Harvey/Desktop/UCIHWK/Spring2017/CS122B/project1/apache-tomcat-8.5.13-windows-x64/apache-tomcat-8.5.13/webapps/XML_Parsing/newGames/pubs.xml
+
 Expected MySQL user and password
 ------------------------------------------------------------
 The program expects a user called "user" but without the
