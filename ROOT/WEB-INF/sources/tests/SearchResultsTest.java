@@ -109,6 +109,7 @@ public class SearchResultsTest {
                 Table table = child.data;
                 if (table.name.equals("publishers")) {
                     assertTrue("Nintendo not found",table.find("publisher","Nintendo"));
+                    assertTrue("Wii not found in publishers of",child.children.get(0).data.find("platform","Wii"));
                 } else if (table.name.equals("genres")) {
                     assertTrue("Sports not found",table.find("genre","Sports"));
                 } else if (table.name.equals("platforms")) {
@@ -131,6 +132,12 @@ public class SearchResultsTest {
                 ++count;
             }
             assertTrue("Zero games in games table",count>0);
+            tables = SearchResults.getInstance().masterSearch("games","5",
+                    "0","Dragon","","","","","id",false,1);
+            tables.data.print();
+            for (NTreeNode<Table> child : tables.children) {
+                child.data.print();
+            }
         } catch (SQLExceptionHandler ex) {
             System.out.println(ex.getErrorMessage());
         } catch (java.lang.Exception e) {

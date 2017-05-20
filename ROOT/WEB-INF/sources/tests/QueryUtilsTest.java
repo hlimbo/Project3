@@ -51,13 +51,14 @@ public class QueryUtilsTest
 		expectedTables.add("publishers");
 		expectedTables.add("publishers_of_games");
 		expectedTables.add("sales");
+		expectedTables.add("employees");
 		
         Connection dbconn=null;
 		try
 		{
             dbconn = DBConnection.create();
 			ArrayList<String> tables = QueryUtils.getTables(dbconn);
-			assertEquals("failure - tables are not the same size", tables.size(), expectedTables.size());		
+			assertEquals("failure - tables are not the same size", expectedTables.size(), tables.size());
 		}
 		catch (SQLException e)
 		{
@@ -76,7 +77,7 @@ public class QueryUtilsTest
 	public void test_for_equality_GetTables() throws SQLException
 	{
 		//Assumption getting the tables from gamedb
-		ArrayList<String> expectedTables = new ArrayList<String>();
+		HashSet<String> expectedTables = new HashSet<String>();
 		expectedTables.add("creditcards");
 		expectedTables.add("customers");
 		expectedTables.add("games");
@@ -87,12 +88,13 @@ public class QueryUtilsTest
 		expectedTables.add("publishers");
 		expectedTables.add("publishers_of_games");
 		expectedTables.add("sales");
+		expectedTables.add("employees");
 		
         Connection dbconn=null;
 		try
 		{
             dbconn = DBConnection.create();
-			ArrayList<String> tables = QueryUtils.getTables(dbconn);
+			HashSet<String> tables = new HashSet<String> (QueryUtils.getTables(dbconn));
 			assertEquals("failure - tables do not contain the same table names", tables, expectedTables);
 		}
 		catch (SQLException e)
@@ -113,8 +115,11 @@ public class QueryUtilsTest
 	{
 		NTreeNode<String> expectedTables = new NTreeNode<String>("games");
 		expectedTables.addChild(new NTreeNode<String>("publishers"));
-		expectedTables.addChild(new NTreeNode<String>("platforms"));
+        NTreeNode<String> platformNode = new NTreeNode<String>("platforms");
+		expectedTables.addChild(platformNode);
 		expectedTables.addChild(new NTreeNode<String>("genres"));
+		NTreeNode<String> publisherExpectedTables = new NTreeNode<String>("publishers");
+        publisherExpectedTables.addChild(platformNode);
 
         Connection dbconn=null;
 		try 
@@ -123,7 +128,15 @@ public class QueryUtilsTest
 			NTreeNode<String> tables = QueryUtils.getSiblings(dbconn,"games");
 			assertEquals("failure - sibling roots do not contain the same data", tables.data, expectedTables.data);		
             for (NTreeNode<String> sibling : expectedTables.children) {
-                assertTrue(tables.children.contains(sibling));
+                assertTrue(sibling.data+" not found in tables children",tables.children.contains(sibling));
+            }
+            for (NTreeNode<String> child : tables.children) {
+                if (child.data.equals("publishers")) {
+                    for (NTreeNode<String> pubSib : publisherExpectedTables.children) {
+                        assertTrue("publishers expected child "+pubSib.data+" not found",child.children.contains(pubSib));
+                    }
+                    break;
+                }
             }
         } 
         catch (SQLException e) 

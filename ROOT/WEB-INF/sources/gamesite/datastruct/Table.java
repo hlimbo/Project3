@@ -39,6 +39,15 @@ public class Table implements Iterable<HashMap<String,String>> {
         return false;
     }
 
+    public void print () {
+        System.out.println("Table: "+name);
+        for (HashMap<String,String> row : this) {
+            for (HashMap.Entry<String,String> field : row.entrySet()) {
+                System.out.println(field.getKey()+" : "+field.getValue());
+            }
+        }
+    }
+
     //String key in outer HashMap is a primary key to find a particular
     //row by.
     public LinkedHashMap<String,HashMap<String,String>> rows;

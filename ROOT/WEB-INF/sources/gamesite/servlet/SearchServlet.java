@@ -9,114 +9,17 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import gamesite.datastruct.*;
+import gamesite.utils.*;
 import gamesite.model.*;
+import gamesite.servlet.SearchBase;
 
-public class SearchServlet extends HttpServlet
+public class SearchServlet extends SearchBase 
 {
     public String getServletInfo()
     {
         return "Servlet displays search results";
     }
 
-
-    private String cartButton (String id, String quantity, HttpServletRequest request) {
-        String button = "<form class=\"cartButton\" action=\"/ShoppingCart/view-shopping-cart\" method=\"GET\">";
-        button+="<input type=\"HIDDEN\" name=id value=\""+id+"\" \\>";
-        button+="<input type=\"HIDDEN\" name=\"quantity\" value=\""+quantity+"\" \\>";
-        try {
-            button+="<input type=\"HIDDEN\" name=\"previousPage\" value=\""
-                +URLEncoder.encode(request.getRequestURI(), "UTF-8")+"%3F"
-                +URLEncoder.encode(request.getQueryString(), "UTF-8")+"\" \\>";
-        } catch (UnsupportedEncodingException e){
-        }
-        button+="<input class=\"cartButtonCheckout\" type=\"SUBMIT\" value=\"Add to Shopping Cart\" \\>";
-        button+="</form>";
-        return button;
-    }
-
-	private static String fieldValue (String colName, String value, String table,
-            Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
-            Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
-	    String resString = "";
-        if (ignores.containsKey(colName) && ignores.get(colName)) {
-            return "";
-        }
-		resString+=" <span class=\""+table+"_"+colName+"\">";
-        if (value==null || value.trim().compareTo("") == 0) {
-            if (images.containsKey(colName) && images.get(colName)){
-                resString+="<img src=\""
-                    +"http://upload.wikimedia.org/wikipedia/"
-                    +"commons/thumb/5/51/"
-                    +"Star_full.svg/11px-Star_full.svg.png\" />";
-            }
-		    resString+="</span> ";
-            return resString;
-        }
-        if  (link.containsKey(colName) && link.get(colName)) {
-            try {
-		        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
-                    "&"+colName+"="+URLEncoder.encode(value,"UTF-8")+"\">";
-            } catch (UnsupportedEncodingException error) {
-		        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
-                    "&"+colName+"="+value.replaceAll("[^\\w]","_")+"\">";
-            }
-            resString+=value;
-            resString+="</a>";
-        } else if  (externalLinks.containsKey(colName) && externalLinks.get(colName)) {
-		    resString+="<a href=\"http://"+value+"\">"+value+"</a>";
-        } else if (images.containsKey(colName) && images.get(colName)){
-            resString+="<img src=\"http://"+value+"\" />";
-        } else {
-            resString+=value;
-        }
-		resString+="</span> ";
-        return resString;
-	}
-
-    private String rowToHtml (HashMap<String,String> row, HttpServletRequest request, String table,
-            Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
-            Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
-        String htmlRow = "";
-	    htmlRow+="<div class=\""+table+"_row\">";
-        for (Map.Entry<String,String> field: row.entrySet()) {
-                htmlRow+=fieldValue(field.getKey(), field.getValue(), table, 
-                        link, images, externalLinks, ignores);
-        }
-        htmlRow+="</div>";
-        return htmlRow;
-    }
-
-    private String ntreeToHtml (NTreeNode<Table> root, HttpServletRequest request, String id,
-            Hashtable<String,Boolean> link, Hashtable<String,Boolean> images, 
-            Hashtable<String,Boolean> externalLinks, Hashtable<String,Boolean> ignores) {
-        String result = "";
-        for (HashMap<String,String> row : root.data) {
-            if (id==null || id.equals(row.get("id"))) {
-                result+="<div class=\""+root.data.name+"_row\">";
-                for (String field : row.keySet()) {
-                    if (!field.endsWith("_id")) {
-                        result+=fieldValue(field,row.get(field),root.data.name,
-                                link,images,externalLinks,ignores);
-                    }
-                }
-                for (String field : row.keySet()) {
-                    if (field.endsWith("_id")) {
-                        String childTable = QueryUtils.getTableFromRelationIdName(field);
-                        for (NTreeNode<Table> child : root.children) {
-                            if (child.data.name.equals(childTable)) {
-                                result+=ntreeToHtml(child,request,row.get(field),link,images,externalLinks,ignores);
-                            }
-                        }
-                    }
-                }
-                if (root.data.name.equals("games")) {
-                    result+=cartButton(row.get("id"),"1",request);
-                }
-                result+="</div>\n";
-            }
-        }
-        return result;
-    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException
@@ -126,10 +29,6 @@ public class SearchServlet extends HttpServlet
         String returnLink = "<a href=\"/\"> Return to home </a>";
         try
         {
-            // Declare our statement
-            //Statement statement = dbcon.createStatement();
-            //PreparedStatement statement; 
-
             String table = (String) request.getParameter("table");
             if (table==null) {
                 table="games";
@@ -137,7 +36,7 @@ public class SearchServlet extends HttpServlet
                 table = table.replaceAll("[^\\w]","_");
             }
             String limit = (String) request.getParameter("limit");
-            Integer limitMax = 50;
+            Integer limitMax = SearchResults.limitMax;
             if (limit==null) {
                 limit=limitMax.toString();
             } else {

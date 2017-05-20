@@ -6,6 +6,7 @@ import java.sql.*;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 import gamesite.model.QueryUtils;
 import gamesite.model.SQLExceptionHandler;
@@ -14,6 +15,7 @@ import gamesite.datastruct.*;
 
 public class SearchResults {
     private static String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
+    public static Integer limitMax = 50;
 
     //Singleton class, so constructor not permitted outside of class
     private SearchResults () {
@@ -131,8 +133,9 @@ public class SearchResults {
         return results;
     }
 
-    private Table siblingData (NTreeNode<Table> root, NTreeNode<Table> child, 
-            String rootId) throws SQLExceptionHandler, java.lang.Exception {
+    private Table siblingData (NTreeNode<Table> root, 
+            NTreeNode<Table> child, String rootId, HashMap<String,
+            HashMap<String,String>>relations) throws SQLExceptionHandler, java.lang.Exception {
         Connection conn = null;
         ResultSet result = null;
         String queryId = "null";
@@ -141,17 +144,12 @@ public class SearchResults {
         try {
             conn = DBConnection.create();
             ArrayList<String> tables = QueryUtils.getTables(conn);
-            //By SQL schema convention, relationship tables are named by
-            //table1_of_table2
-            String relationName = root.data.name+"_of_"+child.data.name;
-            if (!tables.contains(relationName)) {
-                relationName = child.data.name+"_of_"+root.data.name;
-                assert(tables.contains(relationName));
-            }
+            String relationName = relations.get(root.data.name).get(child.data.name);
             ArrayList<Integer> sibIds = new ArrayList<Integer>();
+            ArrayList<HashMap<String,Integer>> childSibIds = new ArrayList<HashMap<String,Integer>>();
             //By SQL schema convention, values.id = value_id in relation table
             String parentIdField = QueryUtils.getRelationIdName(root.data.name);
-		    itemQuery = "SELECT * FROM "+relationName+" JOIN "+root.data.name
+		    itemQuery = "SELECT "+relationName+".* FROM "+relationName+" JOIN "+root.data.name
                 +" ON "+relationName+"."+parentIdField+"="+root.data.name+".id WHERE id=?";
 		    PreparedStatement statement = conn.prepareStatement(itemQuery);
 		    statement.setInt(1,Integer.parseInt(rootId));
@@ -159,23 +157,53 @@ public class SearchResults {
             while (result.next()) {
                 String sibIdField = QueryUtils.getRelationIdName(child.data.name);
 		        ResultSetMetaData meta = result.getMetaData();
+                childSibIds.add(new HashMap<String, Integer> ());
 		        for (int i=1;i<=meta.getColumnCount();++i) {
                     if (meta.getColumnName(i).equals(sibIdField)) {
                         sibIds.add(result.getInt(i));
-                        break;
+                    } else {
+                        childSibIds.get(childSibIds.size()-1).put(meta.getColumnName(i),result.getInt(i));
                     }
                 }
             }
             result.close();
             statement.close();
             itemQuery=null;
-            for (Integer sibId : sibIds) {
-                queryId = sibId.toString();
-                result = SQLQuery.getTableInfo(conn,
-                        sibId,child.data.name);
-                while (result.next()) {
-                    sibData.addRow(QueryUtils.tableRow(result));
-                }
+            assert(sibIds.size() == childSibIds.size());
+            for (int sibIndex = 0; sibIndex < sibIds.size(); ++sibIndex) {
+                    HashMap<String, String> row;
+                    boolean append = false;
+                    if (sibData.getRow(sibIds.get(sibIndex).toString())==null) {
+                        queryId = sibIds.get(sibIndex).toString();
+                        result = SQLQuery.getTableInfo(conn,
+                            sibIds.get(sibIndex),child.data.name);
+                        if (result.next()) {
+                            row = QueryUtils.tableRow(result);
+                            sibData.addRow(row);
+                            assert(result.next()==false);
+                        } else {
+                            continue;
+                        }
+                    }
+                    row = sibData.getRow(sibIds.get(sibIndex).toString());
+                    if (row.containsKey("child_id")) {
+                        append=true;
+                    }
+                    for (HashMap.Entry<String,Integer> childSib : childSibIds.get(sibIndex).entrySet()) {
+                        if (!row.containsKey("child_id")) {
+                            row.put("child_id",childSib.getKey()+"="+childSib.getValue().toString());
+                        } else {
+                            if (append) {
+                                row.put("child_id",row.get("child_id")
+                                    +","+childSib.getKey()+"="+childSib.getValue().toString());
+                                append=false;
+                            } else {
+                                row.put("child_id",row.get("child_id")
+                                    +"&"+childSib.getKey()+"="+childSib.getValue().toString());
+                            }
+                        }
+                    }
+                    sibData.addRow(row);
             }
         } catch (SQLException ex) {
             if (itemQuery!=null) {
@@ -194,16 +222,40 @@ public class SearchResults {
     }
 
     private NTreeNode<Table> rootSearch (NTreeNode<Table> root,
-            NTreeNode<String> siblings) throws SQLExceptionHandler, java.lang.Exception {
+            NTreeNode<String> siblings, HashMap<String,Boolean> visited,
+            HashMap<String,NTreeNode<Table>> processed,
+            HashMap<String,HashMap<String,String>> relations,
+            ) throws SQLExceptionHandler, java.lang.Exception {
+        visited.put(root.data.name,true);
         for (NTreeNode<String> sib : siblings.children) {
-            root.addChild(new NTreeNode<Table>(new Table(sib.data,"id")));
+            if (!visited.containsKey(sib.data)) {
+                if (!processed.containsKey(sib.data)) {
+                    root.addChild(new NTreeNode<Table>(new Table(sib.data,"id")));
+                } else {
+                    root.addChild(processed.get(sib.data));
+                }
+            }
         }
+        //process children nodes
         for (HashMap<String,String> row : root.data) {
             for (NTreeNode<Table> child : root.children) {
-                Table newData = siblingData(root,child,row.get("id"));
                 String siblingIdField = QueryUtils.getRelationIdName(child.data.name);
+                Table newData = siblingData(root,child,row.get("id"),relations);
+                if (!processed.containsKey(child.data.name)) {
+                    for (HashMap<String, String> newRow : newData) {
+                        if (child.data.getRow(newRow.get("id"))==null) {
+                            child.data.addRow(newRow);
+                        } else if (newRow.get("child_id")!=null){
+                            HashMap<String,String> childRow = child.data.getRow(newRow.get("id"));
+                            if (childRow.get("child_id")!=null) {
+                                childRow.put("child_id",childRow.get("child_id")+","+newRow.get("child_id"));
+                            } else {
+                                childRow.put("child_id",newRow.get("child_id"));
+                            }
+                        }
+                    }
+                }
                 for (HashMap<String, String> newRow : newData) {
-                    child.data.addRow(newRow);
                     if (row.containsKey(siblingIdField)) {
                         row.put(siblingIdField,row.get(siblingIdField)+","+newRow.get("id"));
                     } else {
@@ -212,14 +264,25 @@ public class SearchResults {
                 }
             }
         }
+        //add processed children now that processing is done
+        for (HashMap<String,String> row : root.data) {
+            for (NTreeNode<Table> child : root.children) {
+                if (!processed.containsKey(child.data.name)) {
+                    processed.put(child.data.name,child);
+                }
+            }
+        }
         for (NTreeNode<String> sibling : siblings.children) {
             for (NTreeNode<Table> child : root.children) {
                 if (child.data.name.equals(sibling.data)) {
-                    rootSearch(child,sibling);
+                    if (!visited.containsKey(child.data.name)) {
+                        rootSearch(child,sibling,visited,processed,relations);
+                    }
                     break;
                 }
             }
         }
+        visited.remove(root.data.name);
         return root;
     }
 
@@ -227,8 +290,14 @@ public class SearchResults {
             String game, String year, String genre, String platform, String publisher, String order, 
             boolean descend, int match) throws SQLExceptionHandler, java.lang.Exception {
         NTreeNode<Table> root = new NTreeNode<Table>(new Table(table,"id"));
-        ArrayList<HashMap<String,String>> rootTable = search(table,limit,offset,game,
+        ArrayList<HashMap<String,String>> rootTable;
+        //if (table.equalsIgnoreCase("games")) {
+            rootTable = search(table,limit,offset,game,
                 year,genre,platform,publisher,order,descend,match);
+        /*} else {
+            rootTable = search(table,"18446744073709551615","0",game,
+                year,genre,platform,publisher,order,descend,match);
+        }*/
         for (HashMap<String,String> row : rootTable) {
             root.data.addRow(row);
         }
@@ -236,13 +305,26 @@ public class SearchResults {
         try {
             dbconn = DBConnection.create();
             NTreeNode<String> siblings = QueryUtils.getSiblings(dbconn,table);
-            rootSearch(root,siblings);
+            rootSearch(root,siblings, new HashMap<String,Boolean>(),
+                    new HashMap<String,NTreeNode<Table>>(), QueryUtils.getRelations(dbconn));
         } catch (SQLException ex) {
             throw ex;
         } finally {
             dbconn.close();
         }
         return root;
+    }
+
+    public class ntreeVisitAllTables implements Consumer<Table> {
+        public ntreeVisitAllTables () {
+            visited = new HashMap<String,Table> ();
+        }
+        public void accept (Table data) {
+            if (!visited.containsKey(data.name)) {
+                visited.put(data.name,data);
+            }
+        }
+        public HashMap<String,Table> visited;
     }
 
     public int getCount(String table, String limit, String offset,
