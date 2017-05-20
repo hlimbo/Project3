@@ -4,7 +4,7 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-class ParameterParse {
+public class ParameterParse {
     public static HashMap<String,String> getQueryParameters (String queryString) {
         HashMap<String,String> parsedParams= new HashMap<String,String>();
         if (queryString!=null && queryString.trim().compareTo("")!=0) {

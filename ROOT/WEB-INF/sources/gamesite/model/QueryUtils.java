@@ -104,6 +104,7 @@ public class QueryUtils {
         while (tableMeta.next()) {
             tables.add(tableMeta.getString("TABLE_NAME"));
         } 
+        tableMeta.close();
         return tables;
     }
 
@@ -118,29 +119,60 @@ public class QueryUtils {
         return result;
     }
 
-    public static NTreeNode<String> getSiblings (Connection dbcon, String firstTable) throws SQLExceptionHandler, java.lang.Exception {
-        NTreeNode<String> siblings = new NTreeNode<String>(firstTable);
-        HashMap<String,Boolean> visited = new HashMap<String,Boolean> ();
-        LinkedList<NTreeNode<String>> tableQueue = new LinkedList<NTreeNode<String>> ();
-        tableQueue.add(siblings);
-        visited.put(firstTable,true);
-        ArrayList<String> potentialSiblings = getTables(dbcon);
-        while (!tableQueue.isEmpty()) {
-            NTreeNode<String> node = tableQueue.remove();
-            String table = node.data.trim().toLowerCase();
-            for (String sibling : potentialSiblings) {
-                if (sibling.indexOf(table) != -1) {
-                    //find sibling table by SQL schema convention of relationship tables
-                    String next = sibling.replaceFirst(table,"").replaceFirst("_of_","");
-                    if (potentialSiblings.contains(next) && !visited.containsKey(next)) {
-                        NTreeNode<String> nextNode = new NTreeNode<String>(next);
-                        tableQueue.add(nextNode);
-                        visited.put(next,true);
-                        node.addChild(nextNode);
+    public static HashMap<String,HashMap<String,String>> getRelations (Connection dbcon) 
+        throws SQLException, SQLExceptionHandler, java.lang.Exception {
+        HashMap<String,HashMap<String,String>> relations = new HashMap<String,HashMap<String,String>>();
+        ArrayList<String> tables = getTables(dbcon);
+        for (String table : tables) {
+            //by convention of SQL schema all relationship tables have _of_
+            //between the entity names
+            if (table.indexOf("_of_") != -1) {
+                String[] relatedTables = table.split("_of_");
+                for (String related : relatedTables) {
+                    if (!relations.containsKey(related)) {
+                        relations.put(related,new HashMap<String,String> ());
                     }
+                    DatabaseMetaData dbmeta = dbcon.getMetaData();
+                    ArrayList<String> relation = new ArrayList<String> ();
+                    ResultSet columnsMeta = dbmeta.getColumns(null,null,table,null);
+                    while (columnsMeta.next()) {
+                        String foreignTable = columnsMeta.getString("COLUMN_NAME").replaceFirst("_id","")+"s";
+                        if (!related.equals(foreignTable)) {
+                            relations.get(related).put(foreignTable,table);
+                        }
+                    }
+                    columnsMeta.close();
                 }
             }
         }
+        return relations;
+    }
+
+    private static void getSiblingsRecur (Connection dbcon, NTreeNode<String> root, 
+            HashMap<String,HashMap<String,String>> relations,
+            HashMap<String,Boolean> visited, HashMap<String,NTreeNode<String>> processed) {
+        visited.put(root.data,true);
+        String table = root.data.trim().toLowerCase();
+        for (String sibling : relations.get(table).keySet()) {
+                if (processed.containsKey(sibling)) {
+                    NTreeNode<String> nextNode = processed.get(sibling);
+                    root.addChild(nextNode);
+                } else {
+                    NTreeNode<String> nextNode = new NTreeNode<String>(sibling);
+                    processed.put(sibling,nextNode);
+                    root.addChild(nextNode);
+                    getSiblingsRecur(dbcon,nextNode,relations,visited,processed);
+                }
+        }
+        visited.remove(root.data);
+    }
+
+    public static NTreeNode<String> getSiblings (Connection dbcon, String firstTable) throws SQLExceptionHandler, java.lang.Exception {
+        NTreeNode<String> siblings = new NTreeNode<String>(firstTable);
+        HashMap<String,NTreeNode<String>> processed = new HashMap<String,NTreeNode<String>> ();
+        processed.put(firstTable,siblings);
+        HashMap<String,HashMap<String,String>> relations = getRelations(dbcon);
+        getSiblingsRecur(dbcon, siblings, relations, new HashMap<String, Boolean>(), processed);
         return siblings;
     }
 }
