@@ -49,6 +49,16 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>SearchXml</servlet-name>
+    <servlet-class>gamesite.servlet.SearchServletXml</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SearchXml</servlet-name>
+    <url-pattern>/search/xquery</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>Display</servlet-name>
     <servlet-class>gamesite.servlet.DisplayServlet</servlet-class>
   </servlet>
