@@ -55,7 +55,7 @@ public class QueryUtils {
     public static String addSearchTerm (String value, String term, int useSubMatch) {
             String searchTerm = "";
             if (value != null && value.trim() != "") {
-                if (useSubMatch==1) {
+                if (useSubMatch==1 || useSubMatch==3) {
                     for (String subvalue : value.split(" ")) {
                         searchTerm+=" AND ";
                         searchTerm+=term+" LIKE ?";
@@ -81,6 +81,16 @@ public class QueryUtils {
                         statement.setString(offset,"%"+subvalue+"%");
                         offset+=1;
                     }
+                } else if (useSubMatch==3) {
+                    String[] subvalues = value.split(" ");
+                    //full search for all words except last word
+                    for (int subvalue=0;subvalue<subvalues.length-1;++subvalue) {
+                        statement.setString(offset,"%"+subvalues[subvalue]+"%");
+                        offset+=1;
+                    }
+                    //treat last word as a prefix
+                    statement.setString(offset,subvalues[subvalues.length-1]+"%");
+                    offset+=1;
                 } else {
                     statement.setString(offset,value);
                     offset+=1;
