@@ -43,10 +43,10 @@ public abstract class SearchBaseXml extends HttpServlet {
 		        resString+="<a><href>"+XmlFormat.escapeXml("/display/query?table="+table+"&columnName="+colName+
                     "&"+colName+"="+value.replaceAll("[^\\w]","_"))+"</href>";
             }
-            resString+=XmlFormat.escapeXml(value);
+            resString+="<atext>"+XmlFormat.escapeXml(value)+"</atext>";
             resString+="</a>";
         } else if  (externalLinks.containsKey(colName) && externalLinks.get(colName)) {
-		    resString+="<a><href>http://"+XmlFormat.escapeXml(value)+"\">"+XmlFormat.escapeXml(value)+"</a>";
+		    resString+="<a><href>http://"+XmlFormat.escapeXml(value)+"</href><atext>"+XmlFormat.escapeXml(value)+"</atext></a>";
         } else if (images.containsKey(colName) && images.get(colName)){
             resString+="<img>http://"+XmlFormat.escapeXml(value)+"</img>";
         } else {

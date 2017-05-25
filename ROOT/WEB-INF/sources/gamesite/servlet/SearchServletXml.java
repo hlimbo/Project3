@@ -193,7 +193,6 @@ public class SearchServletXml extends SearchBaseXml
         catch(java.lang.Exception ex)
         {
             PrintWriter out = response.getWriter();
-            out.println();
             out.println(ExceptionFormat.toXml(ex));
             out.close();
             return;
