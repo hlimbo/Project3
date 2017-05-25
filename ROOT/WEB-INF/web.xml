@@ -79,6 +79,16 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>DisplayBox</servlet-name>
+    <servlet-class>gamesite.servlet.DisplayBoxServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>DisplayBox</servlet-name>
+    <url-pattern>/dbox/query</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>LoginFormServlet</servlet-name>
     <servlet-class>gamesite.servlet.LoginPageServlet</servlet-class>
   </servlet>

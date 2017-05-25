@@ -88,21 +88,8 @@ public class DisplayBoxServlet extends HttpServlet
             String column = "id";
             column=column.replaceAll("[^\\w]","_");
             String columnValue= (String) request.getParameter(column);
-            if (table==null) {
-                table="games";
-            }
             String offset="0";
-            if (offset==null) {
-                offset="0";
-            } else {
-                offset = offset.replaceAll("[\\D]","");
-            }
-            try {
-                //request.setAttribute("displayOffset",Integer.parseInt(offset));
-            } catch (NumberFormatException ex) {
-                //request.setAttribute("displayOffset",-1);
-            }
-            String limit = 1;
+            String limit = "1";
             Integer limitMax = 50;
             if (limit==null) {
                 limit=limitMax.toString();
@@ -120,10 +107,8 @@ public class DisplayBoxServlet extends HttpServlet
                     lim=1;
                 }
                 limit = lim.toString();
-                //request.setAttribute("displayLimit",lim);
             } catch (NumberFormatException ex) {
                 limit = limitMax.toString();
-                //request.setAttribute("displayLimit",limitMax);
             }
 
             String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
@@ -342,6 +327,9 @@ public class DisplayBoxServlet extends HttpServlet
             rs.close();
             dbcon.close();
 
+            PrintWriter out = response.getWriter();
+            out.println(results);
+            out.close();
             //request.setAttribute("displayResults",results);
             //RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP); 
             //dispatcher.forward(request,response);
