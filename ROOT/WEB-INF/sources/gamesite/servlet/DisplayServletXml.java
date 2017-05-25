@@ -28,7 +28,7 @@ public class DisplayServletXml extends HttpServlet
             String fieldUrl = XmlFormat.escapeXml("/display/query?table="+table+
                 "&columnName="+column+"&"+column+"="+
                 URLEncoder.encode(fieldValue,"UTF-8"));
-            return("<field>"+column+": <a><href>"+fieldUrl+"</href><atext>"+fieldValue+"</atext></a></field>");
+            return("<field><column>"+column+"</column><a><href>"+fieldUrl+"</href><atext>"+fieldValue+"</atext></a></field>");
         } else if (images.containsKey(column) && images.get(column)){
             if (fieldValue.startsWith("/art")) {
                 return ("<field><img>"+fieldValue+"</img></field>");
@@ -222,7 +222,8 @@ public class DisplayServletXml extends HttpServlet
                 //publishers and games within its name
                 if (tbl.indexOf(table) != -1 && tbl.trim().compareToIgnoreCase(table.trim()) != 0) {
                     //results+="<table>";
-                    results+="<field>"+tbl.trim().replace("_of_","").replace(table,"")+":</field>";
+                    results += "<entity>";
+                    results+="<table>"+tbl.trim().replace("_of_","").replace(table,"")+"</table>";
                     if (table.compareToIgnoreCase("games")!=0 && tbl.indexOf("games") != -1) {
                         query="SELECT DISTINCT * FROM "+tbl+" WHERE "
                             +tableIDCond;
@@ -240,12 +241,10 @@ public class DisplayServletXml extends HttpServlet
                     }
                     statement=dbcon.prepareStatement(query);
                     rs = statement.executeQuery();
-                    results += "<entity>";
-                    /*results+="<count>";
+                    results+="<gameCount>";
                     results+=gameCount;
-                    results+="</count>";*/
+                    results+="</gameCount>";
                     ArrayList<String> fields = new ArrayList<String>();
-                    //ArrayList<String> checkouts = new ArrayList<String>();
 
                     int row = 0;
                     while (rs.next()) {
@@ -280,26 +279,12 @@ public class DisplayServletXml extends HttpServlet
                                         if (fieldValue == null) {
                                             continue;
                                         }
-                                        //if (fieldIgnores.containsKey(parentColumn) && fieldIgnores.get(parentColumn)
-                                        //        && (parentTable.compareToIgnoreCase("games") != 0 || parentColumn.compareToIgnoreCase("id") != 0)) {
-                                        //    continue;
-                                        //} else if (links.containsKey(parentColumn) && links.get(parentColumn)) {
-                                        //    String fieldUrl = "/display/query?table="+parentTable+
-                                        //        "&columnName="+parentColumn+"&"+parentColumn+"="+
-                                        //        URLEncoder.encode(fieldValue,"UTF-8");
-                                        //    fieldValue="<field>"+parentColumn+": <a href=\""+fieldUrl+"\">"+fieldValue+"</a></field>";
-                                        //} else {
-                                        //    fieldValue="<field>"+parentColumn+": "+fieldValue+"</field>";
-                                        //}
                                         if (fields.size() > row) {
                                             fields.set(row,fields.get(row)+fieldValue);
                                         } else {
                                             fields.add(row,fieldValue);
                                         }
                                     }
-                                    //if (parentTable.trim().compareToIgnoreCase("games")==0) {
-                                        //fields.set(row,fields.get(row));
-                                    //}
                                 }
                                 parentResult.close();
                                 parentStatement.close();
@@ -319,20 +304,10 @@ public class DisplayServletXml extends HttpServlet
             statement.close();
             rs.close();
             dbcon.close();
-            /*String nextJSP = request.getParameter("nextPage");
-            if (nextJSP == null) {
-                nextJSP = "/display/index.jsp";
-            } else {
-                nextJSP="/"+nextJSP;
-            }*/
 
             PrintWriter out = response.getWriter();
             out.println(results);
             out.close();
-
-            //request.setAttribute("displayResults",results);
-            //RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP); 
-            //dispatcher.forward(request,response);
 
         }
         catch (SQLException ex) {
