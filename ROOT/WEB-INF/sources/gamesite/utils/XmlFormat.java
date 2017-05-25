@@ -26,4 +26,11 @@ public class XmlFormat {
         writer.println(xmlRows(row, rowClass, columnClass));
     }
 
+    public static String escapeXml (String xml) {
+        //xml = xml.replaceAll("=","&#61;");
+        xml = xml.replaceAll("<","&lt;");
+        xml = xml.replaceAll(">","&gt;");
+        xml = xml.replaceAll("&","&amp;");
+        return xml;
+    }
 }

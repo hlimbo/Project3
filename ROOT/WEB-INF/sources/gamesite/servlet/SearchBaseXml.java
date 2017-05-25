@@ -26,31 +26,31 @@ public abstract class SearchBaseXml extends HttpServlet {
         }
 		resString+=" <field class=\""+table+"_"+colName+"\">";
         if (value==null || value.trim().compareTo("") == 0) {
-            if (images.containsKey(colName) && images.get(colName)){
+            /*if (images.containsKey(colName) && images.get(colName)){
                 resString+="<img>"
                     +"http://upload.wikimedia.org/wikipedia/"
                     +"commons/thumb/5/51/"
                     +"Star_full.svg/11px-Star_full.svg.png</img>";
-            }
+            }*/
 		    resString+="</field> ";
             return resString;
         }
         if  (link.containsKey(colName) && link.get(colName)) {
             try {
-		        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
-                    "&"+colName+"="+URLEncoder.encode(value,"UTF-8")+"\">";
+		        resString+="<a><href>"+XmlFormat.escapeXml("/display/query?table="+table+"&columnName="+colName+
+                    "&"+colName+"="+URLEncoder.encode(value,"UTF-8"))+"</href>";
             } catch (UnsupportedEncodingException error) {
-		        resString+="<a href=\"/display/query?table="+table+"&columnName="+colName+
-                    "&"+colName+"="+value.replaceAll("[^\\w]","_")+"\">";
+		        resString+="<a><href>"+XmlFormat.escapeXml("/display/query?table="+table+"&columnName="+colName+
+                    "&"+colName+"="+value.replaceAll("[^\\w]","_"))+"</href>";
             }
-            resString+=value;
+            resString+=XmlFormat.escapeXml(value);
             resString+="</a>";
         } else if  (externalLinks.containsKey(colName) && externalLinks.get(colName)) {
-		    resString+="<a href=\"http://"+value+"\">"+value+"</a>";
+		    resString+="<a><href>http://"+XmlFormat.escapeXml(value)+"\">"+XmlFormat.escapeXml(value)+"</a>";
         } else if (images.containsKey(colName) && images.get(colName)){
-            resString+="<img>http://"+value+"</img>";
+            resString+="<img>http://"+XmlFormat.escapeXml(value)+"</img>";
         } else {
-            resString+=value;
+            resString+=XmlFormat.escapeXml(value);
         }
 		resString+="</field> ";
         return resString;
