@@ -88,9 +88,13 @@ public class SearchServletXml extends SearchBaseXml
             }
 
             String matchParameter = (String) request.getParameter("match");
-            boolean useSubMatch = true;
-            if (matchParameter != null && matchParameter.toLowerCase().trim().equals("true")) {
-                useSubMatch = false;
+            int useSubMatch = 2;
+            if (matchParameter != null) { //&& matchParameter.toLowerCase().trim().equals("true")) {
+                try {
+                    useSubMatch = Integer.parseInt(matchParameter);
+                } catch (NumberFormatException ex) {
+                    useSubMatch = 2;
+                }
             }
 
             //column configurations
@@ -135,11 +139,16 @@ public class SearchServletXml extends SearchBaseXml
             int searchCount=-1;
             if (table.equals("games")) {
                 NTreeNode<Table> rows=null;
-                if (useSubMatch) {
+                if (useSubMatch==1) {
                     rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,1);
                     searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,1);
+                } else if (useSubMatch==3) {
+                    rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,3);
+                    searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,3);
                 } else {
                     rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,2);
@@ -150,11 +159,16 @@ public class SearchServletXml extends SearchBaseXml
                 results+=ntreeToHtml(rows,request,null,links,images,externalLinks,ignores)+"\n";
             } else {
                 ArrayList<HashMap<String,String>> rows=null;
-                if (useSubMatch) {
+                if (useSubMatch==1) {
                     rows = SearchResults.getInstance().search(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,1);
                     searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,1);
+                } else if (useSubMatch==3) {
+                    rows = SearchResults.getInstance().search(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,3);
+                    searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,3);
                 } else {
                     rows = SearchResults.getInstance().search(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,2);
