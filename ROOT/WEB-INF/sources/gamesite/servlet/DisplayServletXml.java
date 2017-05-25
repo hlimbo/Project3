@@ -36,9 +36,9 @@ public class DisplayServletXml extends HttpServlet
                 return ("<field><img>http://"+fieldValue+"</img></field>");
             }
         } else if (externalLinks.containsKey(column) && externalLinks.get(column)) {
-            return("<field>"+column+": <a><href>http://"+fieldValue+"</href><atext>"+fieldValue+"</atext></a></field>");
+            return("<field><column>"+column+"</column><value><a><href>http://"+fieldValue+"</href><atext>"+fieldValue+"</atext></a></value></field>");
         }else {
-            return ("<field>"+column+": "+fieldValue+"</field>");
+            return ("<field><column>"+column+"</column><value>"+fieldValue+"</value></field>");
         }
     }
 
@@ -183,7 +183,7 @@ public class DisplayServletXml extends HttpServlet
             statement=dbcon.prepareStatement(query);
             rs = statement.executeQuery();
             while (rs.next()) {
-                results+="<row><field>";
+                results+="<row>";
                 ResultSetMetaData meta = rs.getMetaData();
                 for (int i=1;i<=meta.getColumnCount();++i) {
                     String columnName = meta.getColumnName(i);
@@ -208,12 +208,12 @@ public class DisplayServletXml extends HttpServlet
                     }
                     if (i==1) {
                         //fieldValue=fieldValue.substring(4,fieldValue.length()-5);
-                        results+=fieldValue+"</field><field><entity>";
+                        results+=fieldValue;
                     } else {
                         results+=fieldValue;
                     }
                 }
-                results+="</field></row></display>\n";
+                results+="</row>\n"; //</display>\n";
             }
             int gameCount = -1;
             for (String tbl : tables) {
@@ -221,7 +221,7 @@ public class DisplayServletXml extends HttpServlet
                 //of entity tables. For example, publishers_of_games contains both
                 //publishers and games within its name
                 if (tbl.indexOf(table) != -1 && tbl.trim().compareToIgnoreCase(table.trim()) != 0) {
-                    results+="<row>";
+                    //results+="<table>";
                     results+="<field>"+tbl.trim().replace("_of_","").replace(table,"")+":</field>";
                     if (table.compareToIgnoreCase("games")!=0 && tbl.indexOf("games") != -1) {
                         query="SELECT DISTINCT * FROM "+tbl+" WHERE "
@@ -240,10 +240,10 @@ public class DisplayServletXml extends HttpServlet
                     }
                     statement=dbcon.prepareStatement(query);
                     rs = statement.executeQuery();
-                    results += "<field><entity>";
-                    results+="<count>";
+                    results += "<entity>";
+                    /*results+="<count>";
                     results+=gameCount;
-                    results+="</count>";
+                    results+="</count>";*/
                     ArrayList<String> fields = new ArrayList<String>();
                     //ArrayList<String> checkouts = new ArrayList<String>();
 
@@ -309,13 +309,9 @@ public class DisplayServletXml extends HttpServlet
                     }
                     for (int i=0;i<fields.size();++i) {
                         results+="<row>"+fields.get(i);
-                        /*if (table.compareToIgnoreCase("games") != 0) {
-                            results+=checkouts.get(i);
-                        }*/
                         results+="</row>\n";
                     }
-                    results += "</field></entity>";
-                    results+="</row>\n";
+                    results += "</entity>\n";
                 }
             }
             results+="</display>";
@@ -341,20 +337,12 @@ public class DisplayServletXml extends HttpServlet
         }
         catch (SQLException ex) {
             PrintWriter out = response.getWriter();
-            out.println("<HTML>" +
-                    "<HEAD><TITLE>" +
-                    "gamedb: Error" +
-                    "</TITLE></HEAD>\n<BODY>" +
-                    "<P>Error in SQL: ");
-            while (ex != null) {
-                out.println ("SQL Exception:  " + ex.getMessage ());
-                ex = ex.getNextException ();
-            }  // end while
+            out.println(SQLExceptionFormat.toXml(ex));
             out.close();
         }  // end catch SQLException
         catch (UnsupportedEncodingException ex) {
             PrintWriter out = response.getWriter();
-            out.println(SQLExceptionFormat.toXml(ex));
+            out.println(ExceptionFormat.toXml(ex));
             out.close();
             return;
         }
