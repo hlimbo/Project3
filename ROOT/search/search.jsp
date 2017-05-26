@@ -127,7 +127,7 @@ Search
             //name : encodeURIComponent(typed.trim()).replace("%20","+"),
             name : typed.trim(),
             limit : 10,
-            match : 1},
+            match : 3},
             success: function (data) {
                 xmlDoc = $.parseXML(data);
                 xmlDoc = $(data);
@@ -146,8 +146,22 @@ Search
                    //alert(null);
                 }
                 $('#gameNameField').autocomplete({
-                    source: query
-                });
+                    //source: query
+                    source : function (ev,ui) {
+                        var parts = ev.term.split(" ");
+                        var partialMatches = [];
+                        for (i=0;i<parts.length;++i) {
+                            partialMatches.push(new RegExp($.ui.autocomplete.escapeRegex(parts[i], "i")));
+                        }
+                        ui($.grep(query, function (search){
+                             for (i=0;i<partialMatches.length;++i) {
+                                if (!partialMatches[i].test(search)) {
+                                    return false;
+                                }
+                             }
+                             return true;
+                             }));
+                }});
             },
             failure : function (data) {
                 alert("AJAX request failed!");
