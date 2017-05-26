@@ -114,13 +114,20 @@ Search
     var query = ["test1","test2","test3"];
     $('#gameNameField').keydown(function (ev){
         //var letter = ev.which;
-        typed = $('#gameNameField').val();
+        //avoid ASCII control characters
+        if (ev.which >= 32) {
+            typed = $('#gameNameField').val()+String.fromCharCode(ev.which);
+        } else {
+            typed = $('#gameNameField').val();
+        }
         $.ajax({ 
             url : "/search/xquery",
+            //data : "name="+encodeURIComponent(typed)+"&limit=10&match=3",
             data : {
-            name : typed,
-            limit : 5,
-            match : 3},
+            //name : encodeURIComponent(typed.trim()).replace("%20","+"),
+            name : typed.trim(),
+            limit : 10,
+            match : 1},
             success: function (data) {
                 xmlDoc = $.parseXML(data);
                 xmlDoc = $(data);
