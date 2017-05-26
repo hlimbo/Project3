@@ -119,6 +119,9 @@ Search
             typed = $('#gameNameField').val()+String.fromCharCode(ev.which);
         } else {
             typed = $('#gameNameField').val();
+            if (ev.which==8) {
+                typed=typed.substring(0,typed.length-1);
+            }
         }
         $.ajax({ 
             url : "/search/xquery",
@@ -154,11 +157,11 @@ Search
                             partialMatches.push(new RegExp($.ui.autocomplete.escapeRegex(parts[i], "i")));
                         }
                         ui($.grep(query, function (search){
-                             for (i=0;i<partialMatches.length;++i) {
+                             /*for (i=0;i<partialMatches.length;++i) {
                                 if (!partialMatches[i].test(search)) {
                                     return false;
                                 }
-                             }
+                             }*/
                              return true;
                              }));
                 }});

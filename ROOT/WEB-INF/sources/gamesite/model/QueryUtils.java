@@ -62,12 +62,12 @@ public class QueryUtils {
                     }
                 } else if (useSubMatch==3) {
                     String[] subvalues = value.split(" ");
-                    for (int subvalue=0;subvalue<subvalues.length;++subvalue) {
+                    for (int subvalue=0;subvalue<subvalues.length-1;++subvalue) {
                         searchTerm+=" AND ";
                         searchTerm+=term+" LIKE ?";
                     }
-                    /*searchTerm+=" AND ";
-                    searchTerm+=term+" RLIKE ?";*/
+                    searchTerm+=" AND ";
+                    searchTerm+="("+term+" LIKE ? OR "+term+" LIKE ?)";
                 } else if (useSubMatch==2) {
                     searchTerm+=" AND ";
                     searchTerm+=term+" LIKE ?";
@@ -91,19 +91,17 @@ public class QueryUtils {
                     }
                 } else if (useSubMatch==3) {
                     String[] subvalues = value.split(" ");
-                    if (subvalues.length==1) {
-                        statement.setString(offset,subvalues[subvalues.length-1]+"%");
-                        offset+=1;
-                    } else {
-                        //full search for all words except last word
-                        for (int subvalue=0;subvalue<subvalues.length-1;++subvalue) {
-                            statement.setString(offset,"%"+subvalues[subvalue]+"%");
-                            offset+=1;
-                        }
-                        //treat last word as a prefix
-                        statement.setString(offset,"% "+subvalues[subvalues.length-1]+"%");
+                    //full search for all words except last word
+                    for (int subvalue=0;subvalue<subvalues.length-1;++subvalue) {
+                        statement.setString(offset,"%"+subvalues[subvalue]+"%");
                         offset+=1;
                     }
+                    //treat last word as a prefix
+                    //statement.setString(offset,"%^+"+subvalues[subvalues.length-1]+"%");
+                    statement.setString(offset,subvalues[subvalues.length-1]+"%");
+                    offset+=1;
+                    statement.setString(offset,"% "+subvalues[subvalues.length-1]+"%");
+                    offset+=1;
                 } else {
                     statement.setString(offset,value);
                     offset+=1;
