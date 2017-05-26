@@ -123,7 +123,6 @@ Search
             success: function (data) {
                 xmlDoc = $.parseXML(data);
                 xmlDoc = $(data);
-                alert (null);
                 delete query;
                 query = [];
                 if (xmlDoc != null) {
@@ -142,6 +141,9 @@ Search
                     source: query
                 });
             },
+            failure : function (data) {
+                alert("AJAX request failed!");
+            }
         });
     });
 </script>

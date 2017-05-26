@@ -24,7 +24,7 @@ public class SearchServletXml extends SearchBaseXml
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException
     {
-        response.setContentType("text/xml");    // Response mime type
+        //response.setContentType("text/xml");    // Response mime type
 
         try
         {
