@@ -114,11 +114,12 @@ Search
     var query = ["test1","test2","test3"];
     $('#gameNameField').keydown(function (ev){
         //var letter = ev.which;
-        var typed = $('#gameNameField').text();
+        typed = $('#gameNameField').val();
         $.ajax({ 
             url : "/search/xquery",
             data : {
             name : typed,
+            limit : 5,
             match : 3},
             success: function (data) {
                 xmlDoc = $.parseXML(data);
