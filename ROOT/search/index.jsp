@@ -21,6 +21,7 @@ limitations under the License.
         <meta charset="UTF-8" />
         <title>Search</title>
         <link href="/tomcat.css" rel="stylesheet" type="text/css" />
+        <jsp:include page="/jqueryIncludes.jsp" />
     </head>
     <body>
         <jsp:include page="/headerLinks.jsp" />

@@ -148,7 +148,7 @@ public class DisplayBoxServlet extends HttpServlet
             String results = ""; //"<TABLE border>";
             //Sets which fields to not display to client. Configuration option
             Hashtable<String,Boolean> fieldIgnores = new Hashtable<String,Boolean>();
-            //fieldIgnores.put("id",true);
+            fieldIgnores.put("id",true);
             fieldIgnores.put("platform_id",true);
             fieldIgnores.put("game_id",true);
             fieldIgnores.put("genre_id",true);
@@ -202,7 +202,7 @@ public class DisplayBoxServlet extends HttpServlet
                         continue;
                     }
                     if (i==1) {
-                        fieldValue=fieldValue.substring(4,fieldValue.length()-5);
+                        //fieldValue=fieldValue.substring(4,fieldValue.length()-5);
                         results+=fieldValue+"</span><span>"; //<TABLE border>";
                     } else {
                         results+=fieldValue;

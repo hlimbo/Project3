@@ -35,6 +35,7 @@
         <input type="SUBMIT" value="Reverse Sort Order" />
     </form>
     <%= (String) request.getAttribute("searchResults") %>
+    <%-- TODO: Add javascript pop-up window to searchResults game names --%>
     <%  if (((String)request.getAttribute("searchResults")).trim().compareTo("")==0) {
     %>  <p> No Search Results </p> <%
     } %>
@@ -99,16 +100,23 @@
 <% } else { %>
 Search
 <form action="/search/query" method="GET">
-    title: <input type="TEXT" name="name" /> <BR />
-    year: <input type="TEXT" name="year" /> <BR />
+    title: <input id="gameNameField" type="TEXT" name="name" /> <BR />
+<%--    year: <input type="TEXT" name="year" /> <BR />
     genre: <input type="TEXT" name="genre" /> <BR />
     platform: <input type="TEXT" name="platform" /> <BR />
     publisher: <input type="TEXT" name="publisher" /> <BR />
     results per page (max 50): <input type="text" name="limit" /> <BR />
     exact search?: <input type="checkbox" name="match" value="true" /> <BR />
-    <input type="HIDDEN" name="forward" <%= "value="+request.getRequestURI() %> />
+    <input type="HIDDEN" name="forward" <%= "value="+request.getRequestURI() %> /> --%>
     <center>
         <input type="SUBMIT" value="Search" />
     </center>
 </form>
+<script>
+    var query = ["test1","test2","test3"];
+    $('#gameNameField').autocomplete({
+        source: query
+    });
+</script>
+
 <% } %>
