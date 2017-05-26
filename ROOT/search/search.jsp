@@ -100,7 +100,7 @@
 <% } else { %>
 Search
 <form action="/search/query" method="GET">
-    title: <input id="gameNameField" type="TEXT" name="name" /> <BR />
+    title: <input id="gameNameField" type="TEXT" name="name" />
 <%--    year: <input type="TEXT" name="year" /> <BR />
     genre: <input type="TEXT" name="genre" /> <BR />
     platform: <input type="TEXT" name="platform" /> <BR />
@@ -108,14 +108,41 @@ Search
     results per page (max 50): <input type="text" name="limit" /> <BR />
     exact search?: <input type="checkbox" name="match" value="true" /> <BR />
     <input type="HIDDEN" name="forward" <%= "value="+request.getRequestURI() %> /> --%>
-    <center>
         <input type="SUBMIT" value="Search" />
-    </center>
 </form>
 <script>
     var query = ["test1","test2","test3"];
-    $('#gameNameField').autocomplete({
-        source: query
+    $('#gameNameField').keydown(function (ev){
+        //var letter = ev.which;
+        var typed = $('#gameNameField').text();
+        $.ajax({ 
+            url : "/search/xquery",
+            data : {
+            name : typed,
+            match : 3},
+            success: function (data) {
+                xmlDoc = $.parseXML(data);
+                xmlDoc = $(data);
+                alert (null);
+                delete query;
+                query = [];
+                if (xmlDoc != null) {
+                   $xml = $(xmlDoc);
+                   names = $xml.find('.games_name');
+                   for (i=0;i<names.length;++i) {
+                       texts=names.eq(i).find('atext');
+                       for (j=0;j<texts.length;++j) {
+                         query.push(texts.eq(j).text());
+                       }
+                   }
+                } else {
+                   //alert(null);
+                }
+                $('#gameNameField').autocomplete({
+                    source: query
+                });
+            },
+        });
     });
 </script>
 

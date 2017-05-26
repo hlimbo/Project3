@@ -14,7 +14,7 @@ import gamesite.model.*;
 import gamesite.servlet.SearchBase;
 
 public abstract class SearchBaseXml extends HttpServlet {
-    public static String xmlHeader="<?xml version=\"1.0\" encoding=\"UTF-8\"?><search_results>";
+    public static String xmlHeader="<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<search_results>";
     public static String xmlFooter="</search_results>";
 
 	protected static String fieldValue (String colName, String value, String table,
