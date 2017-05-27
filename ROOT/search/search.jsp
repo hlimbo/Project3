@@ -97,9 +97,12 @@
         } else { %>
     <% } %>
 <%-- default is to ask for the search--%>
-<div id="hidden" hidden="hidden">testing</div>
+<div id="hidden" hidden="hidden"></div>
 <script>
 $('.games_name').hover(function(ev,ui){
+        $('#hidden').empty();
+        var id = $(this).parent().find('.games_id').text();
+        $('#hidden').load("/dbox/query?id="+id);
         $('#hidden').dialog({
             position: {my: "left top",
             at: "left bottom",
