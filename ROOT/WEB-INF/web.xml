@@ -100,6 +100,17 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>LoginXml</servlet-name>
+    <servlet-class>gamesite.servlet.LoginServletXml</servlet-class>
+  </servlet>
+
+
+  <servlet-mapping>
+    <servlet-name>LoginXml</servlet-name>
+    <url-pattern>/servlet/xlogin</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>ShoppingCartServlet</servlet-name>
     <servlet-class>gamesite.servlet.ShoppingCartServlet</servlet-class>
   </servlet>
