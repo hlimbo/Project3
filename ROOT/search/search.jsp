@@ -106,7 +106,8 @@ $('.games_name').hover(function(ev,ui){
         $('#hidden').dialog({
             position: {my: "left top",
             at: "left bottom",
-            of: $(this)}});
+            of: $(this)},
+            maxHeight:300});
     },
     function(ev,ui){});
 </script>
