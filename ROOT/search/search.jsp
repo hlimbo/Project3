@@ -34,8 +34,8 @@
         <% } %>
         <input type="SUBMIT" value="Reverse Sort Order" />
     </form>
-    <%= (String) request.getAttribute("searchResults") %>
     <%-- TODO: Add javascript pop-up window to searchResults game names --%>
+    <%= (String) request.getAttribute("searchResults")  %>
     <%  if (((String)request.getAttribute("searchResults")).trim().compareTo("")==0) {
     %>  <p> No Search Results </p> <%
     } %>
@@ -97,6 +97,16 @@
         } else { %>
     <% } %>
 <%-- default is to ask for the search--%>
+<div id="hidden" hidden="hidden">testing</div>
+<script>
+$('.games_name').hover(function(ev,ui){
+        $('#hidden').dialog({
+            position: {my: "left top",
+            at: "left bottom",
+            of: $(this)}});
+    },
+    function(ev,ui){});
+</script>
 <% } else { %>
 Search
 <form action="/search/query" method="GET">
@@ -145,26 +155,15 @@ Search
                          query.push(texts.eq(j).text());
                        }
                    }
-                } else {
-                   //alert(null);
                 }
-                $('#gameNameField').autocomplete({
+                //alert(query);
+                var complete = $('#gameNameField').autocomplete({
                     //source: query
                     source : function (ev,ui) {
-                        var parts = ev.term.split(" ");
-                        var partialMatches = [];
-                        for (i=0;i<parts.length;++i) {
-                            partialMatches.push(new RegExp($.ui.autocomplete.escapeRegex(parts[i], "i")));
-                        }
-                        ui($.grep(query, function (search){
-                             /*for (i=0;i<partialMatches.length;++i) {
-                                if (!partialMatches[i].test(search)) {
-                                    return false;
-                                }
-                             }*/
-                             return true;
-                             }));
-                }});
+                        ui(query);
+                    }
+                });
+                $('#gameNameField').autocomplete("search",typed.trim());
             },
             failure : function (data) {
                 alert("AJAX request failed!");
