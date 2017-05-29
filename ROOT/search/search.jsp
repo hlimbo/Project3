@@ -1,5 +1,15 @@
 <%@ page import="java.net.*" %>
 <%@ page import="java.io.*" %>
+
+<style>
+    .games_row {
+        display: inline-block;
+        border-size:2px;
+        border-style: solid;
+        border-color: black;
+    }
+</style>
+
 <%-- Show results--%>
 <% if (request.getAttribute("searchResults") != null) { %>
     <form action="/search/query" method="GET">
@@ -36,6 +46,7 @@
     </form>
     <%-- TODO: Add javascript pop-up window to searchResults game names --%>
     <%= (String) request.getAttribute("searchResults")  %>
+    <br />
     <%  if (((String)request.getAttribute("searchResults")).trim().compareTo("")==0) {
     %>  <p> No Search Results </p> <%
     } %>
