@@ -63,7 +63,7 @@ public class LoginServletXml extends HttpServlet {
             } else if (params.containsKey("password")) {
                 writeFailure(writer,"-2","Email required as a parameter");
             } else {
-                writeFailure(writer,"-2","Parameters email and password required");
+                writeFailure(writer,"-2","Email and password required");
             }
 
 		
