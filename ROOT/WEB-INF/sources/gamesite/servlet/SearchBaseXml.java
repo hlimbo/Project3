@@ -24,7 +24,7 @@ public abstract class SearchBaseXml extends HttpServlet {
         if (ignores.containsKey(colName) && ignores.get(colName)) {
             return "";
         }
-		resString+=" <field class=\""+table+"_"+colName+"\">";
+		resString+="<field class=\""+table+"_"+colName+"\">";
         if (value==null || value.trim().compareTo("") == 0) {
             /*if (images.containsKey(colName) && images.get(colName)){
                 resString+="<img>"
@@ -32,7 +32,7 @@ public abstract class SearchBaseXml extends HttpServlet {
                     +"commons/thumb/5/51/"
                     +"Star_full.svg/11px-Star_full.svg.png</img>";
             }*/
-		    resString+="</field> ";
+		    resString+="</field>";
             return resString;
         }
         if  (link.containsKey(colName) && link.get(colName)) {
@@ -52,7 +52,7 @@ public abstract class SearchBaseXml extends HttpServlet {
         } else {
             resString+=XmlFormat.escapeXml(value);
         }
-		resString+="</field> ";
+		resString+="</field>";
         return resString;
 	}
 

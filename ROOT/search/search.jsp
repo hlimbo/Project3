@@ -1,9 +1,20 @@
 <%@ page import="java.net.*" %>
 <%@ page import="java.io.*" %>
+
+<style>
+    .games_row {
+        display: inline-block;
+        border-size:2px;
+        border-style: solid;
+        border-color: black;
+    }
+</style>
+
 <%-- Show results--%>
 <% if (request.getAttribute("searchResults") != null) { %>
     <form action="/search/query" method="GET">
     <%        boolean descend = false;
+          String lim = "50";
           if (request.getQueryString() != null) {
             String descendQuery = request.getQueryString();
             if (request.getParameter("descend")!=null
@@ -13,7 +24,8 @@
             }
             if (descendQuery != null) {
                 for (String param : descendQuery.split("&")) {
-					 if( param.split("=").length > 1 && param.split("=")[0].trim().compareToIgnoreCase("descend")!=0) { 
+					 if( param.split("=").length > 1 && param.split("=")[0].trim().compareToIgnoreCase("descend")!=0
+                     && param.split("=")[0].trim().compareToIgnoreCase("limit")!=0) { 
 				        String parsedValue = "name=\'" + param.split("=")[0] + "\'" + " value=\'"; 
 					    try {
                             String decodedValue = URLDecoder.decode(param.split("=")[1], "UTF-8");
@@ -22,20 +34,37 @@
 					<% } catch (UnsupportedEncodingException e) { 
 						e.printStackTrace(); 
 					   } 
-					 } 
+                       } else if (param.split("=").length > 1 && param.split("=")[0].trim().compareToIgnoreCase("limit")==0) { 
+                        try {
+                            Integer limInt = Integer.parseInt(param.split("=")[1].trim());
+                            if (limInt < 50) {
+                                if (limInt == 0) {
+                                    lim = "1";
+                                } else if (limInt > 0) {
+                                    lim = limInt.toString();
+                                } else {
+                                    lim = ((Integer)(-limInt)).toString();
+                                }
+                            }
+                        } catch (NumberFormatException ex) {}
+                     }
                 }
             }
           } 
           %>
         <% if (descend==true) { %> 
-            <input type="hidden" name="descend" value="false" />
+            Reverse Order? <input type="checkbox" name="descend" value="true" checked="checked" /> <br />
         <% } else { %>
-            <input type="hidden" name="descend" value="true" />
+            Reverse Order? <input type="checkbox" name="descend" value="true" /> <br />
         <% } %>
-        <input type="SUBMIT" value="Reverse Sort Order" />
+        <%-- input type="checkbox" value="Reverse Sort?" /> <br / --%>
+        results per page (max 50): <input type="text" name="limit" value<%= "=\""+lim+"\""%> /> <br />
+        <input type="submit" value="Reorder Search" />
+</form>
     </form>
     <%-- TODO: Add javascript pop-up window to searchResults game names --%>
     <%= (String) request.getAttribute("searchResults")  %>
+    <br />
     <%  if (((String)request.getAttribute("searchResults")).trim().compareTo("")==0) {
     %>  <p> No Search Results </p> <%
     } %>
