@@ -28,7 +28,7 @@
   </description>
 
   <!-- for HTTPS ONLY -->
-	<security-constraint>
+<!--	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>HTTPSOnly</web-resource-name>
 			<url-pattern>/*</url-pattern>
@@ -37,7 +37,7 @@
 			<transport-guarantee>CONFIDENTIAL</transport-guarantee>
 		</user-data-constraint>
 	</security-constraint>
-
+-->
   <servlet>
     <servlet-name>Search</servlet-name>
     <servlet-class>gamesite.servlet.SearchServlet</servlet-class>

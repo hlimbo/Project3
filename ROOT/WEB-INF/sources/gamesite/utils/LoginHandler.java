@@ -24,6 +24,10 @@ public class LoginHandler {
             email=email.trim();
             String password= params.get("password");
             ResultSet rs = SQLQuery.getLogin(conn,email,password,table);
+
+		System.out.println("Email: " + email);
+		System.out.println("Password: " + password);
+
             boolean exists = rs.next();
             if (exists) {
 			    HttpSession session = request.getSession();
