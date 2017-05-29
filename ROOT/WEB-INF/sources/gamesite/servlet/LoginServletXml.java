@@ -39,10 +39,11 @@ public class LoginServletXml extends HttpServlet {
         PrintWriter writer = null;
         try {
             writer = response.getWriter();
-            if (params.containsKey("email") && params.containsKey("password")) {
+            writer.println(xmlHeader);
+		if (params.containsKey("email") && params.containsKey("password")) {
                 //writer = response.getWriter();
 		        int login = LoginHandler.loginNoCaptcha(request,response,"customers");
-                writer.println(xmlHeader);
+              //  writer.println(xmlHeader);
                 switch (login) {
                     case 1:
                         writeSuccess(writer);
@@ -56,7 +57,7 @@ public class LoginServletXml extends HttpServlet {
                         writeFailure(writer,"-2","Invalid email or password");
                         break;
                 }
-                writer.println(xmlFooter);
+               // writer.println(xmlFooter);
             } else if (params.containsKey("email")) {
                 writeFailure(writer,"-2","Password required as a parameter");
             } else if (params.containsKey("password")) {
@@ -64,6 +65,9 @@ public class LoginServletXml extends HttpServlet {
             } else {
                 writeFailure(writer,"-2","Parameters email and password required");
             }
+
+		
+		writer.println(xmlFooter);
         } catch (SQLExceptionHandler ex) {
             writer.println(SQLExceptionFormat.toXml(ex));
         } catch (SQLException ex) {
