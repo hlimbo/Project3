@@ -61,7 +61,7 @@ WAR file.
 Access aws instance
 ------------------------------------------------------------
 At the time of this writing, the ip address and port of the
-aws instance is https://34.201.42.202:8443/
+aws instance is https://34.200.221.197:8443/
 
 Example customer and credit card for website demonstration
 ------------------------------------------------------------
@@ -70,6 +70,11 @@ For website login:
 
 email:   einti@ntag.edu 
 password: snZtoXfqs4Fpe0C9Op53
+
+Alternatively, an easier dummy user can be used for login
+
+email:   user@user.edu 
+password: password
 
 For confirmation of purchase:
 
