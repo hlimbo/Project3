@@ -101,3 +101,11 @@ XML Files
 ------------------------------------------------------------
 The XML files can be found in the newGames.zip file within
 the data folder
+
+SIMILIARTO UDF
+------------------------------------------------------------
+Install similiarto.so from the data/ folder into the
+mysql plugin folder. Typically, this would be at
+/usr/lib/mysql/plugin/libsimiliarto.so
+Afterwards, run the similiarto.sql file to load the
+SIMILIARTO function into mysql.
