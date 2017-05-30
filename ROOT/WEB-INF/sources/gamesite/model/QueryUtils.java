@@ -72,7 +72,7 @@ public class QueryUtils {
                     String[] subvalues = value.split(" ");
                     for (int subvalue=0;subvalue<subvalues.length;++subvalue) {
                         searchTerm+=" AND ";
-                        searchTerm+=term+" (LIKE ? OR "+term+" SIMILIARTO("+term+",?,"+leda+"))";
+                        searchTerm+="("+term+" LIKE ? OR SIMILIARTO("+term+",?,"+leda+"))";
                     }
                 } else if (useSubMatch==2) {
                     searchTerm+=" AND ";
