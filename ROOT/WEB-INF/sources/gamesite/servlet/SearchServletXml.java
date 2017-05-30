@@ -97,6 +97,31 @@ public class SearchServletXml extends SearchBaseXml
                 }
             }
 
+            String ledaStr = (String) request.getParameter("limit");
+            Integer ledaMax = 15;
+            Integer leda = 0;
+            results+="<leda>";
+            if (ledaStr==null) {
+                ledaStr=ledaMax.toString();
+            } else {
+                ledaStr = ledaStr.replaceAll("[\\D]","");
+            }
+            if (ledaStr.trim().compareTo("")==0) {
+                ledaStr="0";
+            }
+            try {
+                leda = Integer.parseInt(ledaStr);
+                if (leda > ledaMax) {
+                    leda=ledaMax;
+                } else if (leda < 1) {
+                    leda=0;
+                }
+                ledaStr = leda.toString();
+            } catch (NumberFormatException ex) {
+                ledaStr = "0";
+            }
+            results+=ledaStr+"</leda>\n";
+
             //column configurations
             Hashtable<String,Boolean> links = new Hashtable<String,Boolean>();
             links.put("name",true);
@@ -149,6 +174,11 @@ public class SearchServletXml extends SearchBaseXml
                         year,genre,platform,publisher,order,descend,3);
                     searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,3);
+                } else if (useSubMatch==4) {
+                    rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,4,leda);
+                    searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,4,leda);
                 } else {
                     rows = SearchResults.getInstance().masterSearch(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,2);
@@ -171,6 +201,11 @@ public class SearchServletXml extends SearchBaseXml
                         year,genre,platform,publisher,order,descend,3);
                     searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,3);
+                } else if (useSubMatch==4) {
+                    rows = SearchResults.getInstance().search(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,4,leda);
+                    searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
+                        year,genre,platform,publisher,order,descend,4,leda);
                 } else {
                     rows = SearchResults.getInstance().search(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,2);

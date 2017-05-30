@@ -52,7 +52,7 @@ public class QueryUtils {
         return row;
 	}
 
-    public static String addSearchTerm (String value, String term, int useSubMatch) {
+    public static String addSearchTerm (String value, String term, int useSubMatch, String leda) {
             String searchTerm = "";
             if (value != null && value.trim() != "") {
                 if (useSubMatch==1) {
@@ -68,6 +68,12 @@ public class QueryUtils {
                     }
                     searchTerm+=" AND ";
                     searchTerm+="("+term+" LIKE ? OR "+term+" LIKE ?)";
+                } else if (useSubMatch==4) {
+                    String[] subvalues = value.split(" ");
+                    for (int subvalue=0;subvalue<subvalues.length;++subvalue) {
+                        searchTerm+=" AND ";
+                        searchTerm+=term+" (LIKE ? OR "+term+" SIMILIARTO("+term+",?,"+leda+"))";
+                    }
                 } else if (useSubMatch==2) {
                     searchTerm+=" AND ";
                     searchTerm+=term+" LIKE ?";
@@ -102,6 +108,15 @@ public class QueryUtils {
                     offset+=1;
                     statement.setString(offset,"% "+subvalues[subvalues.length-1]+"%");
                     offset+=1;
+                } else if (useSubMatch==4) {
+                    for (String subvalue : value.split(" ")) {
+                        //LIKE parameter
+                        statement.setString(offset,"%"+subvalue+"%");
+                        offset+=1;
+                        //SIMILIARTO parameter
+                        statement.setString(offset,subvalue);
+                        offset+=1;
+                    }
                 } else {
                     statement.setString(offset,value);
                     offset+=1;

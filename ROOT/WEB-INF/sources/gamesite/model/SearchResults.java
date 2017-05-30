@@ -68,7 +68,7 @@ public class SearchResults {
     public static String buildQuery (String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher, 
             String order, boolean descend, 
-            int match) throws SQLException, java.lang.Exception {
+            int match, int leda) throws SQLException, java.lang.Exception {
         String query="";
         boolean searchAll = false;
         if ((game==null || game.trim().compareTo("")==0) && (year==null || year.trim().compareTo("")==0)
@@ -81,11 +81,11 @@ public class SearchResults {
             //duplicates due to games on multiple platforms, with multiple genres, or etc...
             query = "SELECT DISTINCT "+table+".* FROM games, publishers, platforms, genres, "+masterTable+" WHERE "
                 +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id AND genres.id=genre_id";
-            query+=QueryUtils.addSearchTerm(game,"name",match);
-            query+=QueryUtils.addSearchTerm(year,"year",match);
-            query+=QueryUtils.addSearchTerm(publisher,"publisher",match);
-            query+=QueryUtils.addSearchTerm(genre,"genre",match);
-            query+=QueryUtils.addSearchTerm(platform,"platform",match);
+            query+=QueryUtils.addSearchTerm(game,"name",match,Integer.toString(leda));
+            query+=QueryUtils.addSearchTerm(year,"year",match,Integer.toString(leda));
+            query+=QueryUtils.addSearchTerm(publisher,"publisher",match,Integer.toString(leda));
+            query+=QueryUtils.addSearchTerm(genre,"genre",match,Integer.toString(leda));
+            query+=QueryUtils.addSearchTerm(platform,"platform",match,Integer.toString(leda));
         } else {
             query = "SELECT "+table+".* FROM "+table;
         }
@@ -105,7 +105,13 @@ public class SearchResults {
     public ArrayList<HashMap<String,String>> search (String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher, String order, 
             boolean descend, int match) throws SQLExceptionHandler, java.lang.Exception {
-        String query = buildQuery(table,limit,offset,game,year,genre,platform,publisher,order,descend,match);
+        return search(table,limit,offset,game,year,genre,platform,publisher,order,descend,match,0);
+    }
+
+    public ArrayList<HashMap<String,String>> search (String table, String limit, String offset,
+            String game, String year, String genre, String platform, String publisher, String order, 
+            boolean descend, int match, int leda) throws SQLExceptionHandler, java.lang.Exception {
+        String query = buildQuery(table,limit,offset,game,year,genre,platform,publisher,order,descend,match,leda);
         if (descend) {
             query+=" ORDER BY ISNULL( "+table+"."+order+"), "+table+"."+order+" DESC, "
                 +table+".id LIMIT "+limit+" OFFSET "+offset;
@@ -289,11 +295,17 @@ public class SearchResults {
     public NTreeNode<Table> masterSearch (String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher, String order, 
             boolean descend, int match) throws SQLExceptionHandler, java.lang.Exception {
+        return masterSearch(table,limit,offset,game,year,genre,platform,publisher,order,descend,match,0);
+    }
+
+    public NTreeNode<Table> masterSearch (String table, String limit, String offset,
+            String game, String year, String genre, String platform, String publisher, String order, 
+            boolean descend, int match, int leda) throws SQLExceptionHandler, java.lang.Exception {
         NTreeNode<Table> root = new NTreeNode<Table>(new Table(table,"id"));
         ArrayList<HashMap<String,String>> rootTable;
         //if (table.equalsIgnoreCase("games")) {
             rootTable = search(table,limit,offset,game,
-                year,genre,platform,publisher,order,descend,match);
+                year,genre,platform,publisher,order,descend,match,leda);
         /*} else {
             rootTable = search(table,"18446744073709551615","0",game,
                 year,genre,platform,publisher,order,descend,match);
@@ -330,8 +342,14 @@ public class SearchResults {
     public int getCount(String table, String limit, String offset,
             String game, String year, String genre, String platform, String publisher,
             String order, boolean descend, int match) throws SQLException, java.lang.Exception {
+        return getCount(table,limit,offset,game,year,genre,platform,publisher,order,descend,match,0);
+    }
+
+    public int getCount(String table, String limit, String offset,
+            String game, String year, String genre, String platform, String publisher,
+            String order, boolean descend, int match, int leda) throws SQLException, java.lang.Exception {
         String countQuery = "SELECT COUNT(*) FROM ("+
-            buildQuery(table,limit,offset,game,year,genre,platform,publisher,order,descend,match)
+            buildQuery(table,limit,offset,game,year,genre,platform,publisher,order,descend,match,leda)
             +") AS countable";
         int count = -1;
         Connection dbconn=null;
