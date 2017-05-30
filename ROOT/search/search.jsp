@@ -73,7 +73,10 @@
         Integer offset = (int)request.getAttribute("searchOffset");
         Integer limit = (int)request.getAttribute("searchLimit");
         if (offset == null || limit==null) {
-        } else if (offset > -1 && limit > 0) {
+        } else if (offset > -1 && limit > -1) {
+            if (limit==0) {
+                limit = 1;
+            }
             int pages = count/limit;
             if (count % limit != 0) {
                 ++pages;

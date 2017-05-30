@@ -119,7 +119,7 @@ public class SearchServlet extends SearchBase
             if (leda > 0) {
                 useSubMatch=4;
             }
-            request.setAttribute("searchLimit",leda);
+            request.setAttribute("leda",leda);
 
             //column configurations
             Hashtable<String,Boolean> links = new Hashtable<String,Boolean>();
