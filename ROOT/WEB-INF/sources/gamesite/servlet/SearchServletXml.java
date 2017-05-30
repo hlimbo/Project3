@@ -156,6 +156,8 @@ public class SearchServletXml extends SearchBaseXml
                         year,genre,platform,publisher,order,descend,2);
                 }
 
+                results+="<searchCount>"+searchCount+"</searchCount>\n";
+
                 results+=ntreeToHtml(rows,request,null,links,images,externalLinks,ignores)+"\n";
             } else {
                 ArrayList<HashMap<String,String>> rows=null;
@@ -175,12 +177,12 @@ public class SearchServletXml extends SearchBaseXml
                     searchCount = SearchResults.getInstance().getCount(table,limit,offset,game,
                         year,genre,platform,publisher,order,descend,2);
                 }
+                results+="<searchCount>"+searchCount+"</searchCount>\n";
 
                 for (HashMap<String,String> row : rows) {
                     results+=rowToHtml(row,request,table,links,images,externalLinks,ignores)+"\n";
                 }
             }
-            results+="<searchCount>"+searchCount+"</searchCount>\n";
             results+=SearchBaseXml.xmlFooter;
 
             PrintWriter out = response.getWriter();
