@@ -121,7 +121,7 @@ public class QueryUtils {
                     }*/
                     statement.setString(offset,"%"+value+"%");
                     offset+=1;
-                    statement.setString(offset,value.toLowerCase());
+                    statement.setString(offset,value);
                     offset+=1;
                 } else {
                     statement.setString(offset,value);

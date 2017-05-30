@@ -158,7 +158,8 @@ Search
     string distance: <input type="TEXT" name="leda" value="0"/> <br />
 </form>
 <script>
-    var query = ["test1","test2","test3"];
+    var query = [];
+    var callID = 0;
     $('#gameNameField').keydown(function (ev){
         //var letter = ev.which;
         //avoid ASCII control characters
@@ -170,6 +171,7 @@ Search
                 typed=typed.substring(0,typed.length-1);
             }
         }
+        var ajaxID = ++callID;
         $.ajax({ 
             url : "/search/xquery",
             //data : "name="+encodeURIComponent(typed)+"&limit=10&match=3",
@@ -180,11 +182,11 @@ Search
             match : 3,
             leda : 0},
             success: function (data) {
+                //$('#gameNameField').autocomplete("disable");
                 xmlDoc = $.parseXML(data);
                 xmlDoc = $(data);
-                delete query;
-                query = [];
-                if (xmlDoc != null) {
+                if (xmlDoc != null && ajaxID==callID) {
+                   query.length=0;
                    $xml = $(xmlDoc);
                    names = $xml.find('.games_name');
                    for (i=0;i<names.length;++i) {
@@ -195,13 +197,18 @@ Search
                    }
                 }
                 //alert(query);
+                var quSource = function (ev,ui) {
+                        ui(query);
+                }
                 var complete = $('#gameNameField').autocomplete({
                     //source: query
-                    source : function (ev,ui) {
-                        ui(query);
-                    }
+                    source : quSource
                 });
+                //$('#gameNameField').autocomplete("destroy");
+                //$('#gameNameField').autocomplete("search",typed.trim());
+                //$('#gameNameField').autocomplete("enable");
                 $('#gameNameField').autocomplete("search",typed.trim());
+                //$('#gameNameField').autocomplete("option",{source : quSource});
             },
             failure : function (data) {
                 alert("AJAX request failed!");
