@@ -97,12 +97,12 @@ public class SearchServletXml extends SearchBaseXml
                 }
             }
 
-            String ledaStr = (String) request.getParameter("limit");
+            String ledaStr = (String) request.getParameter("leda");
             Integer ledaMax = 15;
             Integer leda = 0;
             results+="<leda>";
             if (ledaStr==null) {
-                ledaStr=ledaMax.toString();
+                ledaStr="0";
             } else {
                 ledaStr = ledaStr.replaceAll("[\\D]","");
             }

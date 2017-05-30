@@ -152,7 +152,7 @@ Search
     exact search?: <input type="checkbox" name="match" value="true" /> <BR />
     <input type="HIDDEN" name="forward" <%= "value="+request.getRequestURI() %> /> --%>
     <input type="SUBMIT" value="Search" /> <br />
-    leda: <input type="TEXT" name="leda" value="0"/> <BR />
+    leda: <input type="TEXT" name="leda" value="0"/> <br />
 </form>
 <script>
     var query = ["test1","test2","test3"];
@@ -174,7 +174,8 @@ Search
             //name : encodeURIComponent(typed.trim()).replace("%20","+"),
             name : typed.trim(),
             limit : 10,
-            match : 3},
+            match : 3,
+            leda : 0},
             success: function (data) {
                 xmlDoc = $.parseXML(data);
                 xmlDoc = $(data);

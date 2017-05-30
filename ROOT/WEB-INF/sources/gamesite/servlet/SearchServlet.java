@@ -93,11 +93,11 @@ public class SearchServlet extends SearchBase
                 }
             }
 
-            String ledaStr = (String) request.getParameter("limit");
+            String ledaStr = (String) request.getParameter("leda");
             Integer ledaMax = 15;
             Integer leda = 0;
             if (ledaStr==null) {
-                ledaStr=ledaMax.toString();
+                ledaStr="0";
             } else {
                 ledaStr = ledaStr.replaceAll("[\\D]","");
             }
