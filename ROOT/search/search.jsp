@@ -73,7 +73,7 @@
         Integer offset = (int)request.getAttribute("searchOffset");
         Integer limit = (int)request.getAttribute("searchLimit");
         if (offset == null || limit==null) {
-        } else if (offset > -1 && limit > -1) {
+        } else if (offset > -1 && limit > 0) {
             int pages = count/limit;
             if (count % limit != 0) {
                 ++pages;
@@ -152,7 +152,7 @@ Search
     exact search?: <input type="checkbox" name="match" value="true" /> <BR />
     <input type="HIDDEN" name="forward" <%= "value="+request.getRequestURI() %> /> --%>
     <input type="SUBMIT" value="Search" /> <br />
-    leda: <input type="TEXT" name="leda" value="0"/> <br />
+    string distance: <input type="TEXT" name="leda" value="0"/> <br />
 </form>
 <script>
     var query = ["test1","test2","test3"];

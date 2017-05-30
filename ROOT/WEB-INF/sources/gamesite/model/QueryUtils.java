@@ -69,11 +69,13 @@ public class QueryUtils {
                     searchTerm+=" AND ";
                     searchTerm+="("+term+" LIKE ? OR "+term+" LIKE ?)";
                 } else if (useSubMatch==4) {
-                    String[] subvalues = value.split(" ");
+                    /*String[] subvalues = value.split(" ");
                     for (int subvalue=0;subvalue<subvalues.length;++subvalue) {
                         searchTerm+=" AND ";
                         searchTerm+="("+term+" LIKE ? OR SIMILIARTO("+term+",?,"+leda+"))";
-                    }
+                    }*/
+                    searchTerm+=" AND ";
+                    searchTerm+="("+term+" LIKE ? OR SIMILIARTO("+term+",?,"+leda+"))";
                 } else if (useSubMatch==2) {
                     searchTerm+=" AND ";
                     searchTerm+=term+" LIKE ?";
@@ -109,14 +111,18 @@ public class QueryUtils {
                     statement.setString(offset,"% "+subvalues[subvalues.length-1]+"%");
                     offset+=1;
                 } else if (useSubMatch==4) {
-                    for (String subvalue : value.split(" ")) {
+                    /*for (String subvalue : value.split(" ")) {
                         //LIKE parameter
                         statement.setString(offset,"%"+subvalue+"%");
                         offset+=1;
                         //SIMILIARTO parameter
-                        statement.setString(offset,subvalue);
+                        statement.setString(offset,subvalue.toLowerCase());
                         offset+=1;
-                    }
+                    }*/
+                    statement.setString(offset,"%"+value+"%");
+                    offset+=1;
+                    statement.setString(offset,value.toLowerCase());
+                    offset+=1;
                 } else {
                     statement.setString(offset,value);
                     offset+=1;
