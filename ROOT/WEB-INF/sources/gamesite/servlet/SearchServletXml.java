@@ -88,12 +88,12 @@ public class SearchServletXml extends SearchBaseXml
             }
 
             String matchParameter = (String) request.getParameter("match");
-            int useSubMatch = 2;
+            int useSubMatch = 3;
             if (matchParameter != null) { //&& matchParameter.toLowerCase().trim().equals("true")) {
                 try {
                     useSubMatch = Integer.parseInt(matchParameter);
                 } catch (NumberFormatException ex) {
-                    useSubMatch = 2;
+                    useSubMatch = 3;
                 }
             }
 
@@ -119,6 +119,9 @@ public class SearchServletXml extends SearchBaseXml
                 ledaStr = leda.toString();
             } catch (NumberFormatException ex) {
                 ledaStr = "0";
+            }
+            if (leda>0) {
+                useSubMatch=4;
             }
             results+=ledaStr+"</leda>\n";
 

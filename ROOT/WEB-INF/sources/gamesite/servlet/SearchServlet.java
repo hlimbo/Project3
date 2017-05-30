@@ -84,12 +84,12 @@ public class SearchServlet extends SearchBase
             }
 
             String matchParameter = (String) request.getParameter("match");
-            int useSubMatch = 2;
+            int useSubMatch = 1;
             if (matchParameter != null) { //&& matchParameter.toLowerCase().trim().equals("true")) {
                 try {
                     useSubMatch = Integer.parseInt(matchParameter);
                 } catch (NumberFormatException ex) {
-                    useSubMatch = 2;
+                    useSubMatch = 1;
                 }
             }
 
@@ -114,6 +114,10 @@ public class SearchServlet extends SearchBase
                 ledaStr = leda.toString();
             } catch (NumberFormatException ex) {
                 ledaStr = "0";
+                leda=0;
+            }
+            if (leda > 0) {
+                useSubMatch=4;
             }
             request.setAttribute("searchLimit",leda);
 

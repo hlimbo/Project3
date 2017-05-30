@@ -151,7 +151,8 @@ Search
     results per page (max 50): <input type="text" name="limit" /> <BR />
     exact search?: <input type="checkbox" name="match" value="true" /> <BR />
     <input type="HIDDEN" name="forward" <%= "value="+request.getRequestURI() %> /> --%>
-        <input type="SUBMIT" value="Search" />
+    <input type="SUBMIT" value="Search" /> <br />
+    leda: <input type="TEXT" name="leda" value="0"/> <BR />
 </form>
 <script>
     var query = ["test1","test2","test3"];
