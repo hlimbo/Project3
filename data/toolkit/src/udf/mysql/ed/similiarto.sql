@@ -11,10 +11,10 @@
 DROP FUNCTION IF EXISTS SIMILIARTO;
 CREATE FUNCTION SIMILIARTO RETURNS INTEGER SONAME 'libsimiliarto.so';
 
-SELECT edth('abc', 'ad', 1);
-SELECT edth('abc', 'ad', 2);
-SELECT edth('abc', 'aaa', 1);
-SELECT edth('abc', 'aaa', 2);
-SELECT edth('abc', 'abcd', 1);
-SELECT edth('abc', 'abcd', 2);
-SELECT edth('a', 'abcdefghijklmnopqrstuvwxyz', 2);
+SELECT SIMILIARTO('abc', 'ad', 1);
+SELECT SIMILIARTO('abc', 'ad', 2);
+SELECT SIMILIARTO('abc', 'aaa', 1);
+SELECT SIMILIARTO('abc', 'aaa', 2);
+SELECT SIMILIARTO('abc', 'abcd', 1);
+SELECT SIMILIARTO('abc', 'abcd', 2);
+SELECT SIMILIARTO('a', 'abcdefghijklmnopqrstuvwxyz', 2);
