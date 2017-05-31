@@ -109,6 +109,14 @@ mysql plugin folder. Typically, this would be at
 /usr/lib/mysql/plugin/libsimiliarto.so
 Afterwards, run the similiarto.sql file to load the
 SIMILIARTO function into mysql.
+
+SIMILIARTO SEARCH
+--------------------------------------------------------------
+Does not apply to autocomplete searches. Similiarto query only executes when hitting the search button.
+Searches are Case sensitive e.g. Dark Souls is not the same as dark souls
+String distance option specifies how many characters a query needs to be off by to show a suggested search result.
+e.g. Dbrk Souls should return Dark Souls in the search results page with a string distance of 1.
+
 Android
 ------------------------------------------------------------
 SQL Query to insert dummy user
