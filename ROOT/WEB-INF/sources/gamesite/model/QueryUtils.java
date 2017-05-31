@@ -54,7 +54,7 @@ public class QueryUtils {
 
     public static String addSearchTerm (String value, String term, int useSubMatch, String leda) {
             String searchTerm = "";
-            if (value != null && value.trim() != "") {
+            if (value != null && !value.trim().equals("")) {
                 if (useSubMatch==1) {
                     for (String subvalue : value.split(" ")) {
                         searchTerm+=" AND ";
@@ -91,7 +91,7 @@ public class QueryUtils {
             int offset, int useSubMatch) throws SQLException {
 
             String searchTerm = "";
-            if (value != null && value.trim() != "") {
+            if (value != null && !value.trim().equals("")) {
                 if (useSubMatch==1) {
                     for (String subvalue : value.split(" ")) {
                         statement.setString(offset,"%"+subvalue+"%");
