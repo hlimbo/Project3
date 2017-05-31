@@ -41,17 +41,17 @@ public class DisplayBoxServlet extends HttpServlet
             String fieldUrl = "/display/query?table="+table+
                 "&columnName="+column+"&"+column+"="+
                 URLEncoder.encode(fieldValue,"UTF-8");
-            return("<span>"+column+": <a href=\""+fieldUrl+"\">"+fieldValue+"</a></span>");
+            return("<span>"+column+": <a href=\""+fieldUrl+"\">"+fieldValue+"</a></span><br />");
         } else if (images.containsKey(column) && images.get(column)){
             if (fieldValue.startsWith("/art")) {
-                return ("<span><img src=\""+fieldValue+"\" /></span>");
+                return ("<span><img src=\""+fieldValue+"\" /></span><br />");
             } else {
-                return ("<span><img src=\"http://"+fieldValue+"\" /></span>");
+                return ("<span><img src=\"http://"+fieldValue+"\" /></span><br />");
             }
         } else if (externalLinks.containsKey(column) && externalLinks.get(column)) {
-            return("<span>"+column+": <a href=\"http://"+fieldValue+"\">"+fieldValue+"</a></span>");
+            return("<span>"+column+": <a href=\"http://"+fieldValue+"\">"+fieldValue+"</a></span><br />");
         }else {
-            return ("<span>"+column+": "+fieldValue+"</span>");
+            return ("<span>"+column+": "+fieldValue+"</span><br />");
         }
     }
 
