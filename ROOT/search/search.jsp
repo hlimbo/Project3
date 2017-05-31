@@ -155,7 +155,7 @@ Search
     exact search?: <input type="checkbox" name="match" value="true" /> <BR />
     <input type="HIDDEN" name="forward" <%= "value="+request.getRequestURI() %> /> --%>
     <input type="SUBMIT" value="Search" /> <br />
-    string distance: <input type="TEXT" name="leda" value="0"/> <br />
+    string distance (max 15): <input type="TEXT" name="leda" value="0"/> <br />
 </form>
 <script>
     var query = [];
