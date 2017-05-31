@@ -160,17 +160,42 @@ Search
 <script>
     var query = [];
     var callID = 0;
+    var shift = false;
+    $('#gameNameField').keyup(function (ev){
+        if (ev.which == 16) {
+            shift = false;
+        }
+    });
     $('#gameNameField').keydown(function (ev){
         //var letter = ev.which;
         //avoid ASCII control characters
-        if (ev.which >= 32) {
+        if (ev.which == 16) {
+            shift = true;
+        }
+
+        if ((ev.which >= 32 && shift==false) || (ev.which>=65 && ev.which<=90)) {
             typed = $('#gameNameField').val()+String.fromCharCode(ev.which);
         } else {
+            switch(ev.which) {
+               case 56:
+                typed = $('#gameNameField').val()+"*";
+                break;
+               case 190:
+                typed = $('#gameNameField').val()+".";
+                break;
+               case 109:
+                typed = $('#gameNameField').val()+"-";
+                break;
+               case 173:
+                typed = $('#gameNameField').val()+"_";
+                break;
+            }
             typed = $('#gameNameField').val();
             if (ev.which==8) {
                 typed=typed.substring(0,typed.length-1);
             }
         }
+        typed=typed.replace(/[^\d|a-z|A-Z| |*|.|-|_]/g,'').trim();
         var ajaxID = ++callID;
         $.ajax({ 
             url : "/search/xquery",
