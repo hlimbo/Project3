@@ -121,3 +121,5 @@ Login for android app
 +-------+------------------+------------+-----------+----------------+------------------+----------+
 | 16293 | 0000574018613373 | tester     | mcteston  | tester streets | testee@email.com | email    |
 +-------+------------------+------------+-----------+----------------+------------------+----------+
+
+Passwords do not get saved when hitting the back button on the login page for security reasons
