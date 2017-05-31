@@ -109,3 +109,15 @@ mysql plugin folder. Typically, this would be at
 /usr/lib/mysql/plugin/libsimiliarto.so
 Afterwards, run the similiarto.sql file to load the
 SIMILIARTO function into mysql.
+Android
+------------------------------------------------------------
+SQL Query to insert dummy user
+USE gamedb;
+INSERT INTO customers (cc_id,first_name,last_name,address,email,password) VALUES("0000574018613373","tester","mcteston","tester streets", "testee@email.com", "email");
+
+Login for android app
++-------+------------------+------------+-----------+----------------+------------------+----------+
+| id    | cc_id            | first_name | last_name | address        | email            | password |
++-------+------------------+------------+-----------+----------------+------------------+----------+
+| 16293 | 0000574018613373 | tester     | mcteston  | tester streets | testee@email.com | email    |
++-------+------------------+------------+-----------+----------------+------------------+----------+
