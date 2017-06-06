@@ -189,7 +189,7 @@
 			database that is configured in the server.xml file.
 		</description>
 		<res-ref-name>
-			jdbc/TestDB
+			jdbc/GameDB
 		</res-ref-name>
 		<res-type>
 			javax.sql.DataSource
