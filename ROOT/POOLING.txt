@@ -1,0 +1,11 @@
+Pooling Changes
+-----------------------------------------
+These are the things changed in the project
+to add pooling.
+
+
+1) Adding a context.xml file to the META-INF folder.
+2) <resource-ref> tag was added to the web.xml in the
+    WEB-INF folder.
+3) WEB-INF/sources/gamesite/utils/DBConnection.java was
+    changed to return a Connection from a DataSource
