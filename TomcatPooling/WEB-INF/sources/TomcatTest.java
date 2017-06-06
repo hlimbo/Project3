@@ -59,7 +59,7 @@ public class TomcatTest extends HttpServlet {
 
             // Declare our statement
             Statement statement = dbcon.createStatement();
-            String query = "SELECT * from stars";
+            String query = "SELECT * from games";
 
             // Perform the query
             ResultSet rs = statement.executeQuery(query);
@@ -68,9 +68,9 @@ public class TomcatTest extends HttpServlet {
 
             // Iterate through each row of rs
             while (rs.next()) {
-                String m_FN = rs.getString("first_name");
-                String m_LN = rs.getString("last_name");
-                String m_dob = rs.getString("dob");
+                String m_FN = rs.getString("name");
+                String m_LN = rs.getString("price");
+                String m_dob = rs.getString("year");
                 out.println("<tr>" + "<td>" + m_FN + "</td>" + "<td>" + m_LN + "</td>" + "<td>" + m_dob + "</td>"
                         + "</tr>");
             }
