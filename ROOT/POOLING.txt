@@ -12,5 +12,9 @@ to add pooling.
 
 Master Slave Pooling
 -----------------------------------------
-Change the localhost in META-INF/context.xml to
+These are the things changed in the project
+to add pooling for multiple instances.
+1) Change the localhost in META-INF/context.xml to
     the ip address of the master.
+2) Change the WEB-INF/sources/gamesite/utils/DBConnection.java
+    to also be able to return a connection intended for read only.
