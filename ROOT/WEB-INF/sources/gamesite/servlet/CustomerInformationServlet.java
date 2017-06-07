@@ -39,11 +39,14 @@ public class CustomerInformationServlet extends HttpServlet
 			String expiration = (String)request.getParameter("expiration");
 			java.sql.Date expDate = java.sql.Date.valueOf(expiration);
 			
-			Statement statement = dbcon.createStatement();	
              String query = "SELECT * FROM creditcards WHERE id='" + cc_id 
-			 + "' and first_name='" + first_name + "' and last_name='" + last_name + "' and expiration='" + expDate + "';";
+			 + "' and first_name=? and last_name=? and expiration=?";
+			PreparedStatement statement = dbcon.prepareStatement(query);
 			  
-			ResultSet result = statement.executeQuery(query);
+            statement.setString(1,first_name);
+            statement.setString(2,last_name);
+            statement.setDate(3,expDate);
+			ResultSet result = statement.executeQuery();
 			//get the number of rows in the set executed by query
 			result.last();
 			int rowCount = result.getRow();
