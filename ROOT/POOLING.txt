@@ -9,3 +9,8 @@ to add pooling.
     WEB-INF folder.
 3) WEB-INF/sources/gamesite/utils/DBConnection.java was
     changed to return a Connection from a DataSource
+
+Master Slave Pooling
+-----------------------------------------
+Change the localhost in META-INF/context.xml to
+    the ip address of the master.
