@@ -42,7 +42,7 @@ public class SearchResults {
         PreparedStatement statement = null;
         ResultSet rs = null;
         try {
-            dbconn=DBConnection.create();
+            dbconn=DBConnection.createRead();
             statement = dbconn.prepareStatement(query);
             setSearchTerms(statement,game,year,publisher,genre,platform,match);
             rs = statement.executeQuery();
@@ -148,7 +148,7 @@ public class SearchResults {
         String itemQuery = null;
         Table sibData = new Table(child.data.name,"id");
         try {
-            conn = DBConnection.create();
+            conn = DBConnection.createRead();
             ArrayList<String> tables = QueryUtils.getTables(conn);
             String relationName = relations.get(root.data.name).get(child.data.name);
             ArrayList<Integer> sibIds = new ArrayList<Integer>();
@@ -315,7 +315,7 @@ public class SearchResults {
         }
         Connection dbconn = null;
         try {
-            dbconn = DBConnection.create();
+            dbconn = DBConnection.createRead();
             NTreeNode<String> siblings = QueryUtils.getSiblings(dbconn,table);
             rootSearch(root,siblings, new HashMap<String,Boolean>(),
                     new HashMap<String,NTreeNode<Table>>(), QueryUtils.getRelations(dbconn));
@@ -354,7 +354,7 @@ public class SearchResults {
         int count = -1;
         Connection dbconn=null;
         try {
-            dbconn=DBConnection.create();
+            dbconn=DBConnection.createRead();
             PreparedStatement statement = dbconn.prepareStatement(countQuery);
             setSearchTerms(statement,game,year,publisher,genre,platform,match);
             ResultSet rs = statement.executeQuery();
