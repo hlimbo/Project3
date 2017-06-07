@@ -62,15 +62,16 @@ public class TomcatFormReCaptcha extends HttpServlet
 
               Connection dbcon = DriverManager.getConnection(loginUrl, loginUser, loginPasswd);
               // Declare our statement
-              Statement statement = dbcon.createStatement();
 
-	      String lastname = request.getParameter("lastname");
-              String query = "SELECT * from games where name = '" + lastname + "'";
+	        String lastname = request.getParameter("lastname");
+              String query = "SELECT * from games where name = ?";
+            PreparedStatement statement = dbcon.prepareStatement(query);
 		
 
+            statement.setString(1,lastname);
 		out.println(query);
               // Perform the query
-              ResultSet rs = statement.executeQuery(query);
+              ResultSet rs = statement.executeQuery();
 
               out.println("<TABLE>");
 		out.println("HELLO");
