@@ -152,7 +152,7 @@ public class QueryUtils {
 
     public static HashMap<String,String> getColumns (Connection conn,String tableName) throws SQLExceptionHandler, java.lang.Exception {
         HashMap<String,String> result = new HashMap<String,String>();
-        conn = DBConnection.create();
+        conn = DBConnection.createRead();
         DatabaseMetaData metadataDB = conn.getMetaData();
 		ResultSet tableColumns = metadataDB.getColumns(conn.getCatalog(),null,tableName, "%");
         while(tableColumns.next()) {

@@ -19,4 +19,7 @@ to add pooling for multiple instances.
 2) Change the WEB-INF/sources/gamesite/utils/DBConnection.java
     to also be able to return a connection intended for read only.
 3) Change servlets that use read only connections to use the new
-    function.
+    function. For our project these files where QueryUtils.java,
+    LoginPageServlet.java, ShoppingCartServlet.java, LoginHandler.java,
+    and SearchResults.java
+4) Recompile all the files that were changed.

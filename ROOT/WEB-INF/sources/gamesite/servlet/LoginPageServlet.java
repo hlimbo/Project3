@@ -25,7 +25,7 @@ public class LoginPageServlet extends HttpServlet
        try
 	   {
 				
-			Connection dbcon = DBConnection.create();
+			Connection dbcon = DBConnection.createRead();
 
 			//Query for email and password in database
 			String email = request.getParameter("email");

@@ -57,7 +57,7 @@ public class ShoppingCartServlet extends HttpServlet
 			{
 				try
 				{
-					Connection dbcon = DBConnection.create();
+					Connection dbcon = DBConnection.createRead();
 					
 					//query for item to add in cart
 					Integer game_id = Integer.valueOf(id);

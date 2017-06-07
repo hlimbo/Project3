@@ -18,7 +18,7 @@ public class LoginHandler {
         throws SQLException, Exception {
         Connection conn = null;
         try {
-            conn = DBConnection.create();
+            conn = DBConnection.createRead();
             HashMap<String,String> params = ParameterParse.getQueryParameters(request.getQueryString());
             String email = params.get("email");
             email=email.trim();
@@ -46,7 +46,7 @@ public class LoginHandler {
     public static int login(HttpServletRequest request, HttpServletResponse response, String table) throws SQLException, Exception {
         Connection conn = null;
         try {
-            conn = DBConnection.create();
+            conn = DBConnection.createRead();
             HashMap<String,String> params = ParameterParse.getQueryParameters(request.getQueryString());
             String email = params.get("email");
             email=email.trim();
