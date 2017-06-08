@@ -166,6 +166,8 @@ public class SearchServlet extends SearchBase
 
             int searchCount=-1;
             String results = "";
+            long queryStartTime = System.nanoTime();
+            long queryEndTime = queryStartTime;
             if (table.equals("games")) {
                 NTreeNode<Table> rows=null;
                 if (useSubMatch==1) {
@@ -190,6 +192,7 @@ public class SearchServlet extends SearchBase
                         year,genre,platform,publisher,order,descend,2);
                 }
 
+                queryEndTime = System.nanoTime();
                 results+=ntreeToHtml(rows,request,null,links,images,externalLinks,ignores);
             } else {
                 ArrayList<HashMap<String,String>> rows=null;
@@ -215,6 +218,8 @@ public class SearchServlet extends SearchBase
                         year,genre,platform,publisher,order,descend,2);
                 }
 
+                queryEndTime = System.nanoTime();
+
                 for (HashMap<String,String> row : rows) {
                     results+=rowToHtml(row,request,table,links,images,externalLinks,ignores);
                 }
@@ -236,6 +241,13 @@ public class SearchServlet extends SearchBase
             OutputStream out = new BufferedOutputStream(Files.newOutputStream(
                         Paths.get("./ts.txt"), CREATE, APPEND));
             byte data[] = (elapsedTime.toString()+"\n").getBytes();
+            out.write(data);
+            out.flush();
+            out.close();
+            elapsedTime = queryEndTime - queryStartTime;
+            out = new BufferedOutputStream(Files.newOutputStream(
+                        Paths.get("./tj.txt"), CREATE, APPEND));
+            data = (elapsedTime.toString()+"\n").getBytes();
             out.write(data);
             out.flush();
             out.close();
