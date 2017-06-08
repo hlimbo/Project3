@@ -2,3 +2,11 @@ Logging
 ------------------------------------------------
 ts.txt and tj.txt will appear in directory
     that the server is started from.
+
+Averaging Log File
+------------------------------------------------
+avgLog.py will return the average of all the numbers
+in either the ts.txt or tj.txt file. It just has
+to be given the file name as an argument
+
+    python avgLog.py path/to/ts.txt
