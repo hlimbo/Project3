@@ -1,0 +1,4 @@
+Logging
+------------------------------------------------
+ts.txt and tj.txt will appear in directory
+    that the server is started from.
