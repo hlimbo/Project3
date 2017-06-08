@@ -131,3 +131,11 @@ Login for android app
 +-------+------------------+------------+-----------+----------------+------------------+----------+
 
 Passwords do not get saved when hitting the back button on the login page for security reasons
+
+Averaging Log File
+------------------------------------------------
+avgLog.py will return the average of all the numbers
+in either the ts.txt or tj.txt file. It just has
+to be given the file name as an argument
+
+    python avgLog.py path/to/ts.txt

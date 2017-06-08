@@ -1,0 +1,4 @@
+Prepared Statements
+-----------------------------------------
+A lot of the code was already using prepared statement.
+However, some files were changed to start using statements.
