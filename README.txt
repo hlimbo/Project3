@@ -21,3 +21,28 @@ JMeter test file
 The JMeter plans are within the war file. Additionally,
 the file it pulls the get parameters from is the included
 queryList.txt file.
+
+Example customer and credit card for website demonstration
+------------------------------------------------------------
+
+For website login:
+
+email:   einti@ntag.edu 
+password: snZtoXfqs4Fpe0C9Op53
+
+Alternatively, an easier dummy user can be used for login
+
+email:   user@user.edu 
+password: password
+
+For confirmation of purchase:
+
+First Name: Tina
+Last Name: Watson
+Credit Card Number: 0000574018613373  
+Expiration Date: 2018-11-12
+
+For Further Information
+------------------------------------------------------------
+There is a more detailed README.txt within the 
+gamesstation_webapp.war file
