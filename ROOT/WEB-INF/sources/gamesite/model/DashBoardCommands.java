@@ -32,33 +32,32 @@ public class DashBoardCommands {
         }
         try {
             conn = DBConnection.create();
-            PreparedStatement addStmt = conn.prepareStatement("CALL add_game(?,?,?,?,?,?,?)");
-            addStmt.setString(1,name.trim());
-            addStmt.setString(2,year.trim());
-            addStmt.setString(3,price.trim());
+            Statement addStmt = conn.createStatement();
+            String addQuery = "CALL add_game('"+name.trim()+"','"+year.trim()+"','"+price.trim()+"'";
             if (platform==null) {
-                addStmt.setString(4,null);
+                addQuery+=", null";
             } else {
-                addStmt.setString(4,platform.trim());
+                addQuery+=",'"+platform.trim()+"'";
             }
             if (publisher==null) {
-                addStmt.setString(5,null);
-                addStmt.setString(6,null);
+                addQuery+=",null";
+                addQuery+=",null";
             } else {
-                addStmt.setString(5,publisher.trim());
+                addQuery+=",'"+publisher.trim()+"'";
                 if (founded==null) {
-                    addStmt.setString(6,null);
+                    addQuery+=",null";
                 } else {
-                    addStmt.setString(6,founded.trim());
+                    addQuery+=",'"+founded.trim()+"'";
                 }
             }
             if (genre==null) {
-                addStmt.setString(7,null);
+                addQuery+=",null";
             } else {
-                addStmt.setString(7,genre.trim());
+                addQuery+=",'"+genre.trim()+"'";
             }
+            addQuery+=")";
             try {
-                addStmt.executeUpdate();
+                addStmt.executeUpdate(addQuery);
             } catch (SQLException ex) {
                 //Invalid year
                 if (ex!=null && ex.getErrorCode()==1264) {
@@ -130,28 +129,25 @@ public class DashBoardCommands {
         String query ="";
         try {
             conn = DBConnection.create();
-            PreparedStatement count;
-            query = "SELECT COUNT(*) FROM publishers WHERE publisher = ?";
-            count = conn.prepareStatement(query);
-            count.setString(1,publisher);
-            ResultSet rs = count.executeQuery();
+            Statement count;
+            query = "SELECT COUNT(*) FROM publishers WHERE publisher = '"+publisher+"'";
+            count = conn.createStatement();
+            ResultSet rs = count.executeQuery(query);
             rs.next();
             int exists = rs.getInt(1);
             rs.close();
             count.close();
             if (exists == 0) {
-                PreparedStatement insert;
+                Statement insert;
                 if (year != null) {
-                    query = "INSERT INTO publishers (publisher, founded) VALUES (?,?)";
-                    insert = conn.prepareStatement(query);
-                    insert.setString(2,year);
+                    query = "INSERT INTO publishers (publisher, founded) VALUES ('"+publisher+"','"+year+"')";
+                    insert = conn.createStatement();
                 } else {
-                    query = "INSERT INTO publishers (publisher, founded) VALUES (?,null)";
-                    insert = conn.prepareStatement(query);
+                    query = "INSERT INTO publishers (publisher, founded) VALUES ('"+publisher+"',null)";
+                    insert = conn.createStatement();
                 }
-                insert.setString(1,publisher);
                 try {
-                    insert.executeUpdate();
+                    insert.executeUpdate(query);
                 } catch (SQLException ex) {
                     //Invalid year
                     if (ex!=null && ex.getErrorCode()==1264) {
