@@ -81,7 +81,7 @@ public class DisplayBoxServlet extends HttpServlet
                 tables.add(tableMeta.getString("TABLE_NAME"));
             }
             tableMeta.close();
-            PreparedStatement statement;
+            Statement statement;
 
             String table = "games";
             table=table.replaceAll("[^\\w]","_");
@@ -114,12 +114,11 @@ public class DisplayBoxServlet extends HttpServlet
             String masterTable = "platforms_of_games NATURAL JOIN genres_of_games NATURAL JOIN publishers_of_games";
             //duplicates due to games on multiple platforms, with multiple genres, or etc...
             String query = "SELECT DISTINCT "+table+".* FROM games, publishers, platforms, genres, "+masterTable+" WHERE "
-                +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id AND genres.id=genre_id AND "+table+"."+column+"=?";
-            statement = dbcon.prepareStatement(query);
-            statement.setString(1,columnValue);
+                +"games.id=game_id AND publishers.id=publisher_id AND platforms.id=platform_id AND genres.id=genre_id AND "+table+"."+column+"='"+columnValue+"'";
+            statement = dbcon.createStatement();
 
             // Perform the query
-            ResultSet rs = statement.executeQuery();
+            ResultSet rs = statement.executeQuery(query);
 
             String id;
             String gameID = "";
@@ -175,8 +174,8 @@ public class DisplayBoxServlet extends HttpServlet
             //results+="<div><span>"+columnValue+"</span></div><div>";
             //results+="<div>";
             query="SELECT DISTINCT * FROM "+table+" WHERE id="+id;
-            statement=dbcon.prepareStatement(query);
-            rs = statement.executeQuery();
+            statement=dbcon.createStatement();
+            rs = statement.executeQuery(query);
             while (rs.next()) {
                 results+="<div><span>";
                 ResultSetMetaData meta = rs.getMetaData();
@@ -224,8 +223,8 @@ public class DisplayBoxServlet extends HttpServlet
                             +tableIDCond;
                         String originalQuery = query;
                         query = "SELECT COUNT(*) FROM ("+query+") AS countable";
-                        PreparedStatement gameCountStatement = dbcon.prepareStatement(query);
-                        ResultSet gameCountRs= gameCountStatement.executeQuery();
+                        Statement gameCountStatement = dbcon.createStatement();
+                        ResultSet gameCountRs= gameCountStatement.executeQuery(query);
                         gameCountRs.next();
                         gameCount=gameCountRs.getInt(1);
                         gameCountStatement.close();
@@ -235,8 +234,8 @@ public class DisplayBoxServlet extends HttpServlet
                         query="SELECT DISTINCT * FROM "+tbl+" WHERE "+tableIDCond;
                     }
                     //request.setAttribute("displayGameCount",gameCount);
-                    statement=dbcon.prepareStatement(query);
-                    rs = statement.executeQuery();
+                    statement=dbcon.createStatement();
+                    rs = statement.executeQuery(query);
                     results += "<span>"; //<TABLE border>";
                     ArrayList<String> fields = new ArrayList<String>();
                     ArrayList<String> checkouts = new ArrayList<String>();
@@ -249,10 +248,9 @@ public class DisplayBoxServlet extends HttpServlet
                             if (columnName.compareToIgnoreCase(tableIDField) != 0) {
                                 //By naming convention of database
                                 String parentTable = columnName.substring(0,columnName.length()-3)+"s";
-                                query= "SELECT DISTINCT * FROM "+parentTable+" WHERE id=?";
-                                PreparedStatement parentStatement=dbcon.prepareStatement(query);
-                                parentStatement.setString(1,rs.getString(i));
-                                ResultSet parentResult = parentStatement.executeQuery();
+                                query= "SELECT DISTINCT * FROM "+parentTable+" WHERE id='"+rs.getString(i)+"'";
+                                Statement parentStatement=dbcon.createStatement();
+                                ResultSet parentResult = parentStatement.executeQuery(query);
                                 ResultSetMetaData parentMeta = parentResult.getMetaData();
                                 while (parentResult.next()) {
                                     for (int j=1;j<=parentMeta.getColumnCount();++j) {
