@@ -159,6 +159,7 @@ public class SearchServlet extends SearchBase
             }
 
             String game = (String) request.getParameter("name");
+            game = game.replaceAll("'","''");
             String year = (String) request.getParameter("year");
             String publisher = (String) request.getParameter("publisher");
             String genre = (String) request.getParameter("genre");
