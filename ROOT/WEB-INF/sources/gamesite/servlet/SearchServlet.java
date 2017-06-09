@@ -1,6 +1,9 @@
 package gamesite.servlet;
 
+import static java.nio.file.StandardOpenOption.*;
 import java.io.*;
+import java.nio.*;
+import java.nio.file.*;
 import java.net.*;
 import java.sql.*;
 import java.text.*;
@@ -24,6 +27,7 @@ public class SearchServlet extends SearchBase
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException
     {
+        long startTime = System.nanoTime();
         response.setContentType("text/html");    // Response mime type
 
         String returnLink = "<a href=\"/\"> Return to home </a>";
@@ -162,6 +166,8 @@ public class SearchServlet extends SearchBase
 
             int searchCount=-1;
             String results = "";
+            long queryStartTime = System.nanoTime();
+            long queryEndTime = queryStartTime;
             if (table.equals("games")) {
                 NTreeNode<Table> rows=null;
                 if (useSubMatch==1) {
@@ -186,6 +192,7 @@ public class SearchServlet extends SearchBase
                         year,genre,platform,publisher,order,descend,2);
                 }
 
+                queryEndTime = System.nanoTime();
                 results+=ntreeToHtml(rows,request,null,links,images,externalLinks,ignores);
             } else {
                 ArrayList<HashMap<String,String>> rows=null;
@@ -211,6 +218,8 @@ public class SearchServlet extends SearchBase
                         year,genre,platform,publisher,order,descend,2);
                 }
 
+                queryEndTime = System.nanoTime();
+
                 for (HashMap<String,String> row : rows) {
                     results+=rowToHtml(row,request,table,links,images,externalLinks,ignores);
                 }
@@ -227,7 +236,21 @@ public class SearchServlet extends SearchBase
             request.setAttribute("searchResults",results);
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(nextJSP); 
             dispatcher.forward(request,response);
-
+            long endTime = System.nanoTime();
+            Long elapsedTime = endTime - startTime;
+            OutputStream out = new BufferedOutputStream(Files.newOutputStream(
+                        Paths.get("./ts.txt"), CREATE, APPEND));
+            byte data[] = (elapsedTime.toString()+"\n").getBytes();
+            out.write(data);
+            out.flush();
+            out.close();
+            elapsedTime = queryEndTime - queryStartTime;
+            out = new BufferedOutputStream(Files.newOutputStream(
+                        Paths.get("./tj.txt"), CREATE, APPEND));
+            data = (elapsedTime.toString()+"\n").getBytes();
+            out.write(data);
+            out.flush();
+            out.close();
         }
         catch (SQLExceptionHandler ex) {
             PrintWriter out = response.getWriter();
@@ -252,7 +275,6 @@ public class SearchServlet extends SearchBase
             ex.printStackTrace(out);
             out.println(ex.getMessage() + "<br />\n"+returnLink+"</P></BODY></HTML>");
             out.close();
-            return;
         }
     }
 
