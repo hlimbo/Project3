@@ -8,3 +8,19 @@ The files changed to include PreparedStatements were
         CustomerInformationServlet.java
     within WEB-INF/sources/recaptcha
         TomcatFormReCaptcha.java 
+
+In the end, all the files that use PreparedStatements are
+    within WEB-INF/sources/gamesite/servlet
+        LoginPageServlet.java 
+        CustomerInformationServlet.java
+        DisplayServlet.java
+        DisplayServletXml.java
+        DisplayBoxServlet.java
+    within WEB-INF/sources/gamesite/utils
+        SQLQuery.java
+    within WEB-INF/sources/gamesite/model
+        SearchResults.java
+        DashBoardCommands.java
+        QueryUtils.java
+    within WEB-INF/sources/recaptcha
+        TomcatFormReCaptcha.java 
