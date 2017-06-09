@@ -31,11 +31,9 @@ public class LoginPageServlet extends HttpServlet
 			String email = request.getParameter("email");
 			email = email.trim();
 			String password = request.getParameter("password");
-			String query = "SELECT * from customers where email = ? and password = ?";
-			PreparedStatement statement = dbcon.prepareStatement(query);	
-            statement.setString(1,email);
-            statement.setString(2,password);
-			ResultSet result = statement.executeQuery();
+			String query = "SELECT * from customers where email = '"+email+"' and password = '"+password+"'";
+			Statement statement = dbcon.createStatement();	
+			ResultSet result = statement.executeQuery(query);
 			
 			//Validate Recaptcha	
 			String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
