@@ -58,77 +58,33 @@ public class QueryUtils {
                 if (useSubMatch==1) {
                     for (String subvalue : value.split(" ")) {
                         searchTerm+=" AND ";
-                        searchTerm+=term+" LIKE ?";
+                        searchTerm+=term+" LIKE '%"+subvalue+"%'";
                     }
                 } else if (useSubMatch==3) {
                     String[] subvalues = value.split(" ");
                     for (int subvalue=0;subvalue<subvalues.length-1;++subvalue) {
                         searchTerm+=" AND ";
-                        searchTerm+=term+" LIKE ?";
+                        searchTerm+=term+" LIKE '%"+subvalue+"%'";
                     }
                     searchTerm+=" AND ";
-                    searchTerm+="("+term+" LIKE ? OR "+term+" LIKE ?)";
+                    searchTerm+="("+term+" LIKE '"+subvalues[subvalues.length-1]+"%' OR "+term+" LIKE '% "+subvalues[subvalues.length-1]+"%')";
                 } else if (useSubMatch==4) {
                     /*String[] subvalues = value.split(" ");
                     for (int subvalue=0;subvalue<subvalues.length;++subvalue) {
                         searchTerm+=" AND ";
-                        searchTerm+="("+term+" LIKE ? OR SIMILIARTO("+term+",?,"+leda+"))";
+                        searchTerm+="("+term+" LIKE '"++"' OR SIMILIARTO("+term+",'"++"',"+leda+"))";
                     }*/
                     searchTerm+=" AND ";
-                    searchTerm+="("+term+" LIKE ? OR SIMILIARTO("+term+",?,"+leda+"))";
+                    searchTerm+="("+term+" LIKE '%"+value+"%' OR SIMILIARTO("+term+",'"+value+"',"+leda+"))";
                 } else if (useSubMatch==2) {
                     searchTerm+=" AND ";
-                    searchTerm+=term+" LIKE ?";
+                    searchTerm+=term+" LIKE '"+value+"'";
                 } else {
                     searchTerm+=" AND ";
-                    searchTerm+=term+" = ?";
+                    searchTerm+=term+" = '"+value+"'";
                 }
             }
             return searchTerm;
-    }
-
-    public static int setSearchTerm (String value, String term, PreparedStatement statement, 
-            int offset, int useSubMatch) throws SQLException {
-
-            String searchTerm = "";
-            if (value != null && !value.trim().equals("")) {
-                if (useSubMatch==1) {
-                    for (String subvalue : value.split(" ")) {
-                        statement.setString(offset,"%"+subvalue+"%");
-                        offset+=1;
-                    }
-                } else if (useSubMatch==3) {
-                    String[] subvalues = value.split(" ");
-                    //full search for all words except last word
-                    for (int subvalue=0;subvalue<subvalues.length-1;++subvalue) {
-                        statement.setString(offset,"%"+subvalues[subvalue]+"%");
-                        offset+=1;
-                    }
-                    //treat last word as a prefix
-                    //statement.setString(offset,"%^+"+subvalues[subvalues.length-1]+"%");
-                    statement.setString(offset,subvalues[subvalues.length-1]+"%");
-                    offset+=1;
-                    statement.setString(offset,"% "+subvalues[subvalues.length-1]+"%");
-                    offset+=1;
-                } else if (useSubMatch==4) {
-                    /*for (String subvalue : value.split(" ")) {
-                        //LIKE parameter
-                        statement.setString(offset,"%"+subvalue+"%");
-                        offset+=1;
-                        //SIMILIARTO parameter
-                        statement.setString(offset,subvalue.toLowerCase());
-                        offset+=1;
-                    }*/
-                    statement.setString(offset,"%"+value+"%");
-                    offset+=1;
-                    statement.setString(offset,value);
-                    offset+=1;
-                } else {
-                    statement.setString(offset,value);
-                    offset+=1;
-                }
-            }
-            return offset;
     }
 
     public static String getRelationIdName (String table) {

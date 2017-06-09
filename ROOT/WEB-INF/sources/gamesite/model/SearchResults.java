@@ -39,13 +39,13 @@ public class SearchResults {
             boolean descend, int match) throws SQLException, java.lang.Exception {
         ArrayList<HashMap<String,String>> results = new ArrayList<HashMap<String,String>> ();
         Connection dbconn = null;
-        PreparedStatement statement = null;
+        Statement statement = null;
         ResultSet rs = null;
         try {
             dbconn=DBConnection.createRead();
-            statement = dbconn.prepareStatement(query);
-            setSearchTerms(statement,game,year,publisher,genre,platform,match);
-            rs = statement.executeQuery();
+            statement = dbconn.createStatement();
+            //setSearchTerms(statement,game,year,publisher,genre,platform,match);
+            rs = statement.executeQuery(query);
             while (rs.next()) {
                 results.add(QueryUtils.tableRow(rs));
             }
@@ -90,16 +90,6 @@ public class SearchResults {
             query = "SELECT "+table+".* FROM "+table;
         }
         return query;
-    }
-
-    private static void setSearchTerms (PreparedStatement statement,String name, String year, String publisher,
-            String genre, String platform,int useSubMatch) throws SQLException {
-        int statementOffset = 1;
-        statementOffset = QueryUtils.setSearchTerm(name,"name",statement,statementOffset,useSubMatch);
-        statementOffset = QueryUtils.setSearchTerm(year,"year",statement,statementOffset,useSubMatch);
-        statementOffset = QueryUtils.setSearchTerm(publisher,"publisher",statement,statementOffset,useSubMatch);
-        statementOffset = QueryUtils.setSearchTerm(genre,"genre",statement,statementOffset,useSubMatch);
-        QueryUtils.setSearchTerm(platform,"platform",statement,statementOffset,useSubMatch);
     }
 
     public ArrayList<HashMap<String,String>> search (String table, String limit, String offset,
@@ -156,10 +146,9 @@ public class SearchResults {
             //By SQL schema convention, values.id = value_id in relation table
             String parentIdField = QueryUtils.getRelationIdName(root.data.name);
 		    itemQuery = "SELECT "+relationName+".* FROM "+relationName+" JOIN "+root.data.name
-                +" ON "+relationName+"."+parentIdField+"="+root.data.name+".id WHERE id=?";
-		    PreparedStatement statement = conn.prepareStatement(itemQuery);
-		    statement.setInt(1,Integer.parseInt(rootId));
-            result = statement.executeQuery();
+                +" ON "+relationName+"."+parentIdField+"="+root.data.name+".id WHERE id='"+rootId+"'";
+		    Statement statement = conn.createStatement();
+            result = statement.executeQuery(itemQuery);
             while (result.next()) {
                 String sibIdField = QueryUtils.getRelationIdName(child.data.name);
 		        ResultSetMetaData meta = result.getMetaData();
@@ -355,9 +344,9 @@ public class SearchResults {
         Connection dbconn=null;
         try {
             dbconn=DBConnection.createRead();
-            PreparedStatement statement = dbconn.prepareStatement(countQuery);
-            setSearchTerms(statement,game,year,publisher,genre,platform,match);
-            ResultSet rs = statement.executeQuery();
+            Statement statement = dbconn.createStatement();
+            //setSearchTerms(statement,game,year,publisher,genre,platform,match);
+            ResultSet rs = statement.executeQuery(countQuery);
             rs.next();
             count = rs.getInt(1);
         } finally {
