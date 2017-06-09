@@ -64,14 +64,13 @@ public class TomcatFormReCaptcha extends HttpServlet
               // Declare our statement
 
 	        String lastname = request.getParameter("lastname");
-              String query = "SELECT * from games where name = ?";
-            PreparedStatement statement = dbcon.prepareStatement(query);
+              String query = "SELECT * from games where name = '"+lastname+"'";
+            Statement statement = dbcon.createStatement();
 		
 
-            statement.setString(1,lastname);
 		out.println(query);
               // Perform the query
-              ResultSet rs = statement.executeQuery();
+              ResultSet rs = statement.executeQuery(query);
 
               out.println("<TABLE>");
 		out.println("HELLO");
