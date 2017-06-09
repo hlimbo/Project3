@@ -40,13 +40,10 @@ public class CustomerInformationServlet extends HttpServlet
 			java.sql.Date expDate = java.sql.Date.valueOf(expiration);
 			
              String query = "SELECT * FROM creditcards WHERE id='" + cc_id 
-			 + "' and first_name=? and last_name=? and expiration=?";
-			PreparedStatement statement = dbcon.prepareStatement(query);
+			 + "' and first_name='"+first_name+"' and last_name='"+last_name+"' and expiration='"+expiration+"'";
+			Statement statement = dbcon.createStatement();
 			  
-            statement.setString(1,first_name);
-            statement.setString(2,last_name);
-            statement.setDate(3,expDate);
-			ResultSet result = statement.executeQuery();
+			ResultSet result = statement.executeQuery(query);
 			//get the number of rows in the set executed by query
 			result.last();
 			int rowCount = result.getRow();
@@ -79,9 +76,6 @@ public class CustomerInformationServlet extends HttpServlet
 				}
 				
 				ShoppingCart cart = (ShoppingCart)session.getAttribute("cart");
-				//String gameIdQuery = "SELECT id FROM games WHERE id = ?";
-				String insertQuery = "INSERT INTO sales (customer_id, salesdate, game_id) VALUES( ?, CURDATE(), ?)";
-				PreparedStatement insertStatement = dbcon.prepareStatement(insertQuery);
 				//used to verify if the game id is a valid id in the database.
 				if(cart != null && !cart.isEmpty())
 				{
@@ -89,15 +83,16 @@ public class CustomerInformationServlet extends HttpServlet
 					for(Map.Entry<String,ShoppingCartItem> entry : cart.itemSet())
 					{
 						Integer gameID = Integer.valueOf(entry.getKey());						
-						insertStatement.setInt(1, customerID);
-						insertStatement.setInt(2, gameID);
+				        String insertQuery = "INSERT INTO sales (customer_id, salesdate, game_id) VALUES( "+customerID.toString()+", CURDATE(), "+gameID.toString()+")";
+				        Statement insertStatement = dbcon.createStatement();
 						
 						//insert game into sales table x times where x = quantity bought
 						for(int i = 0;i < entry.getValue().getQuantity(); ++i)
 						{
-							insertStatement.executeUpdate();
+							insertStatement.executeUpdate(insertQuery);
 						}
 						
+				        insertStatement.close();
 					}
 				}
 				else
@@ -105,7 +100,6 @@ public class CustomerInformationServlet extends HttpServlet
 					System.out.println("Cart is empty or has not been initialized");
 				}
 				
-				insertStatement.close();
 				session.setAttribute("first_name",first_name);				
 				response.sendRedirect("/CustomerInformation/confirmationPage.jsp");
 			}
