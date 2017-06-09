@@ -13,10 +13,9 @@ public class SQLQuery
 
 	public static ResultSet getTableInfo(Connection dbcon, int table_id, String table) throws SQLException
     {
-		String itemQuery = "SELECT * FROM "+table+" WHERE id=?";
-		PreparedStatement statement = dbcon.prepareStatement(itemQuery);
-		statement.setInt(1, table_id);
-		return statement.executeQuery();
+		String itemQuery = "SELECT * FROM "+table+" WHERE id='"+Integer.toString(table_id)+"'";
+		Statement statement = dbcon.createStatement();
+		return statement.executeQuery(itemQuery);
     }
 
 	//Note: can return a null ResultSet if game_id not found in database
@@ -28,11 +27,9 @@ public class SQLQuery
 	//Find and return login information if email and password exist in the table of the database, otherwise return null
 	public static ResultSet getLogin (Connection dbcon, String email, String password, String table) throws SQLException
 	{
-		String query = "Select * from "+table+" where email=? and password=?";
-		PreparedStatement statement = dbcon.prepareStatement(query);
-		statement.setString(1, email.trim());
-		statement.setString(2, password);
-		return statement.executeQuery();
+		String query = "Select * from "+table+" where email='"+email.trim()+"' and password='"+password+"'";
+		Statement statement = dbcon.createStatement();
+		return statement.executeQuery(query);
 	}
 	
 	//Find and return customer login information if email and password exist in database, otherwise return null
