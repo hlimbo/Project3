@@ -121,7 +121,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">singlesingle.txt</stringProp>
+          <stringProp name="filename">tencluster.txt</stringProp>
         </ResultCollector>
         <hashTree/>
       </hashTree>
