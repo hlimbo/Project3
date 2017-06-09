@@ -2,3 +2,9 @@ Prepared Statements
 -----------------------------------------
 A lot of the code was already using prepared statement.
 However, some files were changed to start using statements.
+The files changed to include PreparedStatements were
+    within WEB-INF/sources/gamesite/servlet
+        LoginPageServlet.java 
+        CustomerInformationServlet.java
+    within WEB-INF/sources/recaptcha
+        TomcatFormReCaptcha.java 
