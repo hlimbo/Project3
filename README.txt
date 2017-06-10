@@ -11,6 +11,11 @@ time.
 IP Addresses
 ------------------------------------------------
 instance 1 (load balancer): 34.201.9.40
+** Note: instance 1 both supports http and https protocol.
+
+http protocol: http://34.201.9.40
+https protocol: https://34.201.9.40:8443
+
 instance 2 (master): 34.206.54.116
 instance 3 (slave): 54.236.62.19
 
