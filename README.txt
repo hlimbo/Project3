@@ -16,8 +16,8 @@ instance 1 (load balancer): 34.201.9.40
 http protocol: http://34.201.9.40
 https protocol: https://34.201.9.40:8443
 
-instance 2 (master): 34.206.54.116
-instance 3 (slave): 54.236.62.19
+instance 2 (master): http://34.206.54.116:8080
+instance 3 (slave): http://54.236.62.19:8080
 
 google instance: 35.197.13.226
 
