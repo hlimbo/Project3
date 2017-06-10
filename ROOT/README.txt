@@ -2,7 +2,7 @@ WAR file deployment
 ------------------------------------------------------------
 Before beginning, rename your previous ROOT to something
 else to keep your original data. Afterwards, take the war 
-file and rename it from ccopelan_project3.war to ROOT.war 
+file and rename it from gamesstation_webapp.war to ROOT.war 
 and drop it into the webapps folder of your tomcat 
 installation. When the tomcat server is running, it should
 automatically create the ROOT folder after a little bit of 
