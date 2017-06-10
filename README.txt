@@ -12,7 +12,9 @@ avgLog.py will return the average of all the numbers
 in either the ts.txt or tj.txt file. It just has
 to be given the file name as an argument. The data files
 it is used on can be found within the gamesstation_webapp.war
-under the results/ folder.
+under the results/ folder. Alternatively, the results/
+folder has been included here so that the jmeter_report.html
+file is able to find the images it needs to include.
 
     python avgLog.py path/to/ts.txt
 
