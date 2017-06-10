@@ -28,15 +28,15 @@ td {
     <td>152</td>
     <td>64.05431153785011</td>
     <td>61.883862696063586</td>
-    <td>--</td>
+    <td>If there's only a single user, this seems the fastest.</td>
   </tr>
   <tr>
     <td>Case 2: HTTP/10 threads</td>
     <td><img src="results/tensingle.png" alt="Graph Results Screenshot Case 2" style="width:304px;height:228px;"></td>
-    <td>695<td>
+    <td>695</td>
     <td>561.9253553422642</td>
     <td>552.2557558403773</td>
-    <td>--</td>
+    <td>Slower due to multiple users.</td>
   </tr>
   <tr>
     <td>Case 3: HTTPS/10 threads</td>
@@ -44,7 +44,7 @@ td {
     <td>702</td>
     <td>567.5020188135849</td>
     <td>564.0815093041509</td>
-    <td>--</td>
+    <td>Overhead of HTTPS is minimal.</td>
   </tr>
   <tr>
     <td>Case 4: HTTP/10 threads/No prepared statements</td>
@@ -52,7 +52,7 @@ td {
     <td>682</td>
     <td>569.1595583320755</td>
     <td>565.185397125283</td>
-    <td>--</td>
+    <td>Slightly slower on the backend, but not a bottleneck of the system.</td>
   </tr>
   <tr>
     <td>Case 5: HTTP/10 threads/No connection pooling</td>
@@ -60,7 +60,7 @@ td {
     <td>767</td>
     <td>653.893960.68</td>
     <td>650.1646190343397</td>
-    <td>--</td>
+    <td>Slower due to not sharing connections.</td>
   </tr>
 
 </table> 
@@ -81,7 +81,7 @@ td {
     <td>178</td>
     <td>82.3648370972748</td>
     <td>80.78443371574564</td>
-    <td>--</td>
+    <td>Still fast due to being only user. However, the overhead of the load balancer slightly slows down the singler user.</td>
   </tr>
   <tr>
     <td>Case 2: HTTP/10 threads</td>
@@ -89,7 +89,7 @@ td {
     <td>444</td>
     <td>341.3877266826415</td>
     <td>338.44302851849055</td>
-    <td>--</td>
+    <td>Faster for multiple users thanks to load balancing.</td>
   </tr>
   <tr>
     <td>Case 3: HTTP/10 threads/No prepared statements</td>
@@ -97,7 +97,7 @@ td {
     <td>465</td>
     <td>327.8339110403774</td>
     <td>325.2315224279245</td>
-    <td>--</td>
+    <td>Statement reuse is not a bottleneck of the system.</td>
   </tr>
   <tr>
     <td>Case 4: HTTP/10 threads/No connection pooling</td>
@@ -105,7 +105,7 @@ td {
     <td>497</td>
     <td>386.8465304373585</td>
     <td>377.93995456</td>
-    <td>--</td>
+    <td>Slower due to not sharing connections.</td>
   </tr>
 
 </table> 
