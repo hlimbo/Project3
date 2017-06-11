@@ -13,7 +13,11 @@ IP Addresses
 instance 1 (load balancer): 34.201.9.40
 ** Note: instance 1 both supports http and https protocol.
 
+load balancer
 http protocol: http://34.201.9.40
+
+single instance tomcat (for jmeter testing)
+http protocol: http://34.201.9.40:8080
 https protocol: https://34.201.9.40:8443
 
 instance 2 (master): http://34.206.54.116:8080
